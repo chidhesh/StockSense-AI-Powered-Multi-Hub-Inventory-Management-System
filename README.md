@@ -127,7 +127,7 @@ The system recommends suitable IoT components such as sensors, microcontrollers,
 
 ## QR Code Tracking
 
-![QR Tracking](images/qr-tracking.png)
+![QR Tracking](images/qr-tracking.jpeg)
 
 ---
 

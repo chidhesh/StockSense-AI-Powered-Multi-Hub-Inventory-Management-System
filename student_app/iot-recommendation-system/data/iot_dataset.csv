@@ -1,0 +1,1201 @@
+project_title,description,category,sensors,actuators,controllers,components
+Fire Detection,detect fire using flame sensor variation 0,IoT,Motion Sensor|Humidity Sensor,Relay,ESP32,Motion Sensor|Humidity Sensor|Relay|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 1,Robotics,Flame Sensor|Humidity Sensor,None,ESP32,Flame Sensor|Humidity Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 2,Robotics,Soil Sensor,Motor Driver,ESP8266,Soil Sensor|Motor Driver|ESP8266
+Home Automation,control home devices using wifi variation 3,IoT,IR Sensor|Flame Sensor,Servo Motor,ESP8266,IR Sensor|Flame Sensor|Servo Motor|ESP8266
+Fire Detection,detect fire using flame sensor variation 4,IoT,Ultrasonic Sensor,Buzzer,ESP32,Ultrasonic Sensor|Buzzer|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 5,IoT,LDR Sensor,Buzzer,ESP32,LDR Sensor|Buzzer|ESP32
+Air Quality Monitoring,monitor pollution levels variation 6,IoT,Flame Sensor|IR Sensor,Valve,ESP32,Flame Sensor|IR Sensor|Valve|ESP32
+Home Automation,control home devices using wifi variation 7,IoT,IR Sensor|LDR Sensor,Valve,ESP32,IR Sensor|LDR Sensor|Valve|ESP32
+Smart Farming,monitor agriculture conditions variation 8,IoT,LDR Sensor|Motion Sensor,None,ESP32,LDR Sensor|Motion Sensor|ESP32
+Smart Lighting,automatic lighting control variation 9,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Lighting,automatic lighting control variation 10,IoT,IR Sensor|Flame Sensor,None,ESP8266,IR Sensor|Flame Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 11,IoT,Ultrasonic Sensor|Motion Sensor,Servo Motor,Arduino,Ultrasonic Sensor|Motion Sensor|Servo Motor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 12,IoT,LDR Sensor|Gas Sensor,None,Arduino,LDR Sensor|Gas Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 13,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Home Automation,control home devices using wifi variation 14,IoT,Temperature Sensor,Valve,ESP32,Temperature Sensor|Valve|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 15,Robotics,Ultrasonic Sensor|Humidity Sensor,None,ESP32,Ultrasonic Sensor|Humidity Sensor|ESP32
+Home Automation,control home devices using wifi variation 16,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 17,IoT,IR Sensor|Ultrasonic Sensor,Motor Driver,ESP32,IR Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 18,Robotics,Ultrasonic Sensor|Motion Sensor,Buzzer,Arduino,Ultrasonic Sensor|Motion Sensor|Buzzer|Arduino
+Home Automation,control home devices using wifi variation 19,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 20,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Parking,detect parking availability variation 21,IoT,LDR Sensor,Valve,ESP8266,LDR Sensor|Valve|ESP8266
+Smart Security System,detect intruders using sensors variation 22,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 23,IoT,LDR Sensor,Relay,Arduino,LDR Sensor|Relay|Arduino
+Line Following Robot,robot follows path using IR sensors variation 24,Robotics,Temperature Sensor|Flame Sensor,LED,ESP8266,Temperature Sensor|Flame Sensor|LED|ESP8266
+Smart Lighting,automatic lighting control variation 25,IoT,Gas Sensor|Motion Sensor,Relay,ESP8266,Gas Sensor|Motion Sensor|Relay|ESP8266
+Home Automation,control home devices using wifi variation 26,IoT,IR Sensor,Motor Driver,ESP32,IR Sensor|Motor Driver|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 27,IoT,Ultrasonic Sensor,Buzzer,ESP8266,Ultrasonic Sensor|Buzzer|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 28,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 29,IoT,Humidity Sensor|Soil Sensor,None,ESP32,Humidity Sensor|Soil Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 30,IoT,IR Sensor,None,ESP32,IR Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 31,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 32,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Home Automation,control home devices using wifi variation 33,IoT,Motion Sensor|Soil Sensor,None,ESP32,Motion Sensor|Soil Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 34,IoT,Ultrasonic Sensor,Motor Driver,ESP32,Ultrasonic Sensor|Motor Driver|ESP32
+Smart Farming,monitor agriculture conditions variation 35,IoT,LDR Sensor|Humidity Sensor,None,ESP32,LDR Sensor|Humidity Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 36,IoT,Ultrasonic Sensor|Gas Sensor,LED,ESP8266,Ultrasonic Sensor|Gas Sensor|LED|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 37,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 38,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 39,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 40,Robotics,Motion Sensor|Humidity Sensor,None,Arduino,Motion Sensor|Humidity Sensor|Arduino
+Home Automation,control home devices using wifi variation 41,IoT,Flame Sensor|Ultrasonic Sensor,Water Pump,ESP8266,Flame Sensor|Ultrasonic Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 42,Robotics,LDR Sensor|Humidity Sensor,None,ESP32,LDR Sensor|Humidity Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 43,IoT,Gas Sensor,Valve,ESP32,Gas Sensor|Valve|ESP32
+Air Quality Monitoring,monitor pollution levels variation 44,IoT,LDR Sensor|Gas Sensor,Buzzer,Arduino,LDR Sensor|Gas Sensor|Buzzer|Arduino
+Smart Security System,detect intruders using sensors variation 45,IoT,Motion Sensor|Flame Sensor,Valve,Arduino,Motion Sensor|Flame Sensor|Valve|Arduino
+Smart Lighting,automatic lighting control variation 46,IoT,Motion Sensor|Soil Sensor,Motor Driver,ESP32,Motion Sensor|Soil Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 47,Robotics,Motion Sensor,LED,ESP8266,Motion Sensor|LED|ESP8266
+Smart Parking,detect parking availability variation 48,IoT,Gas Sensor|Humidity Sensor,None,ESP8266,Gas Sensor|Humidity Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 49,IoT,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 50,Robotics,Gas Sensor|Ultrasonic Sensor,Relay,ESP32,Gas Sensor|Ultrasonic Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 51,IoT,Motion Sensor,Motor Driver,ESP8266,Motion Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 52,IoT,Motion Sensor|Temperature Sensor,Buzzer,Arduino,Motion Sensor|Temperature Sensor|Buzzer|Arduino
+Fire Detection,detect fire using flame sensor variation 53,IoT,Temperature Sensor|LDR Sensor,LED,Arduino,Temperature Sensor|LDR Sensor|LED|Arduino
+Smart Parking,detect parking availability variation 54,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 55,IoT,Motion Sensor,LED,Arduino,Motion Sensor|LED|Arduino
+Fire Detection,detect fire using flame sensor variation 56,IoT,Ultrasonic Sensor,Water Pump,ESP8266,Ultrasonic Sensor|Water Pump|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 57,IoT,Motion Sensor|Soil Sensor,None,ESP8266,Motion Sensor|Soil Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 58,IoT,IR Sensor,Relay,ESP32,IR Sensor|Relay|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 59,Robotics,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 60,IoT,Temperature Sensor|Humidity Sensor,None,ESP32,Temperature Sensor|Humidity Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 61,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 62,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 63,Robotics,Motion Sensor|IR Sensor,Water Pump,ESP32,Motion Sensor|IR Sensor|Water Pump|ESP32
+Smart Farming,monitor agriculture conditions variation 64,IoT,IR Sensor,Buzzer,Arduino,IR Sensor|Buzzer|Arduino
+Smart Security System,detect intruders using sensors variation 65,IoT,Motion Sensor|Gas Sensor,LED,ESP8266,Motion Sensor|Gas Sensor|LED|ESP8266
+Home Automation,control home devices using wifi variation 66,IoT,Soil Sensor|Temperature Sensor,None,ESP8266,Soil Sensor|Temperature Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 67,IoT,Temperature Sensor,Servo Motor,ESP8266,Temperature Sensor|Servo Motor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 68,IoT,Flame Sensor|Humidity Sensor,None,ESP32,Flame Sensor|Humidity Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 69,IoT,Soil Sensor,LED,ESP8266,Soil Sensor|LED|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 70,Robotics,IR Sensor,None,ESP32,IR Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 71,IoT,Temperature Sensor|Motion Sensor,None,ESP32,Temperature Sensor|Motion Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 72,IoT,Gas Sensor|LDR Sensor,Servo Motor,ESP32,Gas Sensor|LDR Sensor|Servo Motor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 73,Robotics,IR Sensor,None,ESP32,IR Sensor|ESP32
+Home Automation,control home devices using wifi variation 74,IoT,IR Sensor|LDR Sensor,Relay,Arduino,IR Sensor|LDR Sensor|Relay|Arduino
+Smart Farming,monitor agriculture conditions variation 75,IoT,Motion Sensor|Temperature Sensor,Servo Motor,ESP32,Motion Sensor|Temperature Sensor|Servo Motor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 76,IoT,Gas Sensor,Relay,ESP32,Gas Sensor|Relay|ESP32
+Smart Parking,detect parking availability variation 77,IoT,LDR Sensor|Soil Sensor,Buzzer,ESP32,LDR Sensor|Soil Sensor|Buzzer|ESP32
+Fire Detection,detect fire using flame sensor variation 78,IoT,Motion Sensor|Humidity Sensor,None,ESP32,Motion Sensor|Humidity Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 79,Robotics,LDR Sensor|IR Sensor,Buzzer,Arduino,LDR Sensor|IR Sensor|Buzzer|Arduino
+Smart Lighting,automatic lighting control variation 80,IoT,Humidity Sensor|IR Sensor,None,ESP8266,Humidity Sensor|IR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 81,IoT,Motion Sensor|LDR Sensor,Valve,Arduino,Motion Sensor|LDR Sensor|Valve|Arduino
+Line Following Robot,robot follows path using IR sensors variation 82,Robotics,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Home Automation,control home devices using wifi variation 83,IoT,Gas Sensor,Relay,ESP8266,Gas Sensor|Relay|ESP8266
+Smart Security System,detect intruders using sensors variation 84,IoT,IR Sensor,Buzzer,ESP8266,IR Sensor|Buzzer|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 85,Robotics,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 86,IoT,Temperature Sensor|Soil Sensor,None,Arduino,Temperature Sensor|Soil Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 87,Robotics,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Parking,detect parking availability variation 88,IoT,Soil Sensor|Gas Sensor,None,Arduino,Soil Sensor|Gas Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 89,IoT,IR Sensor,Relay,ESP32,IR Sensor|Relay|ESP32
+Line Following Robot,robot follows path using IR sensors variation 90,Robotics,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 91,IoT,IR Sensor|Flame Sensor,Water Pump,Arduino,IR Sensor|Flame Sensor|Water Pump|Arduino
+Smart Parking,detect parking availability variation 92,IoT,Flame Sensor,LED,Arduino,Flame Sensor|LED|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 93,IoT,Temperature Sensor|Soil Sensor,None,ESP8266,Temperature Sensor|Soil Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 94,IoT,Temperature Sensor,Motor Driver,ESP32,Temperature Sensor|Motor Driver|ESP32
+Smart Farming,monitor agriculture conditions variation 95,IoT,Ultrasonic Sensor|Soil Sensor,Relay,ESP8266,Ultrasonic Sensor|Soil Sensor|Relay|ESP8266
+Home Automation,control home devices using wifi variation 96,IoT,Motion Sensor|IR Sensor,Valve,ESP8266,Motion Sensor|IR Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 97,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Lighting,automatic lighting control variation 98,IoT,Motion Sensor|Ultrasonic Sensor,Relay,Arduino,Motion Sensor|Ultrasonic Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 99,IoT,IR Sensor|Motion Sensor,None,Arduino,IR Sensor|Motion Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 100,IoT,Humidity Sensor|Motion Sensor,Motor Driver,Arduino,Humidity Sensor|Motion Sensor|Motor Driver|Arduino
+Fire Detection,detect fire using flame sensor variation 101,IoT,Temperature Sensor|LDR Sensor,None,ESP32,Temperature Sensor|LDR Sensor|ESP32
+Home Automation,control home devices using wifi variation 102,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 103,Robotics,Humidity Sensor|LDR Sensor,Motor Driver,Arduino,Humidity Sensor|LDR Sensor|Motor Driver|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 104,IoT,Gas Sensor|Ultrasonic Sensor,Relay,ESP8266,Gas Sensor|Ultrasonic Sensor|Relay|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 105,IoT,Gas Sensor|IR Sensor,None,ESP8266,Gas Sensor|IR Sensor|ESP8266
+Smart Parking,detect parking availability variation 106,IoT,Gas Sensor,Relay,ESP32,Gas Sensor|Relay|ESP32
+Smart Farming,monitor agriculture conditions variation 107,IoT,LDR Sensor,Servo Motor,ESP32,LDR Sensor|Servo Motor|ESP32
+Smart Farming,monitor agriculture conditions variation 108,IoT,Ultrasonic Sensor|Temperature Sensor,None,Arduino,Ultrasonic Sensor|Temperature Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 109,Robotics,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Smart Parking,detect parking availability variation 110,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 111,IoT,Humidity Sensor|Ultrasonic Sensor,None,ESP32,Humidity Sensor|Ultrasonic Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 112,IoT,LDR Sensor|Motion Sensor,None,Arduino,LDR Sensor|Motion Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 113,IoT,Humidity Sensor|Motion Sensor,None,Arduino,Humidity Sensor|Motion Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 114,Robotics,Humidity Sensor,Water Pump,ESP32,Humidity Sensor|Water Pump|ESP32
+Smart Farming,monitor agriculture conditions variation 115,IoT,IR Sensor,Relay,ESP8266,IR Sensor|Relay|ESP8266
+Water Level Indicator,monitor water level in tank variation 116,IoT,LDR Sensor,Relay,Arduino,LDR Sensor|Relay|Arduino
+Weather Monitoring,monitor temperature and humidity variation 117,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Lighting,automatic lighting control variation 118,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 119,Robotics,Ultrasonic Sensor|Motion Sensor,Buzzer,Arduino,Ultrasonic Sensor|Motion Sensor|Buzzer|Arduino
+Smart Farming,monitor agriculture conditions variation 120,IoT,Temperature Sensor|Flame Sensor,LED,Arduino,Temperature Sensor|Flame Sensor|LED|Arduino
+Fire Detection,detect fire using flame sensor variation 121,IoT,Temperature Sensor,Water Pump,ESP32,Temperature Sensor|Water Pump|ESP32
+Smart Farming,monitor agriculture conditions variation 122,IoT,Gas Sensor,Servo Motor,ESP32,Gas Sensor|Servo Motor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 123,Robotics,Flame Sensor|LDR Sensor,Servo Motor,Arduino,Flame Sensor|LDR Sensor|Servo Motor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 124,Robotics,Temperature Sensor,LED,ESP8266,Temperature Sensor|LED|ESP8266
+Smart Farming,monitor agriculture conditions variation 125,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 126,IoT,Flame Sensor|Temperature Sensor,None,Arduino,Flame Sensor|Temperature Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 127,IoT,Flame Sensor,Relay,Arduino,Flame Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 128,IoT,Humidity Sensor,Servo Motor,ESP8266,Humidity Sensor|Servo Motor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 129,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Home Automation,control home devices using wifi variation 130,IoT,Ultrasonic Sensor,Relay,Arduino,Ultrasonic Sensor|Relay|Arduino
+Weather Monitoring,monitor temperature and humidity variation 131,IoT,Humidity Sensor,Buzzer,ESP32,Humidity Sensor|Buzzer|ESP32
+Line Following Robot,robot follows path using IR sensors variation 132,Robotics,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 133,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 134,IoT,Temperature Sensor,Motor Driver,ESP8266,Temperature Sensor|Motor Driver|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 135,IoT,LDR Sensor|Motion Sensor,Motor Driver,ESP8266,LDR Sensor|Motion Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 136,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 137,Robotics,Flame Sensor|Gas Sensor,None,ESP32,Flame Sensor|Gas Sensor|ESP32
+Home Automation,control home devices using wifi variation 138,IoT,Soil Sensor|Gas Sensor,None,ESP32,Soil Sensor|Gas Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 139,Robotics,Temperature Sensor|Motion Sensor,None,ESP8266,Temperature Sensor|Motion Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 140,IoT,Gas Sensor,Motor Driver,ESP8266,Gas Sensor|Motor Driver|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 141,Robotics,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Smart Parking,detect parking availability variation 142,IoT,Soil Sensor,LED,ESP32,Soil Sensor|LED|ESP32
+Weather Monitoring,monitor temperature and humidity variation 143,IoT,Humidity Sensor,Water Pump,ESP32,Humidity Sensor|Water Pump|ESP32
+Weather Monitoring,monitor temperature and humidity variation 144,IoT,Humidity Sensor|Gas Sensor,None,ESP32,Humidity Sensor|Gas Sensor|ESP32
+Smart Parking,detect parking availability variation 145,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 146,Robotics,Flame Sensor,Valve,ESP8266,Flame Sensor|Valve|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 147,IoT,Humidity Sensor|IR Sensor,None,Arduino,Humidity Sensor|IR Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 148,IoT,LDR Sensor,Servo Motor,ESP8266,LDR Sensor|Servo Motor|ESP8266
+Fire Detection,detect fire using flame sensor variation 149,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Home Automation,control home devices using wifi variation 150,IoT,Gas Sensor|Temperature Sensor,LED,ESP8266,Gas Sensor|Temperature Sensor|LED|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 151,Robotics,Flame Sensor|Humidity Sensor,Buzzer,Arduino,Flame Sensor|Humidity Sensor|Buzzer|Arduino
+Line Following Robot,robot follows path using IR sensors variation 152,Robotics,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 153,IoT,Soil Sensor|Temperature Sensor,None,ESP32,Soil Sensor|Temperature Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 154,IoT,LDR Sensor|Ultrasonic Sensor,None,ESP8266,LDR Sensor|Ultrasonic Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 155,IoT,Gas Sensor|Temperature Sensor,Valve,ESP8266,Gas Sensor|Temperature Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 156,IoT,LDR Sensor,Water Pump,Arduino,LDR Sensor|Water Pump|Arduino
+Air Quality Monitoring,monitor pollution levels variation 157,IoT,Temperature Sensor,LED,ESP32,Temperature Sensor|LED|ESP32
+Smart Parking,detect parking availability variation 158,IoT,Ultrasonic Sensor,LED,ESP8266,Ultrasonic Sensor|LED|ESP8266
+Smart Parking,detect parking availability variation 159,IoT,Temperature Sensor|Soil Sensor,Relay,ESP8266,Temperature Sensor|Soil Sensor|Relay|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 160,Robotics,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Home Automation,control home devices using wifi variation 161,IoT,Motion Sensor,LED,ESP8266,Motion Sensor|LED|ESP8266
+Fire Detection,detect fire using flame sensor variation 162,IoT,Gas Sensor|Humidity Sensor,None,ESP8266,Gas Sensor|Humidity Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 163,IoT,Motion Sensor|Temperature Sensor,None,Arduino,Motion Sensor|Temperature Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 164,Robotics,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 165,IoT,Soil Sensor,Motor Driver,Arduino,Soil Sensor|Motor Driver|Arduino
+Line Following Robot,robot follows path using IR sensors variation 166,Robotics,Soil Sensor|Temperature Sensor,None,ESP8266,Soil Sensor|Temperature Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 167,IoT,IR Sensor|LDR Sensor,None,Arduino,IR Sensor|LDR Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 168,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 169,IoT,Flame Sensor|IR Sensor,None,Arduino,Flame Sensor|IR Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 170,Robotics,LDR Sensor|Ultrasonic Sensor,None,ESP32,LDR Sensor|Ultrasonic Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 171,IoT,Gas Sensor,Water Pump,Arduino,Gas Sensor|Water Pump|Arduino
+Line Following Robot,robot follows path using IR sensors variation 172,Robotics,Soil Sensor|Temperature Sensor,Buzzer,Arduino,Soil Sensor|Temperature Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 173,IoT,Ultrasonic Sensor|IR Sensor,Valve,Arduino,Ultrasonic Sensor|IR Sensor|Valve|Arduino
+Smart Farming,monitor agriculture conditions variation 174,IoT,Temperature Sensor|LDR Sensor,None,ESP8266,Temperature Sensor|LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 175,Robotics,LDR Sensor|Soil Sensor,Relay,ESP8266,LDR Sensor|Soil Sensor|Relay|ESP8266
+Water Level Indicator,monitor water level in tank variation 176,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 177,Robotics,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 178,Robotics,Flame Sensor,Relay,ESP8266,Flame Sensor|Relay|ESP8266
+Home Automation,control home devices using wifi variation 179,IoT,Humidity Sensor|Gas Sensor,Valve,ESP8266,Humidity Sensor|Gas Sensor|Valve|ESP8266
+Fire Detection,detect fire using flame sensor variation 180,IoT,Humidity Sensor|Motion Sensor,Water Pump,ESP8266,Humidity Sensor|Motion Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 181,Robotics,Humidity Sensor|IR Sensor,Water Pump,Arduino,Humidity Sensor|IR Sensor|Water Pump|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 182,Robotics,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Home Automation,control home devices using wifi variation 183,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 184,IoT,Motion Sensor|Flame Sensor,None,ESP32,Motion Sensor|Flame Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 185,IoT,Motion Sensor|Soil Sensor,Valve,ESP8266,Motion Sensor|Soil Sensor|Valve|ESP8266
+Fire Detection,detect fire using flame sensor variation 186,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 187,Robotics,Motion Sensor,Motor Driver,Arduino,Motion Sensor|Motor Driver|Arduino
+Smart Parking,detect parking availability variation 188,IoT,LDR Sensor|Temperature Sensor,None,ESP32,LDR Sensor|Temperature Sensor|ESP32
+Smart Lighting,automatic lighting control variation 189,IoT,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 190,IoT,Temperature Sensor|Ultrasonic Sensor,Motor Driver,ESP32,Temperature Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Smart Parking,detect parking availability variation 191,IoT,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 192,IoT,Humidity Sensor|Motion Sensor,None,ESP8266,Humidity Sensor|Motion Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 193,IoT,IR Sensor|Flame Sensor,LED,ESP32,IR Sensor|Flame Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 194,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 195,Robotics,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 196,IoT,Ultrasonic Sensor|Gas Sensor,Valve,ESP8266,Ultrasonic Sensor|Gas Sensor|Valve|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 197,IoT,Motion Sensor|Soil Sensor,None,ESP8266,Motion Sensor|Soil Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 198,Robotics,IR Sensor|LDR Sensor,None,Arduino,IR Sensor|LDR Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 199,IoT,Soil Sensor|Gas Sensor,Servo Motor,ESP32,Soil Sensor|Gas Sensor|Servo Motor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 200,IoT,IR Sensor,Buzzer,Arduino,IR Sensor|Buzzer|Arduino
+Water Level Indicator,monitor water level in tank variation 201,IoT,Temperature Sensor|Gas Sensor,Valve,ESP8266,Temperature Sensor|Gas Sensor|Valve|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 202,IoT,IR Sensor|Soil Sensor,None,ESP8266,IR Sensor|Soil Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 203,IoT,IR Sensor|Motion Sensor,None,Arduino,IR Sensor|Motion Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 204,Robotics,Motion Sensor,Buzzer,ESP8266,Motion Sensor|Buzzer|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 205,IoT,Gas Sensor,Servo Motor,ESP32,Gas Sensor|Servo Motor|ESP32
+Smart Security System,detect intruders using sensors variation 206,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 207,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 208,IoT,Temperature Sensor|Soil Sensor,Valve,ESP8266,Temperature Sensor|Soil Sensor|Valve|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 209,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Home Automation,control home devices using wifi variation 210,IoT,Flame Sensor|Humidity Sensor,None,Arduino,Flame Sensor|Humidity Sensor|Arduino
+Smart Lighting,automatic lighting control variation 211,IoT,Gas Sensor|Ultrasonic Sensor,Servo Motor,ESP8266,Gas Sensor|Ultrasonic Sensor|Servo Motor|ESP8266
+Smart Parking,detect parking availability variation 212,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 213,Robotics,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 214,Robotics,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 215,Robotics,Gas Sensor|Soil Sensor,None,Arduino,Gas Sensor|Soil Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 216,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 217,IoT,IR Sensor|Humidity Sensor,Buzzer,ESP32,IR Sensor|Humidity Sensor|Buzzer|ESP32
+Smart Lighting,automatic lighting control variation 218,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 219,IoT,Motion Sensor|Temperature Sensor,None,ESP8266,Motion Sensor|Temperature Sensor|ESP8266
+Smart Parking,detect parking availability variation 220,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Home Automation,control home devices using wifi variation 221,IoT,LDR Sensor,Buzzer,ESP8266,LDR Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 222,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 223,IoT,Temperature Sensor,Valve,ESP32,Temperature Sensor|Valve|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 224,Robotics,Gas Sensor|Temperature Sensor,None,ESP32,Gas Sensor|Temperature Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 225,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 226,Robotics,Humidity Sensor|Ultrasonic Sensor,None,ESP8266,Humidity Sensor|Ultrasonic Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 227,IoT,Ultrasonic Sensor|LDR Sensor,Water Pump,Arduino,Ultrasonic Sensor|LDR Sensor|Water Pump|Arduino
+Smart Parking,detect parking availability variation 228,IoT,Humidity Sensor|Soil Sensor,Valve,ESP8266,Humidity Sensor|Soil Sensor|Valve|ESP8266
+Water Level Indicator,monitor water level in tank variation 229,IoT,Gas Sensor,Valve,ESP8266,Gas Sensor|Valve|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 230,Robotics,Gas Sensor,Motor Driver,ESP32,Gas Sensor|Motor Driver|ESP32
+Air Quality Monitoring,monitor pollution levels variation 231,IoT,Humidity Sensor,Buzzer,ESP32,Humidity Sensor|Buzzer|ESP32
+Air Quality Monitoring,monitor pollution levels variation 232,IoT,Flame Sensor,Water Pump,Arduino,Flame Sensor|Water Pump|Arduino
+Smart Lighting,automatic lighting control variation 233,IoT,Soil Sensor|LDR Sensor,Servo Motor,ESP8266,Soil Sensor|LDR Sensor|Servo Motor|ESP8266
+Smart Farming,monitor agriculture conditions variation 234,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 235,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 236,IoT,Temperature Sensor|LDR Sensor,None,ESP32,Temperature Sensor|LDR Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 237,Robotics,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 238,Robotics,Gas Sensor|Temperature Sensor,None,Arduino,Gas Sensor|Temperature Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 239,IoT,Temperature Sensor|Soil Sensor,Buzzer,Arduino,Temperature Sensor|Soil Sensor|Buzzer|Arduino
+Smart Farming,monitor agriculture conditions variation 240,IoT,Temperature Sensor|Ultrasonic Sensor,None,Arduino,Temperature Sensor|Ultrasonic Sensor|Arduino
+Smart Lighting,automatic lighting control variation 241,IoT,Flame Sensor,Buzzer,Arduino,Flame Sensor|Buzzer|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 242,IoT,Humidity Sensor|Motion Sensor,None,Arduino,Humidity Sensor|Motion Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 243,Robotics,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 244,IoT,Gas Sensor|Temperature Sensor,Relay,ESP32,Gas Sensor|Temperature Sensor|Relay|ESP32
+Fire Detection,detect fire using flame sensor variation 245,IoT,Flame Sensor,Relay,ESP32,Flame Sensor|Relay|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 246,Robotics,Ultrasonic Sensor|Motion Sensor,LED,Arduino,Ultrasonic Sensor|Motion Sensor|LED|Arduino
+Air Quality Monitoring,monitor pollution levels variation 247,IoT,Motion Sensor,Servo Motor,ESP32,Motion Sensor|Servo Motor|ESP32
+Water Level Indicator,monitor water level in tank variation 248,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 249,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 250,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 251,IoT,Humidity Sensor|Soil Sensor,Water Pump,Arduino,Humidity Sensor|Soil Sensor|Water Pump|Arduino
+Smart Farming,monitor agriculture conditions variation 252,IoT,Temperature Sensor|Motion Sensor,Valve,ESP32,Temperature Sensor|Motion Sensor|Valve|ESP32
+Fire Detection,detect fire using flame sensor variation 253,IoT,Flame Sensor,Relay,Arduino,Flame Sensor|Relay|Arduino
+Smart Lighting,automatic lighting control variation 254,IoT,Motion Sensor|Ultrasonic Sensor,Valve,ESP32,Motion Sensor|Ultrasonic Sensor|Valve|ESP32
+Smart Farming,monitor agriculture conditions variation 255,IoT,Motion Sensor|IR Sensor,Buzzer,ESP8266,Motion Sensor|IR Sensor|Buzzer|ESP8266
+Home Automation,control home devices using wifi variation 256,IoT,Flame Sensor,LED,ESP32,Flame Sensor|LED|ESP32
+Smart Farming,monitor agriculture conditions variation 257,IoT,Gas Sensor|Humidity Sensor,Water Pump,ESP8266,Gas Sensor|Humidity Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 258,Robotics,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 259,IoT,Humidity Sensor|Motion Sensor,Valve,Arduino,Humidity Sensor|Motion Sensor|Valve|Arduino
+Smart Parking,detect parking availability variation 260,IoT,Motion Sensor|Flame Sensor,Relay,Arduino,Motion Sensor|Flame Sensor|Relay|Arduino
+Smart Lighting,automatic lighting control variation 261,IoT,Soil Sensor|IR Sensor,None,ESP32,Soil Sensor|IR Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 262,Robotics,Soil Sensor,Servo Motor,ESP8266,Soil Sensor|Servo Motor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 263,Robotics,Motion Sensor,Motor Driver,ESP32,Motion Sensor|Motor Driver|ESP32
+Home Automation,control home devices using wifi variation 264,IoT,Ultrasonic Sensor|IR Sensor,None,Arduino,Ultrasonic Sensor|IR Sensor|Arduino
+Home Automation,control home devices using wifi variation 265,IoT,Humidity Sensor,Valve,ESP8266,Humidity Sensor|Valve|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 266,Robotics,Gas Sensor|Humidity Sensor,LED,ESP8266,Gas Sensor|Humidity Sensor|LED|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 267,IoT,Temperature Sensor,Relay,ESP8266,Temperature Sensor|Relay|ESP8266
+Water Level Indicator,monitor water level in tank variation 268,IoT,Soil Sensor,Water Pump,ESP32,Soil Sensor|Water Pump|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 269,Robotics,Motion Sensor,Relay,Arduino,Motion Sensor|Relay|Arduino
+Smart Parking,detect parking availability variation 270,IoT,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 271,Robotics,Humidity Sensor,Servo Motor,ESP32,Humidity Sensor|Servo Motor|ESP32
+Smart Farming,monitor agriculture conditions variation 272,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 273,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 274,IoT,LDR Sensor|Humidity Sensor,None,ESP32,LDR Sensor|Humidity Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 275,Robotics,Motion Sensor|Humidity Sensor,Water Pump,ESP32,Motion Sensor|Humidity Sensor|Water Pump|ESP32
+Fire Detection,detect fire using flame sensor variation 276,IoT,IR Sensor,Servo Motor,ESP8266,IR Sensor|Servo Motor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 277,Robotics,Gas Sensor,Buzzer,ESP8266,Gas Sensor|Buzzer|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 278,Robotics,Temperature Sensor|Gas Sensor,Motor Driver,ESP32,Temperature Sensor|Gas Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 279,Robotics,LDR Sensor|Temperature Sensor,Valve,ESP32,LDR Sensor|Temperature Sensor|Valve|ESP32
+Weather Monitoring,monitor temperature and humidity variation 280,IoT,Motion Sensor,Water Pump,Arduino,Motion Sensor|Water Pump|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 281,Robotics,Humidity Sensor,Valve,Arduino,Humidity Sensor|Valve|Arduino
+Line Following Robot,robot follows path using IR sensors variation 282,Robotics,Ultrasonic Sensor,Servo Motor,ESP8266,Ultrasonic Sensor|Servo Motor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 283,IoT,Motion Sensor|Flame Sensor,Buzzer,ESP8266,Motion Sensor|Flame Sensor|Buzzer|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 284,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 285,IoT,Ultrasonic Sensor,LED,Arduino,Ultrasonic Sensor|LED|Arduino
+Smart Security System,detect intruders using sensors variation 286,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 287,IoT,Temperature Sensor|Gas Sensor,Water Pump,Arduino,Temperature Sensor|Gas Sensor|Water Pump|Arduino
+Smart Lighting,automatic lighting control variation 288,IoT,Ultrasonic Sensor|IR Sensor,Motor Driver,ESP8266,Ultrasonic Sensor|IR Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 289,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 290,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Home Automation,control home devices using wifi variation 291,IoT,LDR Sensor|Soil Sensor,Water Pump,Arduino,LDR Sensor|Soil Sensor|Water Pump|Arduino
+Smart Lighting,automatic lighting control variation 292,IoT,Soil Sensor|Temperature Sensor,None,ESP32,Soil Sensor|Temperature Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 293,IoT,IR Sensor|Gas Sensor,Buzzer,ESP32,IR Sensor|Gas Sensor|Buzzer|ESP32
+Smart Parking,detect parking availability variation 294,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 295,Robotics,IR Sensor|Motion Sensor,Servo Motor,ESP8266,IR Sensor|Motion Sensor|Servo Motor|ESP8266
+Smart Parking,detect parking availability variation 296,IoT,Ultrasonic Sensor,Relay,ESP32,Ultrasonic Sensor|Relay|ESP32
+Smart Farming,monitor agriculture conditions variation 297,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 298,IoT,IR Sensor|Temperature Sensor,None,ESP8266,IR Sensor|Temperature Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 299,IoT,IR Sensor,Relay,Arduino,IR Sensor|Relay|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 300,IoT,Temperature Sensor|Soil Sensor,None,Arduino,Temperature Sensor|Soil Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 301,IoT,Flame Sensor|LDR Sensor,Motor Driver,ESP32,Flame Sensor|LDR Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 302,Robotics,Gas Sensor|Flame Sensor,None,ESP32,Gas Sensor|Flame Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 303,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 304,IoT,Flame Sensor|Ultrasonic Sensor,None,ESP32,Flame Sensor|Ultrasonic Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 305,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 306,IoT,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 307,IoT,IR Sensor|Humidity Sensor,None,Arduino,IR Sensor|Humidity Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 308,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 309,IoT,Flame Sensor|Humidity Sensor,Servo Motor,ESP8266,Flame Sensor|Humidity Sensor|Servo Motor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 310,Robotics,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 311,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Smart Parking,detect parking availability variation 312,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 313,IoT,IR Sensor,Motor Driver,Arduino,IR Sensor|Motor Driver|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 314,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 315,IoT,LDR Sensor|Motion Sensor,None,ESP8266,LDR Sensor|Motion Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 316,IoT,Temperature Sensor|LDR Sensor,Valve,Arduino,Temperature Sensor|LDR Sensor|Valve|Arduino
+Water Level Indicator,monitor water level in tank variation 317,IoT,Temperature Sensor|Gas Sensor,Buzzer,Arduino,Temperature Sensor|Gas Sensor|Buzzer|Arduino
+Smart Farming,monitor agriculture conditions variation 318,IoT,Motion Sensor,Motor Driver,Arduino,Motion Sensor|Motor Driver|Arduino
+Water Level Indicator,monitor water level in tank variation 319,IoT,Humidity Sensor,Water Pump,Arduino,Humidity Sensor|Water Pump|Arduino
+Smart Lighting,automatic lighting control variation 320,IoT,LDR Sensor|Humidity Sensor,Buzzer,Arduino,LDR Sensor|Humidity Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 321,IoT,Soil Sensor|IR Sensor,Water Pump,Arduino,Soil Sensor|IR Sensor|Water Pump|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 322,Robotics,Soil Sensor|LDR Sensor,Relay,Arduino,Soil Sensor|LDR Sensor|Relay|Arduino
+Fire Detection,detect fire using flame sensor variation 323,IoT,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 324,IoT,Gas Sensor,Buzzer,Arduino,Gas Sensor|Buzzer|Arduino
+Smart Security System,detect intruders using sensors variation 325,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 326,IoT,IR Sensor,None,ESP32,IR Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 327,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 328,IoT,Ultrasonic Sensor,Motor Driver,Arduino,Ultrasonic Sensor|Motor Driver|Arduino
+Smart Security System,detect intruders using sensors variation 329,IoT,Gas Sensor|Ultrasonic Sensor,Motor Driver,ESP8266,Gas Sensor|Ultrasonic Sensor|Motor Driver|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 330,IoT,Humidity Sensor|Ultrasonic Sensor,Buzzer,ESP8266,Humidity Sensor|Ultrasonic Sensor|Buzzer|ESP8266
+Water Level Indicator,monitor water level in tank variation 331,IoT,IR Sensor,Servo Motor,ESP32,IR Sensor|Servo Motor|ESP32
+Smart Farming,monitor agriculture conditions variation 332,IoT,IR Sensor|Flame Sensor,None,Arduino,IR Sensor|Flame Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 333,Robotics,Ultrasonic Sensor,Relay,Arduino,Ultrasonic Sensor|Relay|Arduino
+Smart Lighting,automatic lighting control variation 334,IoT,Temperature Sensor|Flame Sensor,None,Arduino,Temperature Sensor|Flame Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 335,IoT,Ultrasonic Sensor|Humidity Sensor,None,ESP32,Ultrasonic Sensor|Humidity Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 336,IoT,Ultrasonic Sensor,LED,ESP32,Ultrasonic Sensor|LED|ESP32
+Air Quality Monitoring,monitor pollution levels variation 337,IoT,LDR Sensor,Valve,ESP32,LDR Sensor|Valve|ESP32
+Air Quality Monitoring,monitor pollution levels variation 338,IoT,Motion Sensor,Valve,ESP32,Motion Sensor|Valve|ESP32
+Home Automation,control home devices using wifi variation 339,IoT,Motion Sensor|Soil Sensor,None,ESP32,Motion Sensor|Soil Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 340,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 341,IoT,Humidity Sensor,Buzzer,ESP8266,Humidity Sensor|Buzzer|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 342,IoT,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Home Automation,control home devices using wifi variation 343,IoT,Gas Sensor|IR Sensor,None,ESP8266,Gas Sensor|IR Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 344,IoT,Flame Sensor|Temperature Sensor,None,Arduino,Flame Sensor|Temperature Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 345,IoT,Flame Sensor,Relay,ESP8266,Flame Sensor|Relay|ESP8266
+Smart Parking,detect parking availability variation 346,IoT,Humidity Sensor|LDR Sensor,None,ESP8266,Humidity Sensor|LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 347,Robotics,Soil Sensor,LED,Arduino,Soil Sensor|LED|Arduino
+Smart Farming,monitor agriculture conditions variation 348,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 349,IoT,Temperature Sensor,Water Pump,ESP8266,Temperature Sensor|Water Pump|ESP8266
+Smart Lighting,automatic lighting control variation 350,IoT,Soil Sensor|Temperature Sensor,None,ESP32,Soil Sensor|Temperature Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 351,Robotics,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Smart Parking,detect parking availability variation 352,IoT,Gas Sensor|Humidity Sensor,None,ESP8266,Gas Sensor|Humidity Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 353,IoT,Motion Sensor|IR Sensor,None,ESP8266,Motion Sensor|IR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 354,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 355,IoT,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 356,Robotics,Humidity Sensor|Motion Sensor,Valve,ESP32,Humidity Sensor|Motion Sensor|Valve|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 357,IoT,Motion Sensor|Soil Sensor,None,ESP32,Motion Sensor|Soil Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 358,IoT,Ultrasonic Sensor|Gas Sensor,None,Arduino,Ultrasonic Sensor|Gas Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 359,IoT,Flame Sensor|Soil Sensor,Water Pump,ESP8266,Flame Sensor|Soil Sensor|Water Pump|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 360,Robotics,Ultrasonic Sensor|Temperature Sensor,LED,Arduino,Ultrasonic Sensor|Temperature Sensor|LED|Arduino
+Smart Lighting,automatic lighting control variation 361,IoT,Gas Sensor,Buzzer,Arduino,Gas Sensor|Buzzer|Arduino
+Smart Lighting,automatic lighting control variation 362,IoT,LDR Sensor|Soil Sensor,Servo Motor,Arduino,LDR Sensor|Soil Sensor|Servo Motor|Arduino
+Home Automation,control home devices using wifi variation 363,IoT,Motion Sensor,LED,ESP8266,Motion Sensor|LED|ESP8266
+Smart Parking,detect parking availability variation 364,IoT,IR Sensor|Temperature Sensor,Valve,ESP8266,IR Sensor|Temperature Sensor|Valve|ESP8266
+Water Level Indicator,monitor water level in tank variation 365,IoT,Humidity Sensor|Soil Sensor,None,ESP8266,Humidity Sensor|Soil Sensor|ESP8266
+Smart Parking,detect parking availability variation 366,IoT,LDR Sensor,Motor Driver,Arduino,LDR Sensor|Motor Driver|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 367,Robotics,Humidity Sensor,Buzzer,ESP32,Humidity Sensor|Buzzer|ESP32
+Smart Farming,monitor agriculture conditions variation 368,IoT,Gas Sensor,Relay,ESP8266,Gas Sensor|Relay|ESP8266
+Fire Detection,detect fire using flame sensor variation 369,IoT,IR Sensor|Flame Sensor,Buzzer,Arduino,IR Sensor|Flame Sensor|Buzzer|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 370,IoT,Humidity Sensor|Gas Sensor,None,ESP32,Humidity Sensor|Gas Sensor|ESP32
+Smart Parking,detect parking availability variation 371,IoT,Motion Sensor|Ultrasonic Sensor,None,ESP8266,Motion Sensor|Ultrasonic Sensor|ESP8266
+Home Automation,control home devices using wifi variation 372,IoT,Ultrasonic Sensor|IR Sensor,None,ESP8266,Ultrasonic Sensor|IR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 373,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Home Automation,control home devices using wifi variation 374,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 375,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 376,IoT,Gas Sensor|Humidity Sensor,Water Pump,Arduino,Gas Sensor|Humidity Sensor|Water Pump|Arduino
+Water Level Indicator,monitor water level in tank variation 377,IoT,IR Sensor,None,ESP32,IR Sensor|ESP32
+Smart Lighting,automatic lighting control variation 378,IoT,IR Sensor|Soil Sensor,Motor Driver,Arduino,IR Sensor|Soil Sensor|Motor Driver|Arduino
+Weather Monitoring,monitor temperature and humidity variation 379,IoT,Gas Sensor|Temperature Sensor,None,ESP8266,Gas Sensor|Temperature Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 380,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 381,IoT,IR Sensor|Ultrasonic Sensor,Water Pump,ESP8266,IR Sensor|Ultrasonic Sensor|Water Pump|ESP8266
+Smart Lighting,automatic lighting control variation 382,IoT,Gas Sensor|Temperature Sensor,None,ESP32,Gas Sensor|Temperature Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 383,IoT,IR Sensor|Temperature Sensor,Servo Motor,ESP32,IR Sensor|Temperature Sensor|Servo Motor|ESP32
+Water Level Indicator,monitor water level in tank variation 384,IoT,Soil Sensor|Humidity Sensor,Motor Driver,Arduino,Soil Sensor|Humidity Sensor|Motor Driver|Arduino
+Weather Monitoring,monitor temperature and humidity variation 385,IoT,IR Sensor,Buzzer,ESP32,IR Sensor|Buzzer|ESP32
+Smart Parking,detect parking availability variation 386,IoT,IR Sensor|Motion Sensor,None,ESP32,IR Sensor|Motion Sensor|ESP32
+Smart Lighting,automatic lighting control variation 387,IoT,Ultrasonic Sensor|Flame Sensor,None,ESP32,Ultrasonic Sensor|Flame Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 388,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 389,Robotics,Soil Sensor|Motion Sensor,Servo Motor,Arduino,Soil Sensor|Motion Sensor|Servo Motor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 390,Robotics,Ultrasonic Sensor|IR Sensor,LED,Arduino,Ultrasonic Sensor|IR Sensor|LED|Arduino
+Smart Security System,detect intruders using sensors variation 391,IoT,Motion Sensor|Flame Sensor,Motor Driver,ESP32,Motion Sensor|Flame Sensor|Motor Driver|ESP32
+Fire Detection,detect fire using flame sensor variation 392,IoT,LDR Sensor,Buzzer,Arduino,LDR Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 393,IoT,Soil Sensor,LED,ESP32,Soil Sensor|LED|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 394,Robotics,Motion Sensor,Buzzer,ESP8266,Motion Sensor|Buzzer|ESP8266
+Home Automation,control home devices using wifi variation 395,IoT,Humidity Sensor|IR Sensor,Valve,Arduino,Humidity Sensor|IR Sensor|Valve|Arduino
+Weather Monitoring,monitor temperature and humidity variation 396,IoT,Ultrasonic Sensor|LDR Sensor,None,Arduino,Ultrasonic Sensor|LDR Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 397,IoT,Soil Sensor|Flame Sensor,Servo Motor,Arduino,Soil Sensor|Flame Sensor|Servo Motor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 398,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Lighting,automatic lighting control variation 399,IoT,Soil Sensor,Motor Driver,ESP32,Soil Sensor|Motor Driver|ESP32
+Air Quality Monitoring,monitor pollution levels variation 400,IoT,Humidity Sensor|LDR Sensor,Valve,ESP32,Humidity Sensor|LDR Sensor|Valve|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 401,IoT,Temperature Sensor|Gas Sensor,None,Arduino,Temperature Sensor|Gas Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 402,IoT,IR Sensor|Ultrasonic Sensor,LED,ESP32,IR Sensor|Ultrasonic Sensor|LED|ESP32
+Air Quality Monitoring,monitor pollution levels variation 403,IoT,Ultrasonic Sensor|Gas Sensor,None,ESP8266,Ultrasonic Sensor|Gas Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 404,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 405,IoT,Ultrasonic Sensor,Relay,ESP32,Ultrasonic Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 406,IoT,Flame Sensor|Temperature Sensor,Motor Driver,ESP8266,Flame Sensor|Temperature Sensor|Motor Driver|ESP8266
+Smart Lighting,automatic lighting control variation 407,IoT,Flame Sensor|Humidity Sensor,None,ESP32,Flame Sensor|Humidity Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 408,IoT,Temperature Sensor|Soil Sensor,None,ESP32,Temperature Sensor|Soil Sensor|ESP32
+Home Automation,control home devices using wifi variation 409,IoT,Motion Sensor|Soil Sensor,LED,ESP32,Motion Sensor|Soil Sensor|LED|ESP32
+Home Automation,control home devices using wifi variation 410,IoT,Temperature Sensor,Water Pump,Arduino,Temperature Sensor|Water Pump|Arduino
+Fire Detection,detect fire using flame sensor variation 411,IoT,LDR Sensor,LED,ESP32,LDR Sensor|LED|ESP32
+Home Automation,control home devices using wifi variation 412,IoT,Temperature Sensor,Buzzer,Arduino,Temperature Sensor|Buzzer|Arduino
+Air Quality Monitoring,monitor pollution levels variation 413,IoT,Soil Sensor|IR Sensor,None,ESP32,Soil Sensor|IR Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 414,IoT,Ultrasonic Sensor|Humidity Sensor,LED,ESP32,Ultrasonic Sensor|Humidity Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 415,IoT,Gas Sensor|LDR Sensor,Servo Motor,ESP32,Gas Sensor|LDR Sensor|Servo Motor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 416,IoT,IR Sensor,LED,ESP8266,IR Sensor|LED|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 417,IoT,IR Sensor|Humidity Sensor,LED,ESP32,IR Sensor|Humidity Sensor|LED|ESP32
+Smart Parking,detect parking availability variation 418,IoT,IR Sensor|Soil Sensor,None,ESP8266,IR Sensor|Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 419,IoT,Soil Sensor,Motor Driver,Arduino,Soil Sensor|Motor Driver|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 420,IoT,Flame Sensor|Motion Sensor,Valve,ESP8266,Flame Sensor|Motion Sensor|Valve|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 421,IoT,Ultrasonic Sensor|Flame Sensor,None,ESP32,Ultrasonic Sensor|Flame Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 422,IoT,Soil Sensor|LDR Sensor,None,ESP8266,Soil Sensor|LDR Sensor|ESP8266
+Home Automation,control home devices using wifi variation 423,IoT,Motion Sensor|Ultrasonic Sensor,None,ESP8266,Motion Sensor|Ultrasonic Sensor|ESP8266
+Home Automation,control home devices using wifi variation 424,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Smart Parking,detect parking availability variation 425,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 426,IoT,Soil Sensor|Temperature Sensor,LED,ESP32,Soil Sensor|Temperature Sensor|LED|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 427,IoT,Ultrasonic Sensor,Water Pump,Arduino,Ultrasonic Sensor|Water Pump|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 428,Robotics,IR Sensor|Humidity Sensor,LED,Arduino,IR Sensor|Humidity Sensor|LED|Arduino
+Home Automation,control home devices using wifi variation 429,IoT,Soil Sensor,Relay,ESP32,Soil Sensor|Relay|ESP32
+Weather Monitoring,monitor temperature and humidity variation 430,IoT,Temperature Sensor|Flame Sensor,Motor Driver,ESP8266,Temperature Sensor|Flame Sensor|Motor Driver|ESP8266
+Water Level Indicator,monitor water level in tank variation 431,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 432,Robotics,IR Sensor|Flame Sensor,LED,ESP8266,IR Sensor|Flame Sensor|LED|ESP8266
+Home Automation,control home devices using wifi variation 433,IoT,Humidity Sensor|Flame Sensor,Servo Motor,ESP8266,Humidity Sensor|Flame Sensor|Servo Motor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 434,IoT,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 435,IoT,Humidity Sensor|Soil Sensor,None,ESP8266,Humidity Sensor|Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 436,IoT,LDR Sensor|Gas Sensor,Motor Driver,Arduino,LDR Sensor|Gas Sensor|Motor Driver|Arduino
+Smart Security System,detect intruders using sensors variation 437,IoT,Motion Sensor|Gas Sensor,None,ESP32,Motion Sensor|Gas Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 438,IoT,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 439,IoT,Temperature Sensor|Motion Sensor,None,ESP32,Temperature Sensor|Motion Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 440,IoT,Temperature Sensor|IR Sensor,None,Arduino,Temperature Sensor|IR Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 441,IoT,Flame Sensor|Motion Sensor,Water Pump,ESP8266,Flame Sensor|Motion Sensor|Water Pump|ESP8266
+Smart Lighting,automatic lighting control variation 442,IoT,Temperature Sensor,Motor Driver,Arduino,Temperature Sensor|Motor Driver|Arduino
+Fire Detection,detect fire using flame sensor variation 443,IoT,Gas Sensor,Water Pump,ESP32,Gas Sensor|Water Pump|ESP32
+Water Level Indicator,monitor water level in tank variation 444,IoT,Gas Sensor|Ultrasonic Sensor,None,ESP32,Gas Sensor|Ultrasonic Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 445,IoT,Flame Sensor|Gas Sensor,Valve,Arduino,Flame Sensor|Gas Sensor|Valve|Arduino
+Water Level Indicator,monitor water level in tank variation 446,IoT,Ultrasonic Sensor,Motor Driver,Arduino,Ultrasonic Sensor|Motor Driver|Arduino
+Air Quality Monitoring,monitor pollution levels variation 447,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 448,IoT,Ultrasonic Sensor|Motion Sensor,LED,Arduino,Ultrasonic Sensor|Motion Sensor|LED|Arduino
+Smart Security System,detect intruders using sensors variation 449,IoT,Soil Sensor,Motor Driver,ESP8266,Soil Sensor|Motor Driver|ESP8266
+Home Automation,control home devices using wifi variation 450,IoT,IR Sensor|Flame Sensor,Water Pump,ESP8266,IR Sensor|Flame Sensor|Water Pump|ESP8266
+Smart Security System,detect intruders using sensors variation 451,IoT,LDR Sensor,Relay,ESP8266,LDR Sensor|Relay|ESP8266
+Smart Parking,detect parking availability variation 452,IoT,Motion Sensor|Ultrasonic Sensor,None,Arduino,Motion Sensor|Ultrasonic Sensor|Arduino
+Smart Parking,detect parking availability variation 453,IoT,IR Sensor,None,ESP32,IR Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 454,IoT,Flame Sensor|Temperature Sensor,None,ESP32,Flame Sensor|Temperature Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 455,IoT,Flame Sensor|IR Sensor,None,ESP8266,Flame Sensor|IR Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 456,IoT,Gas Sensor|Ultrasonic Sensor,Valve,ESP32,Gas Sensor|Ultrasonic Sensor|Valve|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 457,Robotics,IR Sensor|Ultrasonic Sensor,None,ESP8266,IR Sensor|Ultrasonic Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 458,IoT,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 459,IoT,Ultrasonic Sensor|LDR Sensor,Water Pump,Arduino,Ultrasonic Sensor|LDR Sensor|Water Pump|Arduino
+Home Automation,control home devices using wifi variation 460,IoT,Soil Sensor|IR Sensor,Servo Motor,Arduino,Soil Sensor|IR Sensor|Servo Motor|Arduino
+Home Automation,control home devices using wifi variation 461,IoT,Gas Sensor,LED,Arduino,Gas Sensor|LED|Arduino
+Smart Lighting,automatic lighting control variation 462,IoT,Temperature Sensor,Relay,ESP32,Temperature Sensor|Relay|ESP32
+Water Level Indicator,monitor water level in tank variation 463,IoT,Motion Sensor,Servo Motor,ESP8266,Motion Sensor|Servo Motor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 464,IoT,Motion Sensor|IR Sensor,None,ESP8266,Motion Sensor|IR Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 465,Robotics,Gas Sensor|Soil Sensor,LED,Arduino,Gas Sensor|Soil Sensor|LED|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 466,Robotics,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 467,IoT,Motion Sensor|IR Sensor,None,ESP8266,Motion Sensor|IR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 468,IoT,IR Sensor,Buzzer,ESP8266,IR Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 469,IoT,Flame Sensor|Motion Sensor,Motor Driver,ESP8266,Flame Sensor|Motion Sensor|Motor Driver|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 470,Robotics,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 471,IoT,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 472,IoT,Flame Sensor|Temperature Sensor,LED,ESP32,Flame Sensor|Temperature Sensor|LED|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 473,Robotics,Motion Sensor|Gas Sensor,Water Pump,ESP8266,Motion Sensor|Gas Sensor|Water Pump|ESP8266
+Smart Parking,detect parking availability variation 474,IoT,Ultrasonic Sensor,Water Pump,ESP32,Ultrasonic Sensor|Water Pump|ESP32
+Smart Lighting,automatic lighting control variation 475,IoT,LDR Sensor|IR Sensor,None,Arduino,LDR Sensor|IR Sensor|Arduino
+Smart Parking,detect parking availability variation 476,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 477,IoT,LDR Sensor|Temperature Sensor,Buzzer,ESP8266,LDR Sensor|Temperature Sensor|Buzzer|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 478,Robotics,Motion Sensor|LDR Sensor,Servo Motor,ESP8266,Motion Sensor|LDR Sensor|Servo Motor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 479,Robotics,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 480,IoT,Humidity Sensor,Water Pump,Arduino,Humidity Sensor|Water Pump|Arduino
+Smart Security System,detect intruders using sensors variation 481,IoT,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Smart Parking,detect parking availability variation 482,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 483,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Lighting,automatic lighting control variation 484,IoT,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 485,IoT,Gas Sensor|Humidity Sensor,None,ESP32,Gas Sensor|Humidity Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 486,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 487,IoT,Gas Sensor|Humidity Sensor,None,ESP8266,Gas Sensor|Humidity Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 488,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Home Automation,control home devices using wifi variation 489,IoT,Ultrasonic Sensor|Temperature Sensor,None,ESP8266,Ultrasonic Sensor|Temperature Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 490,IoT,Temperature Sensor,Relay,Arduino,Temperature Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 491,IoT,Ultrasonic Sensor,Relay,ESP32,Ultrasonic Sensor|Relay|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 492,IoT,Ultrasonic Sensor,Motor Driver,Arduino,Ultrasonic Sensor|Motor Driver|Arduino
+Home Automation,control home devices using wifi variation 493,IoT,Humidity Sensor|Soil Sensor,None,ESP8266,Humidity Sensor|Soil Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 494,IoT,Motion Sensor|Flame Sensor,LED,ESP8266,Motion Sensor|Flame Sensor|LED|ESP8266
+Smart Farming,monitor agriculture conditions variation 495,IoT,Ultrasonic Sensor|LDR Sensor,Buzzer,ESP8266,Ultrasonic Sensor|LDR Sensor|Buzzer|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 496,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 497,IoT,Ultrasonic Sensor|Flame Sensor,Water Pump,Arduino,Ultrasonic Sensor|Flame Sensor|Water Pump|Arduino
+Line Following Robot,robot follows path using IR sensors variation 498,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 499,IoT,IR Sensor,LED,ESP32,IR Sensor|LED|ESP32
+Line Following Robot,robot follows path using IR sensors variation 500,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 501,IoT,Gas Sensor,Motor Driver,Arduino,Gas Sensor|Motor Driver|Arduino
+Smart Parking,detect parking availability variation 502,IoT,Motion Sensor|Temperature Sensor,None,Arduino,Motion Sensor|Temperature Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 503,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 504,Robotics,Ultrasonic Sensor|Temperature Sensor,Servo Motor,ESP8266,Ultrasonic Sensor|Temperature Sensor|Servo Motor|ESP8266
+Smart Farming,monitor agriculture conditions variation 505,IoT,Humidity Sensor|Flame Sensor,LED,ESP8266,Humidity Sensor|Flame Sensor|LED|ESP8266
+Fire Detection,detect fire using flame sensor variation 506,IoT,Humidity Sensor,Relay,ESP32,Humidity Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 507,IoT,IR Sensor|Motion Sensor,Relay,Arduino,IR Sensor|Motion Sensor|Relay|Arduino
+Fire Detection,detect fire using flame sensor variation 508,IoT,Humidity Sensor,Buzzer,Arduino,Humidity Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 509,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Home Automation,control home devices using wifi variation 510,IoT,Temperature Sensor|Gas Sensor,Relay,ESP32,Temperature Sensor|Gas Sensor|Relay|ESP32
+Weather Monitoring,monitor temperature and humidity variation 511,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 512,IoT,Gas Sensor|Ultrasonic Sensor,Water Pump,ESP8266,Gas Sensor|Ultrasonic Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 513,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 514,IoT,Temperature Sensor,Motor Driver,ESP8266,Temperature Sensor|Motor Driver|ESP8266
+Smart Lighting,automatic lighting control variation 515,IoT,Humidity Sensor,Servo Motor,ESP32,Humidity Sensor|Servo Motor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 516,Robotics,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Smart Parking,detect parking availability variation 517,IoT,Flame Sensor|Motion Sensor,Motor Driver,Arduino,Flame Sensor|Motion Sensor|Motor Driver|Arduino
+Smart Lighting,automatic lighting control variation 518,IoT,Soil Sensor|Flame Sensor,None,ESP8266,Soil Sensor|Flame Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 519,IoT,Temperature Sensor|Motion Sensor,LED,Arduino,Temperature Sensor|Motion Sensor|LED|Arduino
+Weather Monitoring,monitor temperature and humidity variation 520,IoT,IR Sensor|Humidity Sensor,Servo Motor,ESP32,IR Sensor|Humidity Sensor|Servo Motor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 521,Robotics,IR Sensor|Flame Sensor,None,ESP8266,IR Sensor|Flame Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 522,IoT,Gas Sensor|Flame Sensor,None,ESP8266,Gas Sensor|Flame Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 523,Robotics,Motion Sensor|Soil Sensor,None,ESP32,Motion Sensor|Soil Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 524,IoT,Soil Sensor,Water Pump,Arduino,Soil Sensor|Water Pump|Arduino
+Line Following Robot,robot follows path using IR sensors variation 525,Robotics,Gas Sensor|Humidity Sensor,Servo Motor,Arduino,Gas Sensor|Humidity Sensor|Servo Motor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 526,IoT,Ultrasonic Sensor|LDR Sensor,Relay,ESP8266,Ultrasonic Sensor|LDR Sensor|Relay|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 527,IoT,Ultrasonic Sensor,Valve,ESP8266,Ultrasonic Sensor|Valve|ESP8266
+Smart Farming,monitor agriculture conditions variation 528,IoT,Ultrasonic Sensor,Valve,Arduino,Ultrasonic Sensor|Valve|Arduino
+Home Automation,control home devices using wifi variation 529,IoT,Temperature Sensor|Flame Sensor,None,ESP32,Temperature Sensor|Flame Sensor|ESP32
+Smart Lighting,automatic lighting control variation 530,IoT,Flame Sensor|Gas Sensor,Valve,ESP32,Flame Sensor|Gas Sensor|Valve|ESP32
+Smart Security System,detect intruders using sensors variation 531,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 532,IoT,Ultrasonic Sensor|Gas Sensor,None,ESP32,Ultrasonic Sensor|Gas Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 533,IoT,Soil Sensor,LED,Arduino,Soil Sensor|LED|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 534,IoT,Flame Sensor|Soil Sensor,Valve,ESP8266,Flame Sensor|Soil Sensor|Valve|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 535,Robotics,LDR Sensor,Servo Motor,Arduino,LDR Sensor|Servo Motor|Arduino
+Smart Security System,detect intruders using sensors variation 536,IoT,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 537,IoT,IR Sensor|Ultrasonic Sensor,Relay,Arduino,IR Sensor|Ultrasonic Sensor|Relay|Arduino
+Smart Lighting,automatic lighting control variation 538,IoT,Temperature Sensor,Relay,Arduino,Temperature Sensor|Relay|Arduino
+Air Quality Monitoring,monitor pollution levels variation 539,IoT,Flame Sensor|Ultrasonic Sensor,Valve,Arduino,Flame Sensor|Ultrasonic Sensor|Valve|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 540,IoT,Soil Sensor,Buzzer,ESP8266,Soil Sensor|Buzzer|ESP8266
+Smart Lighting,automatic lighting control variation 541,IoT,Motion Sensor,LED,ESP32,Motion Sensor|LED|ESP32
+Home Automation,control home devices using wifi variation 542,IoT,Soil Sensor|Motion Sensor,LED,ESP8266,Soil Sensor|Motion Sensor|LED|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 543,IoT,IR Sensor,Relay,Arduino,IR Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 544,IoT,Ultrasonic Sensor,Relay,ESP8266,Ultrasonic Sensor|Relay|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 545,IoT,IR Sensor|Flame Sensor,None,Arduino,IR Sensor|Flame Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 546,Robotics,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 547,IoT,Humidity Sensor,Valve,ESP8266,Humidity Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 548,IoT,Temperature Sensor|Gas Sensor,None,Arduino,Temperature Sensor|Gas Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 549,IoT,Soil Sensor|Gas Sensor,None,ESP32,Soil Sensor|Gas Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 550,IoT,LDR Sensor|Gas Sensor,None,ESP8266,LDR Sensor|Gas Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 551,Robotics,LDR Sensor|Flame Sensor,Motor Driver,ESP8266,LDR Sensor|Flame Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 552,IoT,Gas Sensor,LED,ESP8266,Gas Sensor|LED|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 553,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 554,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 555,IoT,Ultrasonic Sensor,Water Pump,Arduino,Ultrasonic Sensor|Water Pump|Arduino
+Smart Parking,detect parking availability variation 556,IoT,Motion Sensor,None,ESP8266,Motion Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 557,Robotics,Ultrasonic Sensor|Temperature Sensor,LED,ESP8266,Ultrasonic Sensor|Temperature Sensor|LED|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 558,Robotics,IR Sensor,Servo Motor,Arduino,IR Sensor|Servo Motor|Arduino
+Home Automation,control home devices using wifi variation 559,IoT,Temperature Sensor,Water Pump,ESP32,Temperature Sensor|Water Pump|ESP32
+Smart Lighting,automatic lighting control variation 560,IoT,Humidity Sensor|Ultrasonic Sensor,LED,Arduino,Humidity Sensor|Ultrasonic Sensor|LED|Arduino
+Smart Parking,detect parking availability variation 561,IoT,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Smart Parking,detect parking availability variation 562,IoT,Ultrasonic Sensor|Soil Sensor,None,ESP8266,Ultrasonic Sensor|Soil Sensor|ESP8266
+Home Automation,control home devices using wifi variation 563,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 564,IoT,Motion Sensor|IR Sensor,Valve,Arduino,Motion Sensor|IR Sensor|Valve|Arduino
+Home Automation,control home devices using wifi variation 565,IoT,Gas Sensor,LED,Arduino,Gas Sensor|LED|Arduino
+Smart Lighting,automatic lighting control variation 566,IoT,Soil Sensor|Temperature Sensor,Valve,ESP8266,Soil Sensor|Temperature Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 567,IoT,Gas Sensor|Flame Sensor,Buzzer,ESP8266,Gas Sensor|Flame Sensor|Buzzer|ESP8266
+Water Level Indicator,monitor water level in tank variation 568,IoT,Temperature Sensor,Buzzer,ESP8266,Temperature Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 569,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 570,IoT,IR Sensor|Flame Sensor,Motor Driver,ESP32,IR Sensor|Flame Sensor|Motor Driver|ESP32
+Line Following Robot,robot follows path using IR sensors variation 571,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Lighting,automatic lighting control variation 572,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 573,IoT,Temperature Sensor,Valve,ESP8266,Temperature Sensor|Valve|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 574,Robotics,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 575,Robotics,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Home Automation,control home devices using wifi variation 576,IoT,Gas Sensor|Flame Sensor,Relay,ESP8266,Gas Sensor|Flame Sensor|Relay|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 577,IoT,LDR Sensor|IR Sensor,None,Arduino,LDR Sensor|IR Sensor|Arduino
+Smart Lighting,automatic lighting control variation 578,IoT,Flame Sensor|LDR Sensor,None,ESP8266,Flame Sensor|LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 579,Robotics,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Home Automation,control home devices using wifi variation 580,IoT,IR Sensor|Ultrasonic Sensor,None,ESP8266,IR Sensor|Ultrasonic Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 581,IoT,Motion Sensor|Gas Sensor,Valve,Arduino,Motion Sensor|Gas Sensor|Valve|Arduino
+Water Level Indicator,monitor water level in tank variation 582,IoT,Flame Sensor,Buzzer,Arduino,Flame Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 583,IoT,Temperature Sensor|Humidity Sensor,Valve,Arduino,Temperature Sensor|Humidity Sensor|Valve|Arduino
+Line Following Robot,robot follows path using IR sensors variation 584,Robotics,LDR Sensor|Soil Sensor,Servo Motor,ESP32,LDR Sensor|Soil Sensor|Servo Motor|ESP32
+Smart Parking,detect parking availability variation 585,IoT,Humidity Sensor|Temperature Sensor,Servo Motor,ESP32,Humidity Sensor|Temperature Sensor|Servo Motor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 586,Robotics,Soil Sensor|Flame Sensor,LED,Arduino,Soil Sensor|Flame Sensor|LED|Arduino
+Fire Detection,detect fire using flame sensor variation 587,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 588,Robotics,Soil Sensor|Temperature Sensor,None,ESP32,Soil Sensor|Temperature Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 589,Robotics,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 590,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 591,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 592,IoT,IR Sensor,Motor Driver,ESP8266,IR Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 593,IoT,LDR Sensor,Valve,ESP8266,LDR Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 594,IoT,Soil Sensor|Temperature Sensor,Servo Motor,ESP32,Soil Sensor|Temperature Sensor|Servo Motor|ESP32
+Fire Detection,detect fire using flame sensor variation 595,IoT,Temperature Sensor,Water Pump,Arduino,Temperature Sensor|Water Pump|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 596,IoT,Flame Sensor|Ultrasonic Sensor,Relay,ESP8266,Flame Sensor|Ultrasonic Sensor|Relay|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 597,IoT,Temperature Sensor|LDR Sensor,Motor Driver,Arduino,Temperature Sensor|LDR Sensor|Motor Driver|Arduino
+Smart Security System,detect intruders using sensors variation 598,IoT,Flame Sensor,Valve,ESP32,Flame Sensor|Valve|ESP32
+Line Following Robot,robot follows path using IR sensors variation 599,Robotics,IR Sensor,Water Pump,Arduino,IR Sensor|Water Pump|Arduino
+Line Following Robot,robot follows path using IR sensors variation 600,Robotics,Motion Sensor|Ultrasonic Sensor,Buzzer,ESP32,Motion Sensor|Ultrasonic Sensor|Buzzer|ESP32
+Air Quality Monitoring,monitor pollution levels variation 601,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 602,IoT,Gas Sensor,Relay,ESP32,Gas Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 603,IoT,Motion Sensor,Motor Driver,ESP32,Motion Sensor|Motor Driver|ESP32
+Weather Monitoring,monitor temperature and humidity variation 604,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 605,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 606,IoT,Ultrasonic Sensor|Temperature Sensor,None,ESP8266,Ultrasonic Sensor|Temperature Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 607,IoT,Flame Sensor|LDR Sensor,None,ESP32,Flame Sensor|LDR Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 608,IoT,IR Sensor,Servo Motor,Arduino,IR Sensor|Servo Motor|Arduino
+Smart Lighting,automatic lighting control variation 609,IoT,IR Sensor|Soil Sensor,None,ESP32,IR Sensor|Soil Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 610,IoT,IR Sensor|Motion Sensor,None,Arduino,IR Sensor|Motion Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 611,IoT,Temperature Sensor|Soil Sensor,None,Arduino,Temperature Sensor|Soil Sensor|Arduino
+Home Automation,control home devices using wifi variation 612,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 613,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Home Automation,control home devices using wifi variation 614,IoT,Temperature Sensor|Motion Sensor,Water Pump,ESP8266,Temperature Sensor|Motion Sensor|Water Pump|ESP8266
+Home Automation,control home devices using wifi variation 615,IoT,Gas Sensor|Motion Sensor,None,Arduino,Gas Sensor|Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 616,Robotics,Temperature Sensor|Motion Sensor,Relay,Arduino,Temperature Sensor|Motion Sensor|Relay|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 617,IoT,Humidity Sensor,Relay,Arduino,Humidity Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 618,IoT,Soil Sensor|LDR Sensor,None,Arduino,Soil Sensor|LDR Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 619,Robotics,Humidity Sensor,Motor Driver,ESP8266,Humidity Sensor|Motor Driver|ESP8266
+Fire Detection,detect fire using flame sensor variation 620,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Smart Lighting,automatic lighting control variation 621,IoT,Gas Sensor|Motion Sensor,None,ESP32,Gas Sensor|Motion Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 622,IoT,LDR Sensor|Gas Sensor,None,Arduino,LDR Sensor|Gas Sensor|Arduino
+Smart Lighting,automatic lighting control variation 623,IoT,Motion Sensor|Humidity Sensor,None,ESP8266,Motion Sensor|Humidity Sensor|ESP8266
+Home Automation,control home devices using wifi variation 624,IoT,Ultrasonic Sensor|Gas Sensor,None,Arduino,Ultrasonic Sensor|Gas Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 625,IoT,Motion Sensor|Temperature Sensor,Buzzer,Arduino,Motion Sensor|Temperature Sensor|Buzzer|Arduino
+Air Quality Monitoring,monitor pollution levels variation 626,IoT,LDR Sensor|Ultrasonic Sensor,None,Arduino,LDR Sensor|Ultrasonic Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 627,Robotics,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 628,IoT,Gas Sensor|Ultrasonic Sensor,Motor Driver,ESP32,Gas Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Weather Monitoring,monitor temperature and humidity variation 629,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 630,Robotics,Gas Sensor|IR Sensor,Buzzer,ESP8266,Gas Sensor|IR Sensor|Buzzer|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 631,IoT,Gas Sensor,Motor Driver,ESP8266,Gas Sensor|Motor Driver|ESP8266
+Smart Parking,detect parking availability variation 632,IoT,Ultrasonic Sensor,Relay,ESP8266,Ultrasonic Sensor|Relay|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 633,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 634,IoT,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 635,IoT,Ultrasonic Sensor,Water Pump,Arduino,Ultrasonic Sensor|Water Pump|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 636,Robotics,Gas Sensor,Water Pump,ESP8266,Gas Sensor|Water Pump|ESP8266
+Water Level Indicator,monitor water level in tank variation 637,IoT,Gas Sensor|Ultrasonic Sensor,Servo Motor,Arduino,Gas Sensor|Ultrasonic Sensor|Servo Motor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 638,IoT,Gas Sensor|Soil Sensor,None,Arduino,Gas Sensor|Soil Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 639,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 640,IoT,Humidity Sensor|LDR Sensor,Servo Motor,ESP8266,Humidity Sensor|LDR Sensor|Servo Motor|ESP8266
+Home Automation,control home devices using wifi variation 641,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Smart Lighting,automatic lighting control variation 642,IoT,Ultrasonic Sensor,Motor Driver,ESP8266,Ultrasonic Sensor|Motor Driver|ESP8266
+Smart Parking,detect parking availability variation 643,IoT,Ultrasonic Sensor|Flame Sensor,Water Pump,ESP32,Ultrasonic Sensor|Flame Sensor|Water Pump|ESP32
+Air Quality Monitoring,monitor pollution levels variation 644,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Home Automation,control home devices using wifi variation 645,IoT,Ultrasonic Sensor|LDR Sensor,None,Arduino,Ultrasonic Sensor|LDR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 646,IoT,Motion Sensor|Flame Sensor,None,ESP32,Motion Sensor|Flame Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 647,Robotics,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 648,Robotics,IR Sensor|LDR Sensor,LED,ESP32,IR Sensor|LDR Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 649,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 650,IoT,Motion Sensor,Water Pump,Arduino,Motion Sensor|Water Pump|Arduino
+Home Automation,control home devices using wifi variation 651,IoT,Flame Sensor,Valve,ESP32,Flame Sensor|Valve|ESP32
+Air Quality Monitoring,monitor pollution levels variation 652,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 653,IoT,Flame Sensor|Motion Sensor,None,ESP8266,Flame Sensor|Motion Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 654,IoT,Humidity Sensor|Soil Sensor,Valve,Arduino,Humidity Sensor|Soil Sensor|Valve|Arduino
+Fire Detection,detect fire using flame sensor variation 655,IoT,Flame Sensor,Relay,Arduino,Flame Sensor|Relay|Arduino
+Water Level Indicator,monitor water level in tank variation 656,IoT,Soil Sensor,Valve,ESP8266,Soil Sensor|Valve|ESP8266
+Smart Farming,monitor agriculture conditions variation 657,IoT,Ultrasonic Sensor,LED,ESP32,Ultrasonic Sensor|LED|ESP32
+Air Quality Monitoring,monitor pollution levels variation 658,IoT,IR Sensor|Temperature Sensor,None,ESP32,IR Sensor|Temperature Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 659,Robotics,Soil Sensor|Temperature Sensor,None,ESP32,Soil Sensor|Temperature Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 660,IoT,Ultrasonic Sensor|Humidity Sensor,None,ESP8266,Ultrasonic Sensor|Humidity Sensor|ESP8266
+Smart Parking,detect parking availability variation 661,IoT,Ultrasonic Sensor|Gas Sensor,Water Pump,ESP32,Ultrasonic Sensor|Gas Sensor|Water Pump|ESP32
+Smart Security System,detect intruders using sensors variation 662,IoT,Gas Sensor,Buzzer,Arduino,Gas Sensor|Buzzer|Arduino
+Line Following Robot,robot follows path using IR sensors variation 663,Robotics,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 664,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 665,IoT,IR Sensor|Flame Sensor,Relay,ESP32,IR Sensor|Flame Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 666,IoT,LDR Sensor,Servo Motor,ESP8266,LDR Sensor|Servo Motor|ESP8266
+Smart Farming,monitor agriculture conditions variation 667,IoT,IR Sensor,Buzzer,ESP32,IR Sensor|Buzzer|ESP32
+Line Following Robot,robot follows path using IR sensors variation 668,Robotics,LDR Sensor|Motion Sensor,None,ESP8266,LDR Sensor|Motion Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 669,IoT,Flame Sensor|Gas Sensor,Valve,ESP8266,Flame Sensor|Gas Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 670,IoT,Flame Sensor|Motion Sensor,None,ESP8266,Flame Sensor|Motion Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 671,IoT,LDR Sensor|Ultrasonic Sensor,Water Pump,ESP32,LDR Sensor|Ultrasonic Sensor|Water Pump|ESP32
+Weather Monitoring,monitor temperature and humidity variation 672,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Smart Lighting,automatic lighting control variation 673,IoT,Ultrasonic Sensor|Soil Sensor,None,ESP8266,Ultrasonic Sensor|Soil Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 674,IoT,Ultrasonic Sensor,Motor Driver,ESP8266,Ultrasonic Sensor|Motor Driver|ESP8266
+Smart Lighting,automatic lighting control variation 675,IoT,Gas Sensor|IR Sensor,Motor Driver,ESP8266,Gas Sensor|IR Sensor|Motor Driver|ESP8266
+Smart Security System,detect intruders using sensors variation 676,IoT,Ultrasonic Sensor|Temperature Sensor,Valve,ESP32,Ultrasonic Sensor|Temperature Sensor|Valve|ESP32
+Home Automation,control home devices using wifi variation 677,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 678,IoT,Gas Sensor|Soil Sensor,None,Arduino,Gas Sensor|Soil Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 679,Robotics,IR Sensor|LDR Sensor,None,ESP32,IR Sensor|LDR Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 680,Robotics,Temperature Sensor|Motion Sensor,None,Arduino,Temperature Sensor|Motion Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 681,IoT,Motion Sensor|Gas Sensor,LED,ESP32,Motion Sensor|Gas Sensor|LED|ESP32
+Smart Lighting,automatic lighting control variation 682,IoT,IR Sensor|Soil Sensor,None,Arduino,IR Sensor|Soil Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 683,Robotics,Flame Sensor|Ultrasonic Sensor,Servo Motor,Arduino,Flame Sensor|Ultrasonic Sensor|Servo Motor|Arduino
+Smart Farming,monitor agriculture conditions variation 684,IoT,Soil Sensor,Valve,ESP32,Soil Sensor|Valve|ESP32
+Water Level Indicator,monitor water level in tank variation 685,IoT,LDR Sensor|Motion Sensor,None,ESP32,LDR Sensor|Motion Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 686,IoT,Ultrasonic Sensor|IR Sensor,None,ESP8266,Ultrasonic Sensor|IR Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 687,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 688,IoT,Humidity Sensor|Gas Sensor,None,ESP32,Humidity Sensor|Gas Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 689,IoT,Temperature Sensor|IR Sensor,None,ESP8266,Temperature Sensor|IR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 690,IoT,Humidity Sensor,Buzzer,Arduino,Humidity Sensor|Buzzer|Arduino
+Water Level Indicator,monitor water level in tank variation 691,IoT,IR Sensor,Motor Driver,Arduino,IR Sensor|Motor Driver|Arduino
+Water Level Indicator,monitor water level in tank variation 692,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 693,IoT,Temperature Sensor,LED,ESP32,Temperature Sensor|LED|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 694,Robotics,Gas Sensor,Water Pump,Arduino,Gas Sensor|Water Pump|Arduino
+Fire Detection,detect fire using flame sensor variation 695,IoT,Gas Sensor,Buzzer,ESP8266,Gas Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 696,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Smart Lighting,automatic lighting control variation 697,IoT,Gas Sensor|Humidity Sensor,None,Arduino,Gas Sensor|Humidity Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 698,Robotics,Humidity Sensor|IR Sensor,Buzzer,ESP32,Humidity Sensor|IR Sensor|Buzzer|ESP32
+Smart Lighting,automatic lighting control variation 699,IoT,Flame Sensor|LDR Sensor,None,ESP8266,Flame Sensor|LDR Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 700,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 701,Robotics,Ultrasonic Sensor|Soil Sensor,None,ESP8266,Ultrasonic Sensor|Soil Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 702,Robotics,Humidity Sensor,Servo Motor,ESP8266,Humidity Sensor|Servo Motor|ESP8266
+Smart Security System,detect intruders using sensors variation 703,IoT,IR Sensor|Gas Sensor,Buzzer,ESP32,IR Sensor|Gas Sensor|Buzzer|ESP32
+Smart Farming,monitor agriculture conditions variation 704,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 705,Robotics,Soil Sensor,Water Pump,ESP8266,Soil Sensor|Water Pump|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 706,IoT,IR Sensor|Flame Sensor,None,ESP32,IR Sensor|Flame Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 707,IoT,Ultrasonic Sensor|Temperature Sensor,None,ESP8266,Ultrasonic Sensor|Temperature Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 708,IoT,IR Sensor,Motor Driver,ESP32,IR Sensor|Motor Driver|ESP32
+Home Automation,control home devices using wifi variation 709,IoT,Flame Sensor|Gas Sensor,Motor Driver,ESP8266,Flame Sensor|Gas Sensor|Motor Driver|ESP8266
+Home Automation,control home devices using wifi variation 710,IoT,Motion Sensor,Relay,ESP32,Motion Sensor|Relay|ESP32
+Fire Detection,detect fire using flame sensor variation 711,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 712,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 713,IoT,LDR Sensor|Temperature Sensor,None,ESP32,LDR Sensor|Temperature Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 714,Robotics,Gas Sensor|Ultrasonic Sensor,Relay,ESP32,Gas Sensor|Ultrasonic Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 715,IoT,Soil Sensor,Buzzer,ESP8266,Soil Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 716,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 717,IoT,Flame Sensor|IR Sensor,None,ESP32,Flame Sensor|IR Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 718,Robotics,Ultrasonic Sensor|Gas Sensor,None,Arduino,Ultrasonic Sensor|Gas Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 719,Robotics,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 720,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 721,IoT,Temperature Sensor,Relay,ESP32,Temperature Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 722,IoT,Flame Sensor|LDR Sensor,None,Arduino,Flame Sensor|LDR Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 723,IoT,Gas Sensor|LDR Sensor,None,ESP32,Gas Sensor|LDR Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 724,Robotics,Soil Sensor|IR Sensor,None,ESP8266,Soil Sensor|IR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 725,IoT,IR Sensor,Valve,ESP8266,IR Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 726,IoT,Gas Sensor,Water Pump,ESP32,Gas Sensor|Water Pump|ESP32
+Weather Monitoring,monitor temperature and humidity variation 727,IoT,IR Sensor|Temperature Sensor,Servo Motor,Arduino,IR Sensor|Temperature Sensor|Servo Motor|Arduino
+Smart Farming,monitor agriculture conditions variation 728,IoT,Humidity Sensor|LDR Sensor,Servo Motor,ESP32,Humidity Sensor|LDR Sensor|Servo Motor|ESP32
+Smart Parking,detect parking availability variation 729,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 730,IoT,IR Sensor|Soil Sensor,None,ESP32,IR Sensor|Soil Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 731,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 732,IoT,Gas Sensor,Water Pump,Arduino,Gas Sensor|Water Pump|Arduino
+Home Automation,control home devices using wifi variation 733,IoT,LDR Sensor|Humidity Sensor,Water Pump,ESP8266,LDR Sensor|Humidity Sensor|Water Pump|ESP8266
+Smart Lighting,automatic lighting control variation 734,IoT,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Parking,detect parking availability variation 735,IoT,Flame Sensor|Soil Sensor,None,ESP8266,Flame Sensor|Soil Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 736,Robotics,LDR Sensor|Soil Sensor,Valve,ESP8266,LDR Sensor|Soil Sensor|Valve|ESP8266
+Water Level Indicator,monitor water level in tank variation 737,IoT,IR Sensor,Servo Motor,ESP8266,IR Sensor|Servo Motor|ESP8266
+Water Level Indicator,monitor water level in tank variation 738,IoT,Soil Sensor|Ultrasonic Sensor,Motor Driver,ESP32,Soil Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Air Quality Monitoring,monitor pollution levels variation 739,IoT,Humidity Sensor|Soil Sensor,None,ESP32,Humidity Sensor|Soil Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 740,IoT,Humidity Sensor|Ultrasonic Sensor,None,ESP32,Humidity Sensor|Ultrasonic Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 741,IoT,Motion Sensor,Valve,ESP8266,Motion Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 742,IoT,Temperature Sensor|Humidity Sensor,Buzzer,Arduino,Temperature Sensor|Humidity Sensor|Buzzer|Arduino
+Smart Farming,monitor agriculture conditions variation 743,IoT,Motion Sensor|Flame Sensor,Water Pump,ESP8266,Motion Sensor|Flame Sensor|Water Pump|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 744,IoT,Soil Sensor,Relay,ESP8266,Soil Sensor|Relay|ESP8266
+Smart Security System,detect intruders using sensors variation 745,IoT,Gas Sensor,Water Pump,Arduino,Gas Sensor|Water Pump|Arduino
+Weather Monitoring,monitor temperature and humidity variation 746,IoT,Gas Sensor|Soil Sensor,None,ESP32,Gas Sensor|Soil Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 747,IoT,Motion Sensor,Water Pump,ESP8266,Motion Sensor|Water Pump|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 748,Robotics,Flame Sensor|IR Sensor,LED,ESP32,Flame Sensor|IR Sensor|LED|ESP32
+Smart Lighting,automatic lighting control variation 749,IoT,Motion Sensor|Temperature Sensor,None,ESP32,Motion Sensor|Temperature Sensor|ESP32
+Smart Parking,detect parking availability variation 750,IoT,LDR Sensor|Ultrasonic Sensor,Servo Motor,ESP8266,LDR Sensor|Ultrasonic Sensor|Servo Motor|ESP8266
+Smart Parking,detect parking availability variation 751,IoT,LDR Sensor|Temperature Sensor,Motor Driver,ESP8266,LDR Sensor|Temperature Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 752,IoT,Temperature Sensor|Humidity Sensor,Buzzer,ESP32,Temperature Sensor|Humidity Sensor|Buzzer|ESP32
+Home Automation,control home devices using wifi variation 753,IoT,Humidity Sensor|LDR Sensor,None,Arduino,Humidity Sensor|LDR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 754,IoT,LDR Sensor|Temperature Sensor,None,ESP32,LDR Sensor|Temperature Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 755,Robotics,LDR Sensor,Relay,ESP32,LDR Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 756,IoT,Humidity Sensor|Soil Sensor,None,ESP8266,Humidity Sensor|Soil Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 757,IoT,LDR Sensor|Flame Sensor,None,ESP8266,LDR Sensor|Flame Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 758,IoT,IR Sensor|Gas Sensor,Motor Driver,ESP32,IR Sensor|Gas Sensor|Motor Driver|ESP32
+Weather Monitoring,monitor temperature and humidity variation 759,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Parking,detect parking availability variation 760,IoT,Motion Sensor,Buzzer,ESP8266,Motion Sensor|Buzzer|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 761,Robotics,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 762,IoT,IR Sensor,Servo Motor,ESP32,IR Sensor|Servo Motor|ESP32
+Smart Farming,monitor agriculture conditions variation 763,IoT,Humidity Sensor|Soil Sensor,None,ESP8266,Humidity Sensor|Soil Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 764,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 765,Robotics,Soil Sensor|Motion Sensor,None,ESP32,Soil Sensor|Motion Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 766,IoT,Humidity Sensor,Servo Motor,Arduino,Humidity Sensor|Servo Motor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 767,Robotics,Flame Sensor|Soil Sensor,Servo Motor,ESP32,Flame Sensor|Soil Sensor|Servo Motor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 768,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 769,IoT,Gas Sensor|Soil Sensor,Buzzer,ESP32,Gas Sensor|Soil Sensor|Buzzer|ESP32
+Home Automation,control home devices using wifi variation 770,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 771,Robotics,Flame Sensor,Valve,ESP8266,Flame Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 772,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 773,IoT,Flame Sensor|Motion Sensor,None,ESP32,Flame Sensor|Motion Sensor|ESP32
+Smart Parking,detect parking availability variation 774,IoT,LDR Sensor|Flame Sensor,None,ESP32,LDR Sensor|Flame Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 775,IoT,Motion Sensor,Valve,Arduino,Motion Sensor|Valve|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 776,IoT,Humidity Sensor,None,ESP32,Humidity Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 777,IoT,Ultrasonic Sensor,Servo Motor,ESP32,Ultrasonic Sensor|Servo Motor|ESP32
+Smart Parking,detect parking availability variation 778,IoT,Motion Sensor,Water Pump,ESP32,Motion Sensor|Water Pump|ESP32
+Line Following Robot,robot follows path using IR sensors variation 779,Robotics,Motion Sensor|Flame Sensor,Valve,ESP8266,Motion Sensor|Flame Sensor|Valve|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 780,Robotics,LDR Sensor,Motor Driver,ESP8266,LDR Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 781,IoT,Gas Sensor|Humidity Sensor,Valve,ESP8266,Gas Sensor|Humidity Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 782,IoT,Gas Sensor|Flame Sensor,None,ESP32,Gas Sensor|Flame Sensor|ESP32
+Smart Parking,detect parking availability variation 783,IoT,Gas Sensor|Humidity Sensor,None,Arduino,Gas Sensor|Humidity Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 784,IoT,Humidity Sensor,Buzzer,ESP32,Humidity Sensor|Buzzer|ESP32
+Smart Security System,detect intruders using sensors variation 785,IoT,Flame Sensor,Motor Driver,Arduino,Flame Sensor|Motor Driver|Arduino
+Smart Farming,monitor agriculture conditions variation 786,IoT,IR Sensor|Flame Sensor,None,ESP8266,IR Sensor|Flame Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 787,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Smart Lighting,automatic lighting control variation 788,IoT,Flame Sensor|Gas Sensor,Buzzer,Arduino,Flame Sensor|Gas Sensor|Buzzer|Arduino
+Line Following Robot,robot follows path using IR sensors variation 789,Robotics,Motion Sensor,Servo Motor,Arduino,Motion Sensor|Servo Motor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 790,Robotics,IR Sensor,None,ESP32,IR Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 791,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 792,Robotics,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 793,IoT,Humidity Sensor|Motion Sensor,Buzzer,Arduino,Humidity Sensor|Motion Sensor|Buzzer|Arduino
+Home Automation,control home devices using wifi variation 794,IoT,Ultrasonic Sensor|LDR Sensor,Buzzer,Arduino,Ultrasonic Sensor|LDR Sensor|Buzzer|Arduino
+Fire Detection,detect fire using flame sensor variation 795,IoT,IR Sensor|Gas Sensor,None,ESP32,IR Sensor|Gas Sensor|ESP32
+Home Automation,control home devices using wifi variation 796,IoT,Temperature Sensor|LDR Sensor,Buzzer,Arduino,Temperature Sensor|LDR Sensor|Buzzer|Arduino
+Weather Monitoring,monitor temperature and humidity variation 797,IoT,Humidity Sensor|Ultrasonic Sensor,Valve,Arduino,Humidity Sensor|Ultrasonic Sensor|Valve|Arduino
+Fire Detection,detect fire using flame sensor variation 798,IoT,Motion Sensor,Valve,ESP8266,Motion Sensor|Valve|ESP8266
+Home Automation,control home devices using wifi variation 799,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 800,IoT,Flame Sensor,Motor Driver,Arduino,Flame Sensor|Motor Driver|Arduino
+Smart Farming,monitor agriculture conditions variation 801,IoT,Ultrasonic Sensor|Temperature Sensor,None,ESP32,Ultrasonic Sensor|Temperature Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 802,IoT,Humidity Sensor|Gas Sensor,Water Pump,ESP8266,Humidity Sensor|Gas Sensor|Water Pump|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 803,IoT,LDR Sensor|Gas Sensor,None,ESP8266,LDR Sensor|Gas Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 804,IoT,LDR Sensor|Ultrasonic Sensor,None,ESP8266,LDR Sensor|Ultrasonic Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 805,IoT,Gas Sensor,Servo Motor,Arduino,Gas Sensor|Servo Motor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 806,IoT,Motion Sensor|Flame Sensor,Valve,ESP32,Motion Sensor|Flame Sensor|Valve|ESP32
+Smart Parking,detect parking availability variation 807,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 808,IoT,Flame Sensor,Buzzer,Arduino,Flame Sensor|Buzzer|Arduino
+Smart Lighting,automatic lighting control variation 809,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 810,IoT,Ultrasonic Sensor,Water Pump,ESP8266,Ultrasonic Sensor|Water Pump|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 811,Robotics,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 812,Robotics,Gas Sensor,Servo Motor,Arduino,Gas Sensor|Servo Motor|Arduino
+Fire Detection,detect fire using flame sensor variation 813,IoT,Gas Sensor|Soil Sensor,None,Arduino,Gas Sensor|Soil Sensor|Arduino
+Smart Parking,detect parking availability variation 814,IoT,Ultrasonic Sensor|Flame Sensor,Servo Motor,Arduino,Ultrasonic Sensor|Flame Sensor|Servo Motor|Arduino
+Smart Lighting,automatic lighting control variation 815,IoT,Temperature Sensor|LDR Sensor,LED,ESP8266,Temperature Sensor|LDR Sensor|LED|ESP8266
+Water Level Indicator,monitor water level in tank variation 816,IoT,Soil Sensor,Buzzer,ESP8266,Soil Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 817,IoT,IR Sensor,Water Pump,ESP32,IR Sensor|Water Pump|ESP32
+Smart Security System,detect intruders using sensors variation 818,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Smart Parking,detect parking availability variation 819,IoT,Motion Sensor,Motor Driver,Arduino,Motion Sensor|Motor Driver|Arduino
+Line Following Robot,robot follows path using IR sensors variation 820,Robotics,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 821,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 822,Robotics,Humidity Sensor|Temperature Sensor,Buzzer,ESP32,Humidity Sensor|Temperature Sensor|Buzzer|ESP32
+Home Automation,control home devices using wifi variation 823,IoT,Ultrasonic Sensor|Humidity Sensor,Water Pump,ESP32,Ultrasonic Sensor|Humidity Sensor|Water Pump|ESP32
+Smart Lighting,automatic lighting control variation 824,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 825,IoT,Gas Sensor|Soil Sensor,Water Pump,ESP8266,Gas Sensor|Soil Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 826,Robotics,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 827,Robotics,Soil Sensor|LDR Sensor,Servo Motor,Arduino,Soil Sensor|LDR Sensor|Servo Motor|Arduino
+Water Level Indicator,monitor water level in tank variation 828,IoT,IR Sensor|Motion Sensor,None,ESP8266,IR Sensor|Motion Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 829,IoT,Motion Sensor|LDR Sensor,None,ESP32,Motion Sensor|LDR Sensor|ESP32
+Smart Parking,detect parking availability variation 830,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 831,IoT,Flame Sensor|Temperature Sensor,None,ESP32,Flame Sensor|Temperature Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 832,IoT,Soil Sensor|Flame Sensor,None,ESP8266,Soil Sensor|Flame Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 833,IoT,Ultrasonic Sensor|Gas Sensor,None,Arduino,Ultrasonic Sensor|Gas Sensor|Arduino
+Smart Parking,detect parking availability variation 834,IoT,Flame Sensor,Water Pump,ESP8266,Flame Sensor|Water Pump|ESP8266
+Smart Farming,monitor agriculture conditions variation 835,IoT,Motion Sensor|Temperature Sensor,None,ESP8266,Motion Sensor|Temperature Sensor|ESP8266
+Smart Parking,detect parking availability variation 836,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 837,IoT,Motion Sensor|LDR Sensor,Servo Motor,ESP8266,Motion Sensor|LDR Sensor|Servo Motor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 838,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 839,IoT,Ultrasonic Sensor,Servo Motor,Arduino,Ultrasonic Sensor|Servo Motor|Arduino
+Smart Lighting,automatic lighting control variation 840,IoT,Flame Sensor|Humidity Sensor,None,ESP8266,Flame Sensor|Humidity Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 841,IoT,LDR Sensor|Ultrasonic Sensor,None,ESP32,LDR Sensor|Ultrasonic Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 842,IoT,Motion Sensor|Soil Sensor,None,Arduino,Motion Sensor|Soil Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 843,Robotics,Gas Sensor|Flame Sensor,None,ESP8266,Gas Sensor|Flame Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 844,Robotics,Soil Sensor|IR Sensor,None,Arduino,Soil Sensor|IR Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 845,Robotics,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 846,IoT,LDR Sensor|Gas Sensor,Servo Motor,ESP8266,LDR Sensor|Gas Sensor|Servo Motor|ESP8266
+Smart Lighting,automatic lighting control variation 847,IoT,Motion Sensor|Gas Sensor,None,ESP8266,Motion Sensor|Gas Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 848,IoT,IR Sensor|LDR Sensor,None,ESP8266,IR Sensor|LDR Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 849,IoT,Motion Sensor,Buzzer,ESP8266,Motion Sensor|Buzzer|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 850,IoT,Humidity Sensor,Motor Driver,ESP8266,Humidity Sensor|Motor Driver|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 851,IoT,Motion Sensor,LED,ESP32,Motion Sensor|LED|ESP32
+Line Following Robot,robot follows path using IR sensors variation 852,Robotics,Flame Sensor|IR Sensor,Motor Driver,ESP32,Flame Sensor|IR Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 853,Robotics,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 854,Robotics,Humidity Sensor|Temperature Sensor,None,Arduino,Humidity Sensor|Temperature Sensor|Arduino
+Smart Lighting,automatic lighting control variation 855,IoT,LDR Sensor,Servo Motor,ESP32,LDR Sensor|Servo Motor|ESP32
+Smart Lighting,automatic lighting control variation 856,IoT,Soil Sensor|Flame Sensor,Relay,Arduino,Soil Sensor|Flame Sensor|Relay|Arduino
+Smart Parking,detect parking availability variation 857,IoT,Humidity Sensor|Flame Sensor,None,ESP32,Humidity Sensor|Flame Sensor|ESP32
+Home Automation,control home devices using wifi variation 858,IoT,Ultrasonic Sensor,Relay,ESP32,Ultrasonic Sensor|Relay|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 859,IoT,IR Sensor,LED,Arduino,IR Sensor|LED|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 860,IoT,Motion Sensor|Soil Sensor,Valve,ESP8266,Motion Sensor|Soil Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 861,IoT,Gas Sensor,None,Arduino,Gas Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 862,Robotics,LDR Sensor|IR Sensor,None,Arduino,LDR Sensor|IR Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 863,IoT,Temperature Sensor|Soil Sensor,LED,ESP32,Temperature Sensor|Soil Sensor|LED|ESP32
+Smart Parking,detect parking availability variation 864,IoT,Motion Sensor|LDR Sensor,None,ESP8266,Motion Sensor|LDR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 865,IoT,Ultrasonic Sensor,Motor Driver,Arduino,Ultrasonic Sensor|Motor Driver|Arduino
+Home Automation,control home devices using wifi variation 866,IoT,Gas Sensor|Motion Sensor,Buzzer,ESP8266,Gas Sensor|Motion Sensor|Buzzer|ESP8266
+Fire Detection,detect fire using flame sensor variation 867,IoT,IR Sensor,Water Pump,ESP8266,IR Sensor|Water Pump|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 868,IoT,Humidity Sensor|Ultrasonic Sensor,None,Arduino,Humidity Sensor|Ultrasonic Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 869,IoT,Humidity Sensor,Valve,ESP32,Humidity Sensor|Valve|ESP32
+Smart Farming,monitor agriculture conditions variation 870,IoT,Ultrasonic Sensor|Gas Sensor,None,ESP8266,Ultrasonic Sensor|Gas Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 871,IoT,Soil Sensor,Water Pump,ESP32,Soil Sensor|Water Pump|ESP32
+Smart Farming,monitor agriculture conditions variation 872,IoT,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 873,IoT,Gas Sensor|Motion Sensor,Relay,ESP8266,Gas Sensor|Motion Sensor|Relay|ESP8266
+Water Level Indicator,monitor water level in tank variation 874,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 875,IoT,Soil Sensor,Servo Motor,ESP8266,Soil Sensor|Servo Motor|ESP8266
+Smart Farming,monitor agriculture conditions variation 876,IoT,Humidity Sensor|IR Sensor,None,ESP32,Humidity Sensor|IR Sensor|ESP32
+Smart Lighting,automatic lighting control variation 877,IoT,LDR Sensor|Temperature Sensor,Motor Driver,ESP8266,LDR Sensor|Temperature Sensor|Motor Driver|ESP8266
+Water Level Indicator,monitor water level in tank variation 878,IoT,IR Sensor,Relay,Arduino,IR Sensor|Relay|Arduino
+Smart Farming,monitor agriculture conditions variation 879,IoT,IR Sensor|Gas Sensor,None,Arduino,IR Sensor|Gas Sensor|Arduino
+Smart Lighting,automatic lighting control variation 880,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Smart Parking,detect parking availability variation 881,IoT,Soil Sensor|IR Sensor,Valve,ESP8266,Soil Sensor|IR Sensor|Valve|ESP8266
+Home Automation,control home devices using wifi variation 882,IoT,Motion Sensor|IR Sensor,None,ESP8266,Motion Sensor|IR Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 883,IoT,Gas Sensor|IR Sensor,Motor Driver,ESP32,Gas Sensor|IR Sensor|Motor Driver|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 884,Robotics,IR Sensor|Soil Sensor,None,ESP32,IR Sensor|Soil Sensor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 885,Robotics,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 886,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 887,Robotics,Humidity Sensor,Servo Motor,Arduino,Humidity Sensor|Servo Motor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 888,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 889,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 890,IoT,Flame Sensor,Water Pump,Arduino,Flame Sensor|Water Pump|Arduino
+Smart Farming,monitor agriculture conditions variation 891,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 892,IoT,LDR Sensor,None,Arduino,LDR Sensor|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 893,Robotics,IR Sensor,None,ESP32,IR Sensor|ESP32
+Home Automation,control home devices using wifi variation 894,IoT,Temperature Sensor|LDR Sensor,None,ESP8266,Temperature Sensor|LDR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 895,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 896,IoT,IR Sensor,Buzzer,Arduino,IR Sensor|Buzzer|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 897,Robotics,Ultrasonic Sensor,Buzzer,Arduino,Ultrasonic Sensor|Buzzer|Arduino
+Home Automation,control home devices using wifi variation 898,IoT,Humidity Sensor|Flame Sensor,None,Arduino,Humidity Sensor|Flame Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 899,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Parking,detect parking availability variation 900,IoT,Ultrasonic Sensor,Valve,ESP32,Ultrasonic Sensor|Valve|ESP32
+Home Automation,control home devices using wifi variation 901,IoT,Flame Sensor,None,ESP8266,Flame Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 902,IoT,Soil Sensor,Motor Driver,ESP8266,Soil Sensor|Motor Driver|ESP8266
+Smart Lighting,automatic lighting control variation 903,IoT,Gas Sensor,Motor Driver,ESP32,Gas Sensor|Motor Driver|ESP32
+Water Level Indicator,monitor water level in tank variation 904,IoT,IR Sensor|Temperature Sensor,Water Pump,ESP32,IR Sensor|Temperature Sensor|Water Pump|ESP32
+Water Level Indicator,monitor water level in tank variation 905,IoT,Flame Sensor|LDR Sensor,None,ESP8266,Flame Sensor|LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 906,Robotics,Flame Sensor,Relay,Arduino,Flame Sensor|Relay|Arduino
+Fire Detection,detect fire using flame sensor variation 907,IoT,Ultrasonic Sensor,Valve,ESP8266,Ultrasonic Sensor|Valve|ESP8266
+Smart Parking,detect parking availability variation 908,IoT,Temperature Sensor|Motion Sensor,Water Pump,ESP32,Temperature Sensor|Motion Sensor|Water Pump|ESP32
+Weather Monitoring,monitor temperature and humidity variation 909,IoT,Motion Sensor,Valve,ESP8266,Motion Sensor|Valve|ESP8266
+Smart Lighting,automatic lighting control variation 910,IoT,Gas Sensor|IR Sensor,None,ESP8266,Gas Sensor|IR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 911,IoT,LDR Sensor|IR Sensor,None,Arduino,LDR Sensor|IR Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 912,IoT,Soil Sensor|Flame Sensor,Motor Driver,Arduino,Soil Sensor|Flame Sensor|Motor Driver|Arduino
+Fire Detection,detect fire using flame sensor variation 913,IoT,Ultrasonic Sensor|Soil Sensor,Water Pump,ESP32,Ultrasonic Sensor|Soil Sensor|Water Pump|ESP32
+Smart Security System,detect intruders using sensors variation 914,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 915,IoT,Motion Sensor|Temperature Sensor,Water Pump,ESP8266,Motion Sensor|Temperature Sensor|Water Pump|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 916,Robotics,Soil Sensor|Flame Sensor,None,ESP32,Soil Sensor|Flame Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 917,IoT,Flame Sensor|Gas Sensor,None,ESP32,Flame Sensor|Gas Sensor|ESP32
+Smart Parking,detect parking availability variation 918,IoT,Flame Sensor|LDR Sensor,None,ESP8266,Flame Sensor|LDR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 919,IoT,Motion Sensor,Buzzer,ESP32,Motion Sensor|Buzzer|ESP32
+Line Following Robot,robot follows path using IR sensors variation 920,Robotics,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 921,Robotics,Flame Sensor|Temperature Sensor,Valve,ESP32,Flame Sensor|Temperature Sensor|Valve|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 922,Robotics,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 923,IoT,Humidity Sensor,Water Pump,ESP8266,Humidity Sensor|Water Pump|ESP8266
+Fire Detection,detect fire using flame sensor variation 924,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 925,IoT,Flame Sensor|Soil Sensor,None,Arduino,Flame Sensor|Soil Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 926,IoT,Gas Sensor,Buzzer,Arduino,Gas Sensor|Buzzer|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 927,IoT,Motion Sensor|LDR Sensor,Motor Driver,ESP8266,Motion Sensor|LDR Sensor|Motor Driver|ESP8266
+Water Level Indicator,monitor water level in tank variation 928,IoT,LDR Sensor,Water Pump,Arduino,LDR Sensor|Water Pump|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 929,IoT,Soil Sensor,Water Pump,ESP32,Soil Sensor|Water Pump|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 930,IoT,Gas Sensor|Flame Sensor,Valve,ESP8266,Gas Sensor|Flame Sensor|Valve|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 931,Robotics,Ultrasonic Sensor|Gas Sensor,Motor Driver,ESP8266,Ultrasonic Sensor|Gas Sensor|Motor Driver|ESP8266
+Fire Detection,detect fire using flame sensor variation 932,IoT,LDR Sensor|Gas Sensor,LED,Arduino,LDR Sensor|Gas Sensor|LED|Arduino
+Smart Security System,detect intruders using sensors variation 933,IoT,Temperature Sensor,Relay,ESP32,Temperature Sensor|Relay|ESP32
+Weather Monitoring,monitor temperature and humidity variation 934,IoT,Temperature Sensor,Motor Driver,ESP8266,Temperature Sensor|Motor Driver|ESP8266
+Smart Parking,detect parking availability variation 935,IoT,Temperature Sensor,None,ESP32,Temperature Sensor|ESP32
+Smart Lighting,automatic lighting control variation 936,IoT,Humidity Sensor|Ultrasonic Sensor,Servo Motor,ESP32,Humidity Sensor|Ultrasonic Sensor|Servo Motor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 937,IoT,Ultrasonic Sensor,Buzzer,ESP32,Ultrasonic Sensor|Buzzer|ESP32
+Line Following Robot,robot follows path using IR sensors variation 938,Robotics,Motion Sensor,Relay,ESP8266,Motion Sensor|Relay|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 939,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Smart Lighting,automatic lighting control variation 940,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 941,IoT,Gas Sensor,Water Pump,ESP8266,Gas Sensor|Water Pump|ESP8266
+Smart Lighting,automatic lighting control variation 942,IoT,Temperature Sensor,Buzzer,Arduino,Temperature Sensor|Buzzer|Arduino
+Water Level Indicator,monitor water level in tank variation 943,IoT,Motion Sensor,None,Arduino,Motion Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 944,IoT,Soil Sensor,Valve,Arduino,Soil Sensor|Valve|Arduino
+Home Automation,control home devices using wifi variation 945,IoT,Ultrasonic Sensor|Motion Sensor,Servo Motor,ESP32,Ultrasonic Sensor|Motion Sensor|Servo Motor|ESP32
+Smart Parking,detect parking availability variation 946,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 947,Robotics,Temperature Sensor|LDR Sensor,None,ESP32,Temperature Sensor|LDR Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 948,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 949,IoT,Soil Sensor,Water Pump,Arduino,Soil Sensor|Water Pump|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 950,IoT,Temperature Sensor|Ultrasonic Sensor,None,Arduino,Temperature Sensor|Ultrasonic Sensor|Arduino
+Smart Lighting,automatic lighting control variation 951,IoT,Motion Sensor|Soil Sensor,LED,Arduino,Motion Sensor|Soil Sensor|LED|Arduino
+Smart Farming,monitor agriculture conditions variation 952,IoT,Motion Sensor|Ultrasonic Sensor,None,ESP32,Motion Sensor|Ultrasonic Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 953,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 954,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 955,IoT,Humidity Sensor,Servo Motor,Arduino,Humidity Sensor|Servo Motor|Arduino
+Smart Security System,detect intruders using sensors variation 956,IoT,Temperature Sensor,Buzzer,ESP8266,Temperature Sensor|Buzzer|ESP8266
+Smart Parking,detect parking availability variation 957,IoT,Soil Sensor|Gas Sensor,None,ESP8266,Soil Sensor|Gas Sensor|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 958,Robotics,Temperature Sensor|Flame Sensor,Buzzer,ESP8266,Temperature Sensor|Flame Sensor|Buzzer|ESP8266
+Smart Lighting,automatic lighting control variation 959,IoT,Temperature Sensor|Ultrasonic Sensor,Buzzer,ESP8266,Temperature Sensor|Ultrasonic Sensor|Buzzer|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 960,Robotics,Soil Sensor|Flame Sensor,Servo Motor,ESP32,Soil Sensor|Flame Sensor|Servo Motor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 961,IoT,Temperature Sensor|LDR Sensor,None,ESP32,Temperature Sensor|LDR Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 962,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Smart Parking,detect parking availability variation 963,IoT,Gas Sensor|IR Sensor,Servo Motor,Arduino,Gas Sensor|IR Sensor|Servo Motor|Arduino
+Smart Lighting,automatic lighting control variation 964,IoT,IR Sensor|Ultrasonic Sensor,Buzzer,Arduino,IR Sensor|Ultrasonic Sensor|Buzzer|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 965,Robotics,Soil Sensor|LDR Sensor,None,ESP8266,Soil Sensor|LDR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 966,IoT,Motion Sensor,Motor Driver,ESP8266,Motion Sensor|Motor Driver|ESP8266
+Fire Detection,detect fire using flame sensor variation 967,IoT,Motion Sensor|IR Sensor,Motor Driver,ESP8266,Motion Sensor|IR Sensor|Motor Driver|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 968,Robotics,Ultrasonic Sensor|Flame Sensor,LED,Arduino,Ultrasonic Sensor|Flame Sensor|LED|Arduino
+Air Quality Monitoring,monitor pollution levels variation 969,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Home Automation,control home devices using wifi variation 970,IoT,IR Sensor|Gas Sensor,None,ESP32,IR Sensor|Gas Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 971,IoT,Humidity Sensor,Relay,ESP32,Humidity Sensor|Relay|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 972,IoT,Humidity Sensor|IR Sensor,None,Arduino,Humidity Sensor|IR Sensor|Arduino
+Smart Parking,detect parking availability variation 973,IoT,IR Sensor|Gas Sensor,None,ESP8266,IR Sensor|Gas Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 974,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 975,Robotics,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 976,IoT,Humidity Sensor|Temperature Sensor,None,Arduino,Humidity Sensor|Temperature Sensor|Arduino
+Home Automation,control home devices using wifi variation 977,IoT,Temperature Sensor,Relay,ESP32,Temperature Sensor|Relay|ESP32
+Smart Farming,monitor agriculture conditions variation 978,IoT,Ultrasonic Sensor|Temperature Sensor,None,Arduino,Ultrasonic Sensor|Temperature Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 979,IoT,Soil Sensor|LDR Sensor,Buzzer,ESP8266,Soil Sensor|LDR Sensor|Buzzer|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 980,IoT,Gas Sensor,Buzzer,ESP32,Gas Sensor|Buzzer|ESP32
+Smart Farming,monitor agriculture conditions variation 981,IoT,LDR Sensor,None,ESP8266,LDR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 982,IoT,IR Sensor|Humidity Sensor,None,ESP32,IR Sensor|Humidity Sensor|ESP32
+Home Automation,control home devices using wifi variation 983,IoT,Humidity Sensor,Water Pump,Arduino,Humidity Sensor|Water Pump|Arduino
+Water Level Indicator,monitor water level in tank variation 984,IoT,Flame Sensor|Motion Sensor,None,Arduino,Flame Sensor|Motion Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 985,IoT,Temperature Sensor,None,Arduino,Temperature Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 986,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 987,IoT,LDR Sensor,Valve,ESP32,LDR Sensor|Valve|ESP32
+Weather Monitoring,monitor temperature and humidity variation 988,IoT,LDR Sensor,None,ESP32,LDR Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 989,IoT,Flame Sensor|Motion Sensor,None,Arduino,Flame Sensor|Motion Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 990,IoT,Temperature Sensor|Ultrasonic Sensor,LED,Arduino,Temperature Sensor|Ultrasonic Sensor|LED|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 991,IoT,Motion Sensor|Ultrasonic Sensor,LED,ESP8266,Motion Sensor|Ultrasonic Sensor|LED|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 992,Robotics,Soil Sensor|IR Sensor,None,ESP32,Soil Sensor|IR Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 993,IoT,Flame Sensor|Humidity Sensor,Buzzer,ESP8266,Flame Sensor|Humidity Sensor|Buzzer|ESP8266
+Smart Farming,monitor agriculture conditions variation 994,IoT,Gas Sensor|Motion Sensor,None,Arduino,Gas Sensor|Motion Sensor|Arduino
+Home Automation,control home devices using wifi variation 995,IoT,Motion Sensor|Soil Sensor,None,Arduino,Motion Sensor|Soil Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 996,IoT,Flame Sensor,Water Pump,ESP8266,Flame Sensor|Water Pump|ESP8266
+Smart Farming,monitor agriculture conditions variation 997,IoT,Gas Sensor|IR Sensor,Water Pump,ESP32,Gas Sensor|IR Sensor|Water Pump|ESP32
+Air Quality Monitoring,monitor pollution levels variation 998,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 999,Robotics,Humidity Sensor|Temperature Sensor,None,ESP8266,Humidity Sensor|Temperature Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1000,IoT,IR Sensor|Temperature Sensor,None,ESP32,IR Sensor|Temperature Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1001,IoT,Soil Sensor,Buzzer,ESP8266,Soil Sensor|Buzzer|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 1002,IoT,IR Sensor|Soil Sensor,Servo Motor,ESP8266,IR Sensor|Soil Sensor|Servo Motor|ESP8266
+Smart Security System,detect intruders using sensors variation 1003,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1004,IoT,Humidity Sensor|Temperature Sensor,Servo Motor,Arduino,Humidity Sensor|Temperature Sensor|Servo Motor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1005,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1006,IoT,Temperature Sensor|LDR Sensor,None,ESP32,Temperature Sensor|LDR Sensor|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 1007,Robotics,Flame Sensor|Temperature Sensor,None,Arduino,Flame Sensor|Temperature Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 1008,IoT,LDR Sensor|Humidity Sensor,None,ESP32,LDR Sensor|Humidity Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 1009,IoT,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Smart Parking,detect parking availability variation 1010,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1011,IoT,Gas Sensor|Motion Sensor,Relay,ESP8266,Gas Sensor|Motion Sensor|Relay|ESP8266
+Smart Security System,detect intruders using sensors variation 1012,IoT,LDR Sensor,Servo Motor,Arduino,LDR Sensor|Servo Motor|Arduino
+Home Automation,control home devices using wifi variation 1013,IoT,Gas Sensor,Motor Driver,Arduino,Gas Sensor|Motor Driver|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1014,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1015,IoT,Flame Sensor,Relay,Arduino,Flame Sensor|Relay|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 1016,Robotics,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1017,IoT,Humidity Sensor,Water Pump,ESP8266,Humidity Sensor|Water Pump|ESP8266
+Smart Farming,monitor agriculture conditions variation 1018,IoT,Ultrasonic Sensor,Relay,Arduino,Ultrasonic Sensor|Relay|Arduino
+Fire Detection,detect fire using flame sensor variation 1019,IoT,IR Sensor,LED,ESP8266,IR Sensor|LED|ESP8266
+Smart Lighting,automatic lighting control variation 1020,IoT,Flame Sensor|Humidity Sensor,None,ESP32,Flame Sensor|Humidity Sensor|ESP32
+Home Automation,control home devices using wifi variation 1021,IoT,Gas Sensor|Temperature Sensor,Motor Driver,ESP32,Gas Sensor|Temperature Sensor|Motor Driver|ESP32
+Smart Parking,detect parking availability variation 1022,IoT,LDR Sensor|Flame Sensor,None,ESP8266,LDR Sensor|Flame Sensor|ESP8266
+Smart Parking,detect parking availability variation 1023,IoT,Flame Sensor,LED,ESP32,Flame Sensor|LED|ESP32
+Smart Farming,monitor agriculture conditions variation 1024,IoT,Motion Sensor|Flame Sensor,None,ESP8266,Motion Sensor|Flame Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1025,IoT,Gas Sensor|LDR Sensor,Relay,ESP32,Gas Sensor|LDR Sensor|Relay|ESP32
+Home Automation,control home devices using wifi variation 1026,IoT,Ultrasonic Sensor,LED,ESP8266,Ultrasonic Sensor|LED|ESP8266
+Fire Detection,detect fire using flame sensor variation 1027,IoT,IR Sensor|Gas Sensor,None,ESP8266,IR Sensor|Gas Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 1028,IoT,Gas Sensor|IR Sensor,LED,Arduino,Gas Sensor|IR Sensor|LED|Arduino
+Obstacle Avoiding Robot,robot avoids obstacles variation 1029,Robotics,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 1030,IoT,Flame Sensor|Ultrasonic Sensor,None,ESP8266,Flame Sensor|Ultrasonic Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1031,Robotics,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1032,IoT,Humidity Sensor,Water Pump,ESP32,Humidity Sensor|Water Pump|ESP32
+Smart Parking,detect parking availability variation 1033,IoT,Flame Sensor,Relay,ESP32,Flame Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 1034,IoT,Gas Sensor,LED,ESP32,Gas Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 1035,IoT,Motion Sensor,Motor Driver,ESP32,Motion Sensor|Motor Driver|ESP32
+Smart Lighting,automatic lighting control variation 1036,IoT,Motion Sensor,Water Pump,ESP32,Motion Sensor|Water Pump|ESP32
+Smart Farming,monitor agriculture conditions variation 1037,IoT,LDR Sensor|Humidity Sensor,Buzzer,ESP32,LDR Sensor|Humidity Sensor|Buzzer|ESP32
+Weather Monitoring,monitor temperature and humidity variation 1038,IoT,Flame Sensor|Ultrasonic Sensor,None,Arduino,Flame Sensor|Ultrasonic Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 1039,IoT,Motion Sensor|Flame Sensor,None,Arduino,Motion Sensor|Flame Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1040,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 1041,IoT,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Lighting,automatic lighting control variation 1042,IoT,Motion Sensor|Temperature Sensor,Motor Driver,Arduino,Motion Sensor|Temperature Sensor|Motor Driver|Arduino
+Air Quality Monitoring,monitor pollution levels variation 1043,IoT,Motion Sensor|Soil Sensor,None,Arduino,Motion Sensor|Soil Sensor|Arduino
+Smart Parking,detect parking availability variation 1044,IoT,Temperature Sensor|Motion Sensor,Water Pump,Arduino,Temperature Sensor|Motion Sensor|Water Pump|Arduino
+Smart Security System,detect intruders using sensors variation 1045,IoT,Flame Sensor,Buzzer,ESP32,Flame Sensor|Buzzer|ESP32
+Smart Lighting,automatic lighting control variation 1046,IoT,Ultrasonic Sensor,Servo Motor,Arduino,Ultrasonic Sensor|Servo Motor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 1047,Robotics,Soil Sensor|LDR Sensor,Valve,ESP8266,Soil Sensor|LDR Sensor|Valve|ESP8266
+Smart Security System,detect intruders using sensors variation 1048,IoT,Ultrasonic Sensor|LDR Sensor,None,ESP32,Ultrasonic Sensor|LDR Sensor|ESP32
+Fire Detection,detect fire using flame sensor variation 1049,IoT,Flame Sensor|IR Sensor,None,Arduino,Flame Sensor|IR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1050,IoT,Temperature Sensor,None,ESP8266,Temperature Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1051,Robotics,Motion Sensor,LED,Arduino,Motion Sensor|LED|Arduino
+Smart Parking,detect parking availability variation 1052,IoT,Motion Sensor|Flame Sensor,Relay,ESP32,Motion Sensor|Flame Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1053,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1054,IoT,Temperature Sensor|IR Sensor,LED,ESP8266,Temperature Sensor|IR Sensor|LED|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1055,Robotics,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1056,IoT,LDR Sensor|Ultrasonic Sensor,None,ESP8266,LDR Sensor|Ultrasonic Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 1057,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Parking,detect parking availability variation 1058,IoT,Humidity Sensor|Soil Sensor,Valve,ESP8266,Humidity Sensor|Soil Sensor|Valve|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 1059,IoT,Humidity Sensor,Motor Driver,ESP8266,Humidity Sensor|Motor Driver|ESP8266
+Smart Security System,detect intruders using sensors variation 1060,IoT,Ultrasonic Sensor|Motion Sensor,Valve,Arduino,Ultrasonic Sensor|Motion Sensor|Valve|Arduino
+Line Following Robot,robot follows path using IR sensors variation 1061,Robotics,Temperature Sensor|Humidity Sensor,None,ESP8266,Temperature Sensor|Humidity Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1062,IoT,Gas Sensor|Ultrasonic Sensor,Buzzer,ESP8266,Gas Sensor|Ultrasonic Sensor|Buzzer|ESP8266
+Smart Parking,detect parking availability variation 1063,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 1064,IoT,Ultrasonic Sensor|Flame Sensor,Relay,ESP8266,Ultrasonic Sensor|Flame Sensor|Relay|ESP8266
+Smart Parking,detect parking availability variation 1065,IoT,Flame Sensor|LDR Sensor,None,ESP8266,Flame Sensor|LDR Sensor|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 1066,IoT,Soil Sensor|Humidity Sensor,None,Arduino,Soil Sensor|Humidity Sensor|Arduino
+Smart Parking,detect parking availability variation 1067,IoT,IR Sensor|Humidity Sensor,None,ESP32,IR Sensor|Humidity Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 1068,IoT,IR Sensor,None,ESP32,IR Sensor|ESP32
+Smart Parking,detect parking availability variation 1069,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 1070,IoT,Ultrasonic Sensor|IR Sensor,None,Arduino,Ultrasonic Sensor|IR Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1071,IoT,Motion Sensor,LED,ESP8266,Motion Sensor|LED|ESP8266
+Air Quality Monitoring,monitor pollution levels variation 1072,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 1073,Robotics,Humidity Sensor|LDR Sensor,None,Arduino,Humidity Sensor|LDR Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 1074,IoT,Motion Sensor,Motor Driver,ESP8266,Motion Sensor|Motor Driver|ESP8266
+Water Level Indicator,monitor water level in tank variation 1075,IoT,Temperature Sensor,Water Pump,Arduino,Temperature Sensor|Water Pump|Arduino
+Fire Detection,detect fire using flame sensor variation 1076,IoT,Gas Sensor,Relay,ESP32,Gas Sensor|Relay|ESP32
+Smart Farming,monitor agriculture conditions variation 1077,IoT,Temperature Sensor,LED,ESP32,Temperature Sensor|LED|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 1078,Robotics,Humidity Sensor|Ultrasonic Sensor,Motor Driver,ESP32,Humidity Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Smart Security System,detect intruders using sensors variation 1079,IoT,Temperature Sensor,Water Pump,Arduino,Temperature Sensor|Water Pump|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1080,IoT,LDR Sensor|Humidity Sensor,Buzzer,ESP32,LDR Sensor|Humidity Sensor|Buzzer|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1081,IoT,Gas Sensor|IR Sensor,LED,ESP8266,Gas Sensor|IR Sensor|LED|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1082,Robotics,Motion Sensor|Humidity Sensor,None,ESP8266,Motion Sensor|Humidity Sensor|ESP8266
+Home Automation,control home devices using wifi variation 1083,IoT,Gas Sensor|Ultrasonic Sensor,None,ESP8266,Gas Sensor|Ultrasonic Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 1084,IoT,Ultrasonic Sensor|Soil Sensor,Servo Motor,ESP8266,Ultrasonic Sensor|Soil Sensor|Servo Motor|ESP8266
+Smart Security System,detect intruders using sensors variation 1085,IoT,LDR Sensor|Ultrasonic Sensor,None,ESP32,LDR Sensor|Ultrasonic Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 1086,IoT,Gas Sensor,None,ESP32,Gas Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 1087,IoT,Motion Sensor|Flame Sensor,Valve,ESP32,Motion Sensor|Flame Sensor|Valve|ESP32
+Fire Detection,detect fire using flame sensor variation 1088,IoT,Ultrasonic Sensor,Relay,ESP32,Ultrasonic Sensor|Relay|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1089,IoT,Soil Sensor|Humidity Sensor,Buzzer,ESP32,Soil Sensor|Humidity Sensor|Buzzer|ESP32
+Smart Parking,detect parking availability variation 1090,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Home Automation,control home devices using wifi variation 1091,IoT,Motion Sensor,Relay,ESP32,Motion Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 1092,IoT,Flame Sensor|Humidity Sensor,None,ESP32,Flame Sensor|Humidity Sensor|ESP32
+Smart Lighting,automatic lighting control variation 1093,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 1094,IoT,Ultrasonic Sensor,None,ESP32,Ultrasonic Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 1095,IoT,Humidity Sensor,Relay,ESP32,Humidity Sensor|Relay|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 1096,IoT,Ultrasonic Sensor|Humidity Sensor,Buzzer,ESP32,Ultrasonic Sensor|Humidity Sensor|Buzzer|ESP32
+Fire Detection,detect fire using flame sensor variation 1097,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 1098,IoT,Humidity Sensor|Flame Sensor,None,ESP32,Humidity Sensor|Flame Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 1099,IoT,Soil Sensor,Buzzer,Arduino,Soil Sensor|Buzzer|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1100,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 1101,IoT,Humidity Sensor|LDR Sensor,Buzzer,ESP32,Humidity Sensor|LDR Sensor|Buzzer|ESP32
+Smart Farming,monitor agriculture conditions variation 1102,IoT,Ultrasonic Sensor|Gas Sensor,LED,ESP32,Ultrasonic Sensor|Gas Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 1103,IoT,Flame Sensor,Buzzer,ESP8266,Flame Sensor|Buzzer|ESP8266
+Smart Farming,monitor agriculture conditions variation 1104,IoT,Ultrasonic Sensor,None,Arduino,Ultrasonic Sensor|Arduino
+Home Automation,control home devices using wifi variation 1105,IoT,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Smart Lighting,automatic lighting control variation 1106,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Fire Detection,detect fire using flame sensor variation 1107,IoT,IR Sensor,None,ESP8266,IR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 1108,IoT,IR Sensor|Gas Sensor,None,ESP8266,IR Sensor|Gas Sensor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1109,IoT,LDR Sensor|Humidity Sensor,None,ESP8266,LDR Sensor|Humidity Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1110,IoT,Humidity Sensor|Flame Sensor,Relay,ESP32,Humidity Sensor|Flame Sensor|Relay|ESP32
+Fire Detection,detect fire using flame sensor variation 1111,IoT,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 1112,IoT,Temperature Sensor|Flame Sensor,None,Arduino,Temperature Sensor|Flame Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 1113,IoT,Motion Sensor,Buzzer,Arduino,Motion Sensor|Buzzer|Arduino
+Smart Security System,detect intruders using sensors variation 1114,IoT,LDR Sensor,Water Pump,Arduino,LDR Sensor|Water Pump|Arduino
+Water Level Indicator,monitor water level in tank variation 1115,IoT,Ultrasonic Sensor|Soil Sensor,None,ESP32,Ultrasonic Sensor|Soil Sensor|ESP32
+Smart Lighting,automatic lighting control variation 1116,IoT,Flame Sensor|Ultrasonic Sensor,None,ESP32,Flame Sensor|Ultrasonic Sensor|ESP32
+Home Automation,control home devices using wifi variation 1117,IoT,Temperature Sensor,Motor Driver,Arduino,Temperature Sensor|Motor Driver|Arduino
+Smart Parking,detect parking availability variation 1118,IoT,IR Sensor|Motion Sensor,Motor Driver,ESP8266,IR Sensor|Motion Sensor|Motor Driver|ESP8266
+Smart Farming,monitor agriculture conditions variation 1119,IoT,Temperature Sensor,Valve,ESP32,Temperature Sensor|Valve|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1120,IoT,LDR Sensor,Water Pump,ESP8266,LDR Sensor|Water Pump|ESP8266
+Line Following Robot,robot follows path using IR sensors variation 1121,Robotics,Gas Sensor,Valve,Arduino,Gas Sensor|Valve|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1122,IoT,Gas Sensor,Buzzer,Arduino,Gas Sensor|Buzzer|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1123,IoT,Humidity Sensor,None,ESP8266,Humidity Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1124,Robotics,Soil Sensor,Buzzer,ESP32,Soil Sensor|Buzzer|ESP32
+Fire Detection,detect fire using flame sensor variation 1125,IoT,Ultrasonic Sensor,LED,ESP32,Ultrasonic Sensor|LED|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1126,IoT,Flame Sensor|Soil Sensor,Servo Motor,ESP32,Flame Sensor|Soil Sensor|Servo Motor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 1127,Robotics,Motion Sensor|Flame Sensor,Water Pump,ESP32,Motion Sensor|Flame Sensor|Water Pump|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 1128,Robotics,Soil Sensor,None,ESP32,Soil Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 1129,IoT,IR Sensor|Soil Sensor,Motor Driver,ESP32,IR Sensor|Soil Sensor|Motor Driver|ESP32
+Water Level Indicator,monitor water level in tank variation 1130,IoT,Soil Sensor|Motion Sensor,None,Arduino,Soil Sensor|Motion Sensor|Arduino
+Line Following Robot,robot follows path using IR sensors variation 1131,Robotics,Motion Sensor|LDR Sensor,None,ESP8266,Motion Sensor|LDR Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 1132,IoT,IR Sensor,Servo Motor,ESP8266,IR Sensor|Servo Motor|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 1133,IoT,Gas Sensor|IR Sensor,Water Pump,ESP8266,Gas Sensor|IR Sensor|Water Pump|ESP8266
+Smart Irrigation,automatic watering using soil moisture variation 1134,IoT,LDR Sensor|Humidity Sensor,None,ESP8266,LDR Sensor|Humidity Sensor|ESP8266
+Smart Parking,detect parking availability variation 1135,IoT,LDR Sensor|Ultrasonic Sensor,Motor Driver,ESP32,LDR Sensor|Ultrasonic Sensor|Motor Driver|ESP32
+Line Following Robot,robot follows path using IR sensors variation 1136,Robotics,Ultrasonic Sensor,Servo Motor,ESP32,Ultrasonic Sensor|Servo Motor|ESP32
+Smart Lighting,automatic lighting control variation 1137,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 1138,IoT,IR Sensor|Humidity Sensor,None,ESP8266,IR Sensor|Humidity Sensor|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1139,Robotics,Humidity Sensor|Motion Sensor,None,ESP8266,Humidity Sensor|Motion Sensor|ESP8266
+Smart Parking,detect parking availability variation 1140,IoT,Motion Sensor|IR Sensor,Water Pump,ESP32,Motion Sensor|IR Sensor|Water Pump|ESP32
+Fire Detection,detect fire using flame sensor variation 1141,IoT,Humidity Sensor|Ultrasonic Sensor,Servo Motor,ESP8266,Humidity Sensor|Ultrasonic Sensor|Servo Motor|ESP8266
+Water Level Indicator,monitor water level in tank variation 1142,IoT,IR Sensor|Gas Sensor,Relay,ESP8266,IR Sensor|Gas Sensor|Relay|ESP8266
+Smart Lighting,automatic lighting control variation 1143,IoT,Motion Sensor,Relay,ESP8266,Motion Sensor|Relay|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1144,Robotics,LDR Sensor,LED,Arduino,LDR Sensor|LED|Arduino
+Air Quality Monitoring,monitor pollution levels variation 1145,IoT,Humidity Sensor,None,Arduino,Humidity Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1146,IoT,IR Sensor|Ultrasonic Sensor,Servo Motor,ESP8266,IR Sensor|Ultrasonic Sensor|Servo Motor|ESP8266
+Smart Parking,detect parking availability variation 1147,IoT,Ultrasonic Sensor|IR Sensor,None,ESP32,Ultrasonic Sensor|IR Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1148,IoT,IR Sensor|Temperature Sensor,LED,ESP8266,IR Sensor|Temperature Sensor|LED|ESP8266
+Water Level Indicator,monitor water level in tank variation 1149,IoT,LDR Sensor,Water Pump,ESP8266,LDR Sensor|Water Pump|ESP8266
+Smart Security System,detect intruders using sensors variation 1150,IoT,Motion Sensor,Water Pump,ESP32,Motion Sensor|Water Pump|ESP32
+Smart Lighting,automatic lighting control variation 1151,IoT,Ultrasonic Sensor|Motion Sensor,None,Arduino,Ultrasonic Sensor|Motion Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1152,IoT,LDR Sensor|Humidity Sensor,None,ESP32,LDR Sensor|Humidity Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 1153,IoT,Motion Sensor|Humidity Sensor,None,Arduino,Motion Sensor|Humidity Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1154,IoT,IR Sensor,None,Arduino,IR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1155,IoT,Humidity Sensor|Flame Sensor,None,ESP32,Humidity Sensor|Flame Sensor|ESP32
+Weather Monitoring,monitor temperature and humidity variation 1156,IoT,Humidity Sensor|IR Sensor,Relay,Arduino,Humidity Sensor|IR Sensor|Relay|Arduino
+Home Automation,control home devices using wifi variation 1157,IoT,IR Sensor,Relay,Arduino,IR Sensor|Relay|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1158,IoT,Motion Sensor,Servo Motor,Arduino,Motion Sensor|Servo Motor|Arduino
+Water Level Indicator,monitor water level in tank variation 1159,IoT,Humidity Sensor,LED,ESP8266,Humidity Sensor|LED|ESP8266
+Obstacle Avoiding Robot,robot avoids obstacles variation 1160,Robotics,Soil Sensor,None,Arduino,Soil Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 1161,IoT,Motion Sensor|LDR Sensor,None,ESP8266,Motion Sensor|LDR Sensor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 1162,IoT,LDR Sensor|Temperature Sensor,None,ESP32,LDR Sensor|Temperature Sensor|ESP32
+Water Level Indicator,monitor water level in tank variation 1163,IoT,LDR Sensor|Soil Sensor,None,Arduino,LDR Sensor|Soil Sensor|Arduino
+Water Level Indicator,monitor water level in tank variation 1164,IoT,Motion Sensor|Flame Sensor,Buzzer,ESP32,Motion Sensor|Flame Sensor|Buzzer|ESP32
+Home Automation,control home devices using wifi variation 1165,IoT,Soil Sensor,None,ESP8266,Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1166,IoT,Flame Sensor,Valve,ESP32,Flame Sensor|Valve|ESP32
+Line Following Robot,robot follows path using IR sensors variation 1167,Robotics,Ultrasonic Sensor,None,ESP8266,Ultrasonic Sensor|ESP8266
+Fire Detection,detect fire using flame sensor variation 1168,IoT,Humidity Sensor,Water Pump,ESP8266,Humidity Sensor|Water Pump|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 1169,IoT,IR Sensor|Motion Sensor,None,ESP32,IR Sensor|Motion Sensor|ESP32
+Home Automation,control home devices using wifi variation 1170,IoT,Motion Sensor|Gas Sensor,None,Arduino,Motion Sensor|Gas Sensor|Arduino
+Air Quality Monitoring,monitor pollution levels variation 1171,IoT,Humidity Sensor,Servo Motor,ESP32,Humidity Sensor|Servo Motor|ESP32
+Line Following Robot,robot follows path using IR sensors variation 1172,Robotics,Motion Sensor,Motor Driver,Arduino,Motion Sensor|Motor Driver|Arduino
+Smart Security System,detect intruders using sensors variation 1173,IoT,Humidity Sensor|Soil Sensor,Valve,Arduino,Humidity Sensor|Soil Sensor|Valve|Arduino
+Water Level Indicator,monitor water level in tank variation 1174,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Smart Farming,monitor agriculture conditions variation 1175,IoT,LDR Sensor|Soil Sensor,None,ESP8266,LDR Sensor|Soil Sensor|ESP8266
+Smart Lighting,automatic lighting control variation 1176,IoT,Temperature Sensor,Servo Motor,ESP8266,Temperature Sensor|Servo Motor|ESP8266
+Weather Monitoring,monitor temperature and humidity variation 1177,IoT,Motion Sensor|Humidity Sensor,None,Arduino,Motion Sensor|Humidity Sensor|Arduino
+Smart Security System,detect intruders using sensors variation 1178,IoT,Flame Sensor,None,Arduino,Flame Sensor|Arduino
+Weather Monitoring,monitor temperature and humidity variation 1179,IoT,Gas Sensor|Ultrasonic Sensor,None,ESP32,Gas Sensor|Ultrasonic Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1180,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 1181,IoT,Flame Sensor|IR Sensor,None,Arduino,Flame Sensor|IR Sensor|Arduino
+Smart Irrigation,automatic watering using soil moisture variation 1182,IoT,Temperature Sensor,LED,Arduino,Temperature Sensor|LED|Arduino
+Smart Parking,detect parking availability variation 1183,IoT,Gas Sensor,Buzzer,ESP32,Gas Sensor|Buzzer|ESP32
+Obstacle Avoiding Robot,robot avoids obstacles variation 1184,Robotics,Flame Sensor,None,ESP32,Flame Sensor|ESP32
+Smart Security System,detect intruders using sensors variation 1185,IoT,Temperature Sensor,Motor Driver,ESP8266,Temperature Sensor|Motor Driver|ESP8266
+Smart Parking,detect parking availability variation 1186,IoT,Flame Sensor|LDR Sensor,LED,ESP32,Flame Sensor|LDR Sensor|LED|ESP32
+Smart Security System,detect intruders using sensors variation 1187,IoT,Humidity Sensor,Buzzer,ESP32,Humidity Sensor|Buzzer|ESP32
+Line Following Robot,robot follows path using IR sensors variation 1188,Robotics,Temperature Sensor|Gas Sensor,Motor Driver,ESP32,Temperature Sensor|Gas Sensor|Motor Driver|ESP32
+Smart Lighting,automatic lighting control variation 1189,IoT,IR Sensor|Flame Sensor,Relay,ESP8266,IR Sensor|Flame Sensor|Relay|ESP8266
+Smart Lighting,automatic lighting control variation 1190,IoT,Ultrasonic Sensor|Gas Sensor,None,ESP32,Ultrasonic Sensor|Gas Sensor|ESP32
+Smart Lighting,automatic lighting control variation 1191,IoT,Humidity Sensor|Soil Sensor,None,ESP32,Humidity Sensor|Soil Sensor|ESP32
+Smart Irrigation,automatic watering using soil moisture variation 1192,IoT,Humidity Sensor|Motion Sensor,None,ESP8266,Humidity Sensor|Motion Sensor|ESP8266
+Smart Farming,monitor agriculture conditions variation 1193,IoT,Gas Sensor,None,ESP8266,Gas Sensor|ESP8266
+Home Automation,control home devices using wifi variation 1194,IoT,Gas Sensor|Flame Sensor,Relay,ESP32,Gas Sensor|Flame Sensor|Relay|ESP32
+Smart Lighting,automatic lighting control variation 1195,IoT,Flame Sensor,Relay,ESP32,Flame Sensor|Relay|ESP32
+Water Level Indicator,monitor water level in tank variation 1196,IoT,Gas Sensor|IR Sensor,None,ESP32,Gas Sensor|IR Sensor|ESP32
+Air Quality Monitoring,monitor pollution levels variation 1197,IoT,Motion Sensor,None,ESP32,Motion Sensor|ESP32
+Smart Farming,monitor agriculture conditions variation 1198,IoT,Humidity Sensor|IR Sensor,None,ESP8266,Humidity Sensor|IR Sensor|ESP8266
+Smart Security System,detect intruders using sensors variation 1199,IoT,Humidity Sensor,Water Pump,ESP8266,Humidity Sensor|Water Pump|ESP8266

@@ -1,0 +1,5 @@
+[
+  { "id": "P1", "name": "Arduino Uno", "category": "Microcontrollers", "stock": 100 },
+  { "id": "P2", "name": "ESP32", "category": "IoT Modules", "stock": 150 },
+  { "id": "P3", "name": "DHT22 Sensor", "category": "Sensors", "stock": 200 }
+]

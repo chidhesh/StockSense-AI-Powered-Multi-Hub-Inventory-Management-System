@@ -209,6 +209,21 @@ CREATE TABLE IF NOT EXISTS reports (
   created_at timestamptz DEFAULT now()
 );
 
+-- Create hub_transfer_requests table
+CREATE TABLE IF NOT EXISTS hub_transfer_requests (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_center_id uuid NOT NULL REFERENCES centers(id) ON DELETE CASCADE,
+  destination_center_id uuid NOT NULL REFERENCES centers(id) ON DELETE CASCADE,
+  component_id uuid NOT NULL REFERENCES components(id) ON DELETE CASCADE,
+  quantity integer NOT NULL CHECK (quantity > 0),
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'completed')),
+  requested_by uuid NOT NULL REFERENCES app_users(id),
+  approved_by uuid REFERENCES app_users(id),
+  notes text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_profiles_center_id ON profiles(center_id);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);

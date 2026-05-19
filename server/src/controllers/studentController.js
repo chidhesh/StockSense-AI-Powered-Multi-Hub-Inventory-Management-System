@@ -88,25 +88,64 @@ export const resetPassword = async (req, res) => {
 };
 
 export const recommend = async (req, res) => {
-  const { text } = req.body;
+  const { text, title, description } = req.body;
+  const projectText = text || `${title || ''} ${description || ''}`;
+  
   try {
-    // Mock call to Flask API
-    // const response = await fetch(`${AI_SERVER_URL}/predict`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ text })
-    // });
-    // const data = await response.json();
-    
-    // Temporary mock response
-    res.status(200).json({
-      recommendations: [
-        { component: 'Arduino Uno', reason: 'Common for IoT projects' },
-        { component: 'DHT11 Sensor', reason: 'Used for temperature/humidity' }
-      ]
+    // 1. Fetch ALL unique component names from the global registry (all centers)
+    const { rows: globalComponents } = await query(
+      'SELECT DISTINCT name, category FROM components'
+    );
+
+    // 2. Simple matching logic based on keywords if AI service is not available
+    const keywords = projectText.toLowerCase().split(/\s+/);
+    const recommendations = [];
+
+    const categoryKeywords = {
+      'Microcontrollers': ['arduino', 'esp32', 'raspberry', 'pi', 'uno', 'nano', 'mcu', 'controller'],
+      'Sensors': ['sensor', 'dht11', 'ultrasonic', 'motion', 'pir', 'gas', 'smoke', 'temperature', 'humidity', 'ir'],
+      'Displays': ['lcd', 'oled', 'display', 'screen', 'led', '7 segment', 'monitor'],
+      'Motors': ['motor', 'servo', 'stepper', 'pump', 'driver', 'l298n'],
+      'IoT Modules': ['wifi', 'bluetooth', 'gsm', 'lora', 'gps', 'sim800', 'esp8266', 'cloud'],
+      'Power Supply': ['battery', 'adapter', 'power', 'voltage', 'regulator', 'buck', 'boost', 'solar'],
+      'Cables & Connectors': ['jumper', 'wire', 'cable', 'breadboard', 'connector', 'header']
+    };
+
+    // Find components that match title/description keywords
+    globalComponents.forEach(comp => {
+      const compName = comp.name.toLowerCase();
+      const compCat = comp.category;
+      
+      // Check if component name is in project text
+      const nameMatch = keywords.some(k => k.length > 2 && compName.includes(k));
+      
+      // Check if any category keywords are in project text
+      const catKeywords = categoryKeywords[compCat] || [];
+      const catMatch = keywords.some(k => catKeywords.includes(k));
+
+      if (nameMatch || catMatch) {
+        if (!recommendations.find(r => r.component === comp.name)) {
+          recommendations.push({
+            component: comp.name,
+            reason: nameMatch ? `Directly related to your project keywords` : `Essential ${compCat} for this type of project`
+          });
+        }
+      }
     });
+
+    // If no specific matches, provide general essentials
+    if (recommendations.length < 3) {
+      const essentials = ['Arduino Uno R3', 'Breadboard 830 Points', 'Jumper Wires M-M'];
+      essentials.forEach(e => {
+        if (!recommendations.find(r => r.component === e)) {
+          recommendations.push({ component: e, reason: 'Fundamental requirement for most IoT prototypes' });
+        }
+      });
+    }
+
+    res.status(200).json({ recommendations: recommendations.slice(0, 5) });
   } catch (error) {
-    res.status(500).json({ message: 'AI Service error', error: error.message });
+    res.status(500).json({ message: 'Recommendation error', error: error.message });
   }
 };
 

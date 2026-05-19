@@ -97,10 +97,13 @@ export async function forecastWithLSTM(
     historicalData.push(dayMap.get(date) || 0);
   }
   
-  // Need sufficient data for training
+  // Need sufficient data for training — use visible baseline so chart shows predicted demand
   if (historicalData.filter(v => v > 0).length < 10) {
+    const avg = historicalData.reduce((a, b) => a + b, 0) / historicalData.length;
+    const recentMax = Math.max(...historicalData.slice(-14), 0);
+    const baseline = Math.max(1, Math.round(Math.max(avg, recentMax * 0.4)));
     return {
-      predictions: Array(forecastDays).fill(historicalData.reduce((a, b) => a + b, 0) / historicalData.length),
+      predictions: Array(forecastDays).fill(baseline),
       confidence: 0.3,
       trend: 'stable',
       anomalyScore: 0
@@ -494,6 +497,22 @@ export async function generateAIInsights(
 // Enhanced Forecast with Confidence Intervals
 // ============================================
 
+function fitHistoricalPredicted(actuals: number[]): number[] {
+  const n = actuals.length;
+  if (n === 0) return [];
+  const x = actuals.map((_, i) => i);
+  const sumX = x.reduce((a, b) => a + b, 0);
+  const sumY = actuals.reduce((a, b) => a + b, 0);
+  const sumXY = x.reduce((s, xi, i) => s + xi * actuals[i], 0);
+  const sumX2 = x.reduce((s, xi) => s + xi * xi, 0);
+  const denom = n * sumX2 - sumX * sumX;
+  const slope = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+  const intercept = (sumY - slope * sumX) / n;
+  const safeSlope = Number.isFinite(slope) ? slope : 0;
+  const safeIntercept = Number.isFinite(intercept) ? intercept : 0;
+  return actuals.map((_, i) => Math.max(0, Math.round(safeIntercept + safeSlope * i)));
+}
+
 export async function enhancedForecast(
   componentId: string,
   componentName: string,
@@ -526,19 +545,40 @@ export async function enhancedForecast(
       predicted: 0
     });
   }
+
+  const fitted = fitHistoricalPredicted(historicalPoints.map(p => p.actual ?? 0));
+  historicalPoints.forEach((p, i) => {
+    p.predicted = fitted[i] ?? 0;
+  });
   
   // Future points with confidence
   const futurePoints: ForecastPoint[] = [];
-  let next30Total = 0;
+  let futurePredictions = mlResult.predictions.map(v => Math.max(0, Math.round(v)));
+  let next30Total = futurePredictions.reduce((a, b) => a + b, 0);
+
+  if (next30Total === 0) {
+    const histAvg = historicalPoints.reduce((s, p) => s + (p.actual ?? 0), 0) / historicalPoints.length;
+    const recentMax = Math.max(...historicalPoints.map(p => p.actual ?? 0), 0);
+    const lastFitted = historicalPoints[historicalPoints.length - 1]?.predicted ?? 0;
+    const baseline = Math.round(Math.max(histAvg, recentMax * 0.5, lastFitted));
+    if (baseline > 0) {
+      futurePredictions = Array(forecastDays).fill(baseline);
+      next30Total = baseline * forecastDays;
+    }
+  }
+
+  const lastHistoricalPredicted = historicalPoints[historicalPoints.length - 1]?.predicted ?? 0;
+  if (lastHistoricalPredicted > 0 && futurePredictions[0] < lastHistoricalPredicted) {
+    futurePredictions[0] = lastHistoricalPredicted;
+  }
   
   for (let i = 1; i <= forecastDays; i++) {
     const date = format(addDays(today, i), 'yyyy-MM-dd');
-    const predicted = mlResult.predictions[i - 1] || 0;
-    next30Total += predicted;
+    const predicted = futurePredictions[i - 1] ?? 0;
     
     futurePoints.push({
       date,
-      predicted: Math.round(predicted),
+      predicted,
       confidence: mlResult.confidence
     });
   }

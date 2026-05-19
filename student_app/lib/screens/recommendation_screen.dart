@@ -5,9 +5,11 @@ import '../models/project_history.dart';
 import '../services/api_service.dart';
 
 class RecommendationScreen extends StatefulWidget {
-  final String project;
+  final String title;
+  final String description;
+  final String? rollNo;
 
-  RecommendationScreen({required this.project});
+  RecommendationScreen({required this.title, required this.description, this.rollNo});
 
   @override
   _RecommendationScreenState createState() =>
@@ -24,7 +26,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   }
 
   void loadData() async {
-  var result = await ApiService.getRecommendation(widget.project);
+  // Use both title and description for a better recommendation
+  var result = await ApiService.getRecommendation("${widget.title} ${widget.description}");
 
   setState(() {
     components = result;
@@ -32,9 +35,10 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
 
   HistoryService.add(
     ProjectHistory(
-      title: widget.project,
-      description: widget.project,
+      title: widget.title,
+      description: widget.description,
       components: result,
+      studentRoll: widget.rollNo,
     ),
   );
 }

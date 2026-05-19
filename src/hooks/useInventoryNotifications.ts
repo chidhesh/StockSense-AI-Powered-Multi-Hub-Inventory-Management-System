@@ -28,7 +28,17 @@ export function useInventoryNotifications() {
       }
       const data = list
         .filter(c => ['low_stock', 'expired', 'defective', 'out_of_stock'].includes(c.status))
-        .filter(c => profile.role !== 'center_admin' || !profile.center_id || c.center_id === profile.center_id)
+        .filter(c => {
+          const role = profile.role?.toLowerCase() || '';
+          const isMaster = role === 'master_admin' || role === 'system administrator';
+          const isInventoryManager = role === 'center_admin' || role.includes('inventory manager') || role.includes('inventory_manager');
+          
+          if (isMaster) return true;
+          if (isInventoryManager && profile.center_id) {
+            return c.center_id === profile.center_id;
+          }
+          return false;
+        })
         .slice(0, 20);
       if (!data.length) {
         setNotifications([]);

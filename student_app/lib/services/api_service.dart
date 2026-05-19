@@ -2,13 +2,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // On Android emulators, 10.0.2.2 routes to the host PC localhost.
-  // For a physical device, replace this with your PC network IP, e.g.
-  // http://192.168.0.100:8787
-  static const String baseUrl = String.fromEnvironment(
-    'BACKEND_URL',
-    defaultValue: 'http://10.0.2.2:8787',
-  );
+  // --- CONNECTIVITY CONFIGURATION ---
+  // 1. WIRELESS: Use your PC's IP (e.g. 10.52.10.211)
+  // 2. WIRED (USB): Use 'http://localhost:8787' AFTER running 'adb reverse tcp:8787 tcp:8787'
+  static const String _networkIp = '10.52.10.211'; 
+  
+  static String get baseUrl {
+    // If you are using USB debugging, run: adb reverse tcp:8787 tcp:8787
+    // Then you can use 'http://localhost:8787'
+    const bool useLocalhost = false; // Set to true for wired USB debugging
+    
+    if (useLocalhost) return 'http://localhost:8787';
+    return 'http://$_networkIp:8787';
+  }
+  // ----------------------------------
 
   static Map<String, String> get headers => {
         'Content-Type': 'application/json',

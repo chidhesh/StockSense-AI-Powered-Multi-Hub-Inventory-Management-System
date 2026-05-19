@@ -61,4 +61,31 @@
     90% { opacity: 1; }
     100% { top: 100%; opacity: 0; }
   }
+
+  /* html5-qrcode live preview */
+  #qr-reader,
+  #qr-reader-tx,
+  #student-scanner {
+    position: relative;
+    min-height: 280px;
+  }
+
+  #qr-reader video,
+  #qr-reader-tx video,
+  #student-scanner video,
+  #qr-reader img,
+  #qr-reader-tx img,
+  #student-scanner img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: inherit;
+  }
+
+  #qr-reader > div,
+  #qr-reader-tx > div,
+  #student-scanner > div {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }

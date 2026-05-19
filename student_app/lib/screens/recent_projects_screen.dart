@@ -3,19 +3,27 @@ import '../services/history_service.dart';
 import 'project_detail_screen.dart';
 
 class RecentProjectsScreen extends StatelessWidget {
+  final String? rollNo;
+
+  RecentProjectsScreen({this.rollNo});
+
   @override
   Widget build(BuildContext context) {
-    final data = HistoryService.getAll();
+    // Filter history to show only the projects belonging to the current student
+    final allHistory = HistoryService.getAll();
+    final history = rollNo == null 
+        ? allHistory 
+        : allHistory.where((p) => p.studentRoll == rollNo).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text("Recent Projects")),
-      body: data.isEmpty
-          ? Center(child: Text("No recent projects found"))
+      body: history.isEmpty
+          ? Center(child: Text("No projects found"))
           : ListView.builder(
               padding: EdgeInsets.all(16),
-              itemCount: data.length,
+              itemCount: history.length,
               itemBuilder: (context, index) {
-                final item = data[index];
+                final item = history[index];
 
                 return InkWell(
                   onTap: () {

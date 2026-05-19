@@ -307,7 +307,7 @@ export default function Centers() {
                 )}
                 {center.contact_email && (
                   <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 lowercase tracking-widest">
-                    <Mail size={12} className="text-indigo-400" /> {center.contact_email?.toLowerCase() || 'no email'}
+                    <Mail size={12} className="text-indigo-400" /> {center.contact_email.toLowerCase()}
                   </div>
                 )}
                 {center.contact_phone && (

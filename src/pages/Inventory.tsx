@@ -8,17 +8,50 @@ import { generateQRCode, generateComponentQRData, generateSKU } from '../lib/qrU
 
 const CATEGORIES = ['Microcontrollers', 'Sensors', 'IoT Modules', 'Displays', 'Motors', 'Power Supply', 'Communication', 'Cables & Connectors', 'Tools', 'Other'];
 
-const statusColors: Record<ComponentStatus, string> = {
+type AssetDisplayStatus = 'low_stock' | 'out_of_stock' | 'damaged' | 'active';
+
+const isOutOfStockAsset = (c: Component) =>
+  c.status === 'out_of_stock' || c.available_quantity === 0;
+
+const isLowStockAsset = (c: Component) =>
+  !isOutOfStockAsset(c) && (
+    c.status === 'low_stock' ||
+    (c.total_quantity > 0 && c.available_quantity > 0 && c.available_quantity <= Math.max(2, Math.ceil(c.total_quantity * 0.2)))
+  );
+
+const getDamagedUnits = (componentId: string, txs: InventoryTransaction[]) =>
+  txs
+    .filter(t => t.component_id === componentId && t.transaction_type === 'damaged')
+    .reduce((sum, t) => sum + (Number(t.quantity) || 0), 0);
+
+const isDamagedAsset = (c: Component, txs: InventoryTransaction[]) =>
+  getDamagedUnits(c.id, txs) > 0;
+
+const getAssetDisplayStatus = (c: Component, txs: InventoryTransaction[]): AssetDisplayStatus => {
+  if (isOutOfStockAsset(c)) return 'out_of_stock';
+  if (isLowStockAsset(c)) return 'low_stock';
+  if (isDamagedAsset(c, txs)) return 'damaged';
+  return 'active';
+};
+
+const displayStatusColors: Record<AssetDisplayStatus, string> = {
   active: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
   low_stock: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
-  expired: 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
-  defective: 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
   out_of_stock: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+  damaged: 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800',
+};
+
+const displayStatusLabels: Record<AssetDisplayStatus, string> = {
+  active: 'In Stock',
+  low_stock: 'Low Stock',
+  out_of_stock: 'Out Of Stock',
+  damaged: 'Damaged Asset',
 };
 
 export default function Inventory() {
   const { profile, user } = useAuth();
   const isMaster = profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator';
+  const isInventoryManager = profile?.role === 'center_admin' || (profile?.role?.toLowerCase()?.includes('inventory manager') ?? false);
   const location = useLocation();
   const { centerId: initialCenterId, centerName: initialCenterName } = (location.state || {}) as { centerId?: string; centerName?: string };
 
@@ -157,23 +190,35 @@ export default function Inventory() {
         : available <= form.total_quantity * 0.2 ? 'low_stock' : form.status;
 
       const payload = {
-        name: form.name.trim(), category: form.category, description: form.description,
-        total_quantity: form.total_quantity, available_quantity: Math.max(0, available),
-        max_usage_limit: form.max_usage_limit, unit_cost: form.unit_cost,
-        center_id: centerId, status: autoStatus, sku,
-        qr_code: editItem?.qr_code || qrData, updated_at: new Date().toISOString(),
+        name: form.name.trim(),
+        category: form.category,
+        description: form.description,
+        total_quantity: form.total_quantity,
+        available_quantity: Math.max(0, available),
+        max_usage_limit: form.max_usage_limit,
+        unit_cost: form.unit_cost,
+        center_id: centerId,
+        status: autoStatus,
+        sku,
+        qr_code: editItem?.qr_code || qrData,
+        updated_at: new Date().toISOString(),
       };
+
+      console.log('Attempting to save component:', payload);
 
       if (editItem) {
         await apiPatch(`/api/components/${editItem.id}`, payload);
       } else {
-        await apiPost('/api/components', payload);
+        const response = await apiPost('/api/components', payload);
+        console.log('Component created successfully:', response);
       }
 
       setShowModal(false);
+      setEditItem(null);
       await fetchData();
-    } catch (e) {
-      setSaveError(e instanceof Error ? e.message : 'Could not save component');
+    } catch (e: any) {
+      console.error('Detailed save error:', e);
+      setSaveError(e.message || 'Failed to save component. Please check your connection and try again.');
     } finally {
       setSaving(false);
     }
@@ -198,16 +243,13 @@ export default function Inventory() {
       (c.category?.toLowerCase() || '').includes(search.toLowerCase()) ||
       (c.sku?.toLowerCase().includes(search.toLowerCase()) ?? false);
     
-    // Allow filtering by status OR by actual low stock condition
     let matchStatus = filterStatus === 'all';
-    if (filterStatus !== 'all') {
-      if (filterStatus === 'low_stock') {
-        matchStatus = c.status === 'low_stock' || (c.total_quantity > 0 && c.available_quantity <= c.total_quantity * 0.2);
-      } else if (filterStatus === 'out_of_stock') {
-        matchStatus = c.status === 'out_of_stock' || c.available_quantity === 0;
-      } else {
-        matchStatus = c.status === filterStatus;
-      }
+    if (filterStatus === 'low_stock') {
+      matchStatus = isLowStockAsset(c);
+    } else if (filterStatus === 'out_of_stock') {
+      matchStatus = isOutOfStockAsset(c);
+    } else if (filterStatus === 'damaged') {
+      matchStatus = isDamagedAsset(c, transactions);
     }
     
     const matchColDescription = !colFilters.description || (c.description || '').toLowerCase().includes(colFilters.description.toLowerCase());
@@ -221,6 +263,47 @@ export default function Inventory() {
            matchColName && matchColCategory && matchColStatus &&
            matchColHub && matchColDescription;
   });
+
+  const inventoryTotals = (() => {
+    const scope = currentCenterId
+      ? components.filter(c => c.center_id === currentCenterId)
+      : components;
+    const totalUnits = scope.reduce((s, c) => s + (c.total_quantity || 0), 0);
+    const availableUnits = scope.reduce((s, c) => s + (c.available_quantity || 0), 0);
+    const scopeIds = new Set(scope.map(c => c.id));
+    const scopeTxs = transactions.filter(t => scopeIds.has(t.component_id));
+    const issuedUnits = scopeTxs
+      .filter(t => t.transaction_type === 'issue')
+      .reduce((s, t) => s + (Number(t.quantity) || 0), 0);
+    const returnedUnits = scopeTxs
+      .filter(t => t.transaction_type === 'return')
+      .reduce((s, t) => s + (Number(t.quantity) || 0), 0);
+    const damagedUnits = scopeTxs
+      .filter(t => t.transaction_type === 'damaged')
+      .reduce((s, t) => s + (Number(t.quantity) || 0), 0);
+    const netIssued = Math.max(0, issuedUnits - returnedUnits);
+    const lowStockCount = scope.filter(isLowStockAsset).length;
+    const outOfStockCount = scope.filter(isOutOfStockAsset).length;
+    const damagedAssetCount = scope.filter(c => isDamagedAsset(c, scopeTxs)).length;
+    return {
+      totalUnits,
+      availableUnits,
+      netIssued,
+      damagedUnits,
+      assetCount: scope.length,
+      lowStockCount,
+      outOfStockCount,
+      damagedAssetCount,
+    };
+  })();
+
+  const getHubInfo = (centerId: string) => {
+    const hub = centers.find(c => c.id === centerId);
+    return {
+      name: hub?.name || 'Unknown Hub',
+      location: hub?.location || 'Location not set',
+    };
+  };
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900 dark:text-slate-100">
@@ -243,7 +326,10 @@ export default function Inventory() {
             <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Asset Registry</h1>
           </div>
           <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-            {currentCenterName ? `Managing ${currentCenterName}` : 'All Hubs Overview'} • <span className="text-indigo-600 dark:text-indigo-400">{components.length} Total Items</span>
+            {currentCenterName ? `Managing ${currentCenterName}` : 'All Hubs Overview'} •{' '}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              {inventoryTotals.assetCount} components • {inventoryTotals.availableUnits} units available • {inventoryTotals.netIssued} issued
+            </span>
           </p>
         </div>
         
@@ -279,6 +365,45 @@ export default function Inventory() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          {
+            label: 'Low Stock',
+            value: inventoryTotals.lowStockCount,
+            sub: 'Needs restock',
+            filter: 'low_stock',
+            color: 'border-amber-200 dark:border-amber-900/40 hover:border-amber-400',
+          },
+          {
+            label: 'Out Of Stock',
+            value: inventoryTotals.outOfStockCount,
+            sub: 'Unavailable now',
+            filter: 'out_of_stock',
+            color: 'border-slate-200 dark:border-slate-700 hover:border-slate-400',
+          },
+          {
+            label: 'Damaged Asset',
+            value: inventoryTotals.damagedAssetCount,
+            sub: `${inventoryTotals.damagedUnits} units logged`,
+            filter: 'damaged',
+            color: 'border-rose-200 dark:border-rose-900/40 hover:border-rose-400',
+          },
+        ].map((stat) => (
+          <button
+            key={stat.label}
+            type="button"
+            onClick={() => setFilterStatus(stat.filter)}
+            className={`glass-card rounded-2xl p-5 border text-left transition-all ${stat.color} ${
+              filterStatus === stat.filter ? 'ring-2 ring-indigo-500/40' : ''
+            }`}
+          >
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stat.value}</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase mt-1">{stat.sub}</p>
+          </button>
+        ))}
+      </div>
+
       {/* Glassmorphism Filters */}
       <div className="glass-card p-4 rounded-[32px] premium-shadow border border-white/40 dark:border-slate-800/40">
         <div className="flex flex-wrap gap-4 items-center">
@@ -298,12 +423,10 @@ export default function Inventory() {
               onChange={e => setFilterStatus(e.target.value)}
               className="pl-4 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/5 transition-all cursor-pointer text-slate-900 dark:text-white"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
+              <option value="all">All Assets</option>
               <option value="low_stock">Low Stock</option>
-              <option value="expired">Expired</option>
-              <option value="defective">Defective</option>
-              <option value="out_of_stock">Out of Stock</option>
+              <option value="out_of_stock">Out Of Stock</option>
+              <option value="damaged">Damaged Asset</option>
             </select>
 
             <select
@@ -380,7 +503,9 @@ export default function Inventory() {
                         {hoveredComp === c.id && (
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 bg-white dark:bg-slate-900 rounded-[24px] shadow-2xl border border-slate-100 dark:border-slate-800 p-5 z-[70] animate-in zoom-in-95 fade-in duration-200">
                             <div className="flex items-center justify-between mb-4 border-b border-slate-50 dark:border-slate-800 pb-3">
-                              <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Stock Breakdown</p>
+                              <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                                {isMaster ? 'Hub Stock Detail' : 'Issued To Students'}
+                              </p>
                               <Info size={12} className="text-indigo-500 dark:text-indigo-400" />
                             </div>
                             
@@ -422,10 +547,22 @@ export default function Inventory() {
                                 // Calculate Damaged
                                 const damagedCount = compTxs
                                   .filter(t => t.transaction_type === 'damaged')
-                                  .reduce((acc, t) => acc + t.quantity, 0);
+                                  .reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+                                const hub = getHubInfo(c.center_id);
 
                                 return (
                                   <>
+                                    {isMaster && (
+                                      <div className="mb-3 space-y-2">
+                                        <div className="flex items-start gap-2 text-[10px]">
+                                          <MapPin size={12} className="text-indigo-500 mt-0.5 shrink-0" />
+                                          <div>
+                                            <p className="font-black text-slate-900 dark:text-white uppercase">{hub.name}</p>
+                                            <p className="font-bold text-slate-500">{hub.location}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
                                     <div className="space-y-2">
                                       <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
@@ -434,15 +571,20 @@ export default function Inventory() {
                                         </div>
                                         <span className="text-xs font-black text-slate-900 dark:text-white">{issuedCount}</span>
                                       </div>
-                                      {activeHolders.length > 0 && (
+                                      {!isMaster && activeHolders.length > 0 && (
                                         <div className="pl-4 space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
                                           {activeHolders.map((h, i) => (
-                                            <div key={i} className="flex items-center justify-between text-[8px] font-black uppercase tracking-tighter text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20 px-2 py-1 rounded-lg">
-                                              <span className="truncate max-w-[100px]">{h.name}</span>
-                                              <span>{h.qty}u</span>
+                                            <div key={i} className="flex items-center justify-between text-[9px] font-black uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20 px-2 py-1.5 rounded-lg">
+                                              <span className="truncate max-w-[140px] flex items-center gap-1">
+                                                <Users size={10} /> {h.name}
+                                              </span>
+                                              <span>{h.qty} unit{h.qty !== 1 ? 's' : ''}</span>
                                             </div>
                                           ))}
                                         </div>
+                                      )}
+                                      {!isMaster && activeHolders.length === 0 && (
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase">No units currently issued</p>
                                       )}
                                     </div>
 
@@ -471,16 +613,22 @@ export default function Inventory() {
                       </div>
                     </td>
                     <td className="px-6 py-6">
-                      <span className={`inline-flex px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border ${statusColors[c.status]}`}>
-                        {c.status.replace('_', ' ')}
-                      </span>
+                      {(() => {
+                        const displayStatus = getAssetDisplayStatus(c, transactions);
+                        return (
+                          <span className={`inline-flex px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border ${displayStatusColors[displayStatus]}`}>
+                            {displayStatusLabels[displayStatus]}
+                          </span>
+                        );
+                      })()}
                     </td>
                     {isMaster && (
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-2">
                           <Building2 size={14} className="text-slate-300 dark:text-slate-600" />
                           <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                            {(c as Component & { center?: { name: string } }).center?.name || 'GLOBAL'}
+                            {getHubInfo(c.center_id).name}
+                            <span className="block text-[8px] font-bold text-slate-400 normal-case">{getHubInfo(c.center_id).location}</span>
                           </span>
                         </div>
                       </td>

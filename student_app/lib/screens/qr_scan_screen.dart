@@ -53,24 +53,37 @@ class _QRScanScreenState extends State<QRScanScreen> {
 
     for (final barcode in capture.barcodes) {
       final String? rawValue = barcode.rawValue;
+      debugPrint('--- BARCODE DETECTED ---');
+      debugPrint('Raw Value: $rawValue');
+
       if (rawValue == null || rawValue.isEmpty) continue;
 
       final String? rollNo = _extractRollNo(rawValue);
+      debugPrint('Extracted Roll No: $rollNo');
+
       if (rollNo == null || rollNo.isEmpty) {
         setState(() {
-          _scanError = 'Scanned QR code does not contain a valid roll number.';
+          _scanError = 'Invalid Student QR. Please use the QR code provided by the administrator.';
         });
         continue;
       }
 
       _hasScanned = true;
       _cameraController.stop();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ResetPasswordScreen(rollNo: rollNo, isFirstTime: true),
-        ),
-      );
+      
+      debugPrint('Navigating to ResetPasswordScreen with Roll No: $rollNo');
+      
+      // Use a small delay to ensure camera stops smoothly
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ResetPasswordScreen(rollNo: rollNo, isFirstTime: true),
+            ),
+          );
+        }
+      });
       return;
     }
   }

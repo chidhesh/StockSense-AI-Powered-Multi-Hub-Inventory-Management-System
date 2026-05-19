@@ -15,6 +15,7 @@ import DatasetDownload from './pages/DatasetDownload';
 import Students from './pages/Students';
 import Users from './pages/Users';
 import Centers from './pages/Centers';
+import Transfers from './pages/Transfers';
 
 function ProtectedRoute({ children, masterOnly, excludeMaster }: { children: React.ReactNode; masterOnly?: boolean; excludeMaster?: boolean }) {
   const { user, profile, loading } = useAuth();
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="dataset-download" element={<DatasetDownload />} />
         {/* <Route path="model-accuracy" element={<ModelAccuracy />} /> */}
         <Route path="reports" element={<Reports />} />
+        <Route path="transfers" element={<Transfers />} />
         <Route path="students" element={<ProtectedRoute excludeMaster><Students /></ProtectedRoute>} />
         <Route path="users" element={<ProtectedRoute masterOnly><Users /></ProtectedRoute>} />
         <Route path="centers" element={<ProtectedRoute masterOnly><Centers /></ProtectedRoute>} />

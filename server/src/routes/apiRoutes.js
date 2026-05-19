@@ -4,7 +4,14 @@ import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import { query } from '../config/db.js';
 import { JWT_SECRET } from '../config/env.js';
-import { sendStockAlert, sendBulkStockAlert } from '../notificationService.js';
+import {
+  sendStockAlert,
+  sendBulkStockAlert,
+  sendShortageAlertEmail,
+  sendPurchaseRecommendationEmail,
+  sendInventoryAlertBundle,
+} from '../notificationService.js';
+import { buildInventoryAlertsFromComponents } from '../alertHelpers.js';
 import { generateSimpleInventory, generateSimpleTransactions, convertToCSV } from '../simpleDummyDataGenerator.js';
 
 const router = express.Router();
@@ -53,14 +60,6 @@ const sendThresholdCrossingAlerts = async ({
 
   if (!enteredOutOfStock && !enteredLowStock) return;
 
-  const alertType = enteredOutOfStock ? 'low_stock' : 'low_stock';
-  const componentAlert = {
-    componentName,
-    currentQty: currentAvailable,
-    threshold: lowThreshold,
-    alertType,
-  };
-
   const recipientsResult = await query(
     `SELECT DISTINCT u.email
      FROM app_users u
@@ -78,15 +77,33 @@ const sendThresholdCrossingAlerts = async ({
   const recipients = recipientsResult.rows.map((r) => r.email).filter(Boolean);
   if (!recipients.length) return;
 
-  const senderName = 'Smart Inventory System';
+  const componentRow = await query(
+    `SELECT name, category, available_quantity, total_quantity, max_usage_limit, unit_cost, status, course_name, skill_tags
+     FROM components WHERE center_id = $1 AND name = $2 LIMIT 1`,
+    [centerId, componentName]
+  );
+  const component = componentRow.rows[0];
+  const alertBundle = component
+    ? buildInventoryAlertsFromComponents([component])
+    : {
+        low_stock_alerts: [{
+          componentName,
+          currentStock: currentAvailable,
+          minimumRequired: lowThreshold,
+          predictedWeeklyDemand: Math.max(lowThreshold, 12),
+          suggestedVendor: 'Tech Components Hub, Bangalore',
+        }],
+        shortage_alerts: [],
+        purchase_recommendations: [],
+        purchase_reason: '',
+      };
+
   await Promise.all(
     recipients.map((email) =>
-      sendBulkStockAlert({
+      sendInventoryAlertBundle({
         email,
         phone: null,
-        components: [componentAlert],
-        centerName,
-        senderName,
+        ...alertBundle,
       }).catch((err) => {
         console.error('Stock alert email failed:', err?.message || err);
       })
@@ -204,7 +221,13 @@ router.get('/auth/me', async (req, res) => {
 
 router.get('/public/centers', async (req, res) => {
   try {
-    const result = await query('SELECT id, name, location, admin_name, contact_email, contact_phone, capacity, type, created_at, updated_at FROM centers ORDER BY name');
+    const result = await query(`
+      SELECT DISTINCT ON (LOWER(TRIM(name)))
+        id, name, location, admin_name, contact_email, contact_phone, capacity, type, created_at, updated_at
+      FROM centers
+      WHERE LOWER(TRIM(name)) NOT IN ('main iot hub', 'secondary lab', 'secondary hub')
+      ORDER BY LOWER(TRIM(name)), created_at ASC
+    `);
     return res.json(result.rows);
   } catch (error) {
     console.error('Public centers failed:', error);
@@ -214,7 +237,13 @@ router.get('/public/centers', async (req, res) => {
 
 router.get('/centers', async (req, res) => {
   try {
-    const result = await query('SELECT * FROM centers ORDER BY name');
+    const result = await query(`
+      SELECT DISTINCT ON (LOWER(TRIM(name)))
+        id, name, location, admin_name, contact_email, contact_phone, capacity, type, created_at, updated_at
+      FROM centers
+      WHERE LOWER(TRIM(name)) NOT IN ('main iot hub', 'secondary lab', 'secondary hub')
+      ORDER BY LOWER(TRIM(name)), created_at ASC
+    `);
     return res.json(result.rows);
   } catch (error) {
     console.error('Centers fetch failed:', error);
@@ -274,8 +303,11 @@ router.get('/components', async (req, res) => {
     const { center_id } = req.query;
     let sql = 'SELECT * FROM components';
     const values = [];
-    // Only apply filter if center_id is a non-empty string and not 'undefined'
-    if (center_id && center_id !== 'undefined' && center_id !== 'null' && center_id.length > 10) {
+    
+    // Validate UUID format if center_id is provided
+    const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+    if (center_id && center_id !== 'undefined' && center_id !== 'null' && isUuid(center_id)) {
       sql += ' WHERE center_id = $1';
       values.push(center_id);
     }
@@ -284,7 +316,7 @@ router.get('/components', async (req, res) => {
     return res.json(result.rows);
   } catch (error) {
     console.error('Components fetch failed:', error);
-    return res.status(500).json({ error: 'Failed to load components' });
+    return res.status(500).json({ error: 'Failed to load components', details: error.message });
   }
 });
 
@@ -349,7 +381,10 @@ router.get('/students', async (req, res) => {
     const { center_id } = req.query;
     let sql = 'SELECT id, full_name, roll_number, branch, phone, email, address, qr_code, center_id, created_at, updated_at FROM students';
     const values = [];
-    if (center_id && center_id !== 'undefined' && center_id !== 'null' && center_id.length > 10) {
+    
+    const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+    if (center_id && center_id !== 'undefined' && center_id !== 'null' && isUuid(center_id)) {
       sql += ' WHERE center_id = $1';
       values.push(center_id);
     }
@@ -358,7 +393,7 @@ router.get('/students', async (req, res) => {
     return res.json(result.rows);
   } catch (error) {
     console.error('Students fetch failed:', error);
-    return res.status(500).json({ error: 'Failed to load students' });
+    return res.status(500).json({ error: 'Failed to load students', details: error.message });
   }
 });
 
@@ -406,15 +441,17 @@ router.get('/inventory-transactions', async (req, res) => {
     const filters = [];
     const values = [];
 
-    if (student_uuid) {
+    const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+    if (student_uuid && isUuid(student_uuid)) {
       values.push(String(student_uuid));
       filters.push(`it.student_uuid = $${values.length}`);
     }
-    if (component_id) {
+    if (component_id && isUuid(component_id)) {
       values.push(String(component_id));
       filters.push(`it.component_id = $${values.length}`);
     }
-    if (center_id && center_id !== 'undefined' && center_id !== 'null' && center_id.length > 10) {
+    if (center_id && center_id !== 'undefined' && center_id !== 'null' && isUuid(center_id)) {
       values.push(String(center_id));
       filters.push(`it.center_id = $${values.length}`);
     }
@@ -422,9 +459,16 @@ router.get('/inventory-transactions', async (req, res) => {
     const where = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
     const maxLimit = Math.min(Number(limit) || 1000, 10000);
     const result = await query(`
-      SELECT it.*, c.name as component_name, c.sku as component_sku 
+      SELECT it.*,
+             c.name as component_name,
+             c.sku as component_sku,
+             COALESCE(it.student_name, s.full_name) as student_name,
+             ctr.name as center_name,
+             ctr.location as center_location
       FROM inventory_transactions it
       LEFT JOIN components c ON it.component_id = c.id
+      LEFT JOIN students s ON it.student_uuid = s.id
+      LEFT JOIN centers ctr ON it.center_id = ctr.id
       ${where} 
       ORDER BY it.created_at DESC 
       LIMIT ${maxLimit}
@@ -486,39 +530,14 @@ router.post('/inventory-transactions', async (req, res) => {
       return res.status(400).json({ error: 'Component does not belong to the selected hub.' });
     }
 
-    if (transaction_type === 'issue') {
+    if (transaction_type === 'issue' || transaction_type === 'damaged') {
       if (component.available_quantity < quantity) {
         await query('ROLLBACK');
         return res.status(400).json({ error: `Insufficient stock for ${component.name}. Available: ${component.available_quantity}` });
       }
-
-      // 2. Decrease stock
-      await query(
-        'UPDATE components SET available_quantity = available_quantity - $1, updated_at = NOW() WHERE id = $2',
-        [quantity, component_id]
-      );
-    } else if (transaction_type === 'return') {
-      // 2. Increase stock
-      await query(
-        'UPDATE components SET available_quantity = available_quantity + $1, updated_at = NOW() WHERE id = $2',
-        [quantity, component_id]
-      );
-    } else if (transaction_type === 'damaged') {
-      // For damaged items, we might decrease available but keep total? 
-      // Usually, damaged items are removed from available stock.
-      await query(
-        'UPDATE components SET available_quantity = available_quantity - $1, updated_at = NOW() WHERE id = $2',
-        [quantity, component_id]
-      );
     }
 
-    const { rows: postUpdateRows } = await query(
-      'SELECT available_quantity, total_quantity, center_id, name FROM components WHERE id = $1',
-      [component_id]
-    );
-    const postUpdate = postUpdateRows[0];
-
-    // 3. Record the transaction
+    // Stock is updated by DB trigger trg_update_stock on INSERT (avoid double deduction)
     const result = await query(
       `INSERT INTO inventory_transactions (component_id, center_id, transaction_type, quantity, student_uuid, student_name, student_id, usage_count, notes, performed_by, session_date)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
@@ -528,19 +547,26 @@ router.post('/inventory-transactions', async (req, res) => {
 
     await query('COMMIT');
 
-    if (postUpdate && (transaction_type === 'issue' || transaction_type === 'damaged')) {
-      const centerResult = await query('SELECT name FROM centers WHERE id = $1', [postUpdate.center_id]);
-      const centerName = centerResult.rows[0]?.name || 'Unknown Center';
-      sendThresholdCrossingAlerts({
-        componentName: postUpdate.name,
-        centerId: postUpdate.center_id,
-        centerName,
-        previousAvailable: Number(component.available_quantity),
-        currentAvailable: Number(postUpdate.available_quantity),
-        totalQuantity: Number(postUpdate.total_quantity),
-      }).catch((err) => {
-        console.error('Threshold email alert handler failed:', err?.message || err);
-      });
+    if (transaction_type === 'issue' || transaction_type === 'damaged') {
+      const { rows: postUpdateRows } = await query(
+        'SELECT available_quantity, total_quantity, center_id, name FROM components WHERE id = $1',
+        [component_id]
+      );
+      const postUpdate = postUpdateRows[0];
+      if (postUpdate) {
+        const centerResult = await query('SELECT name FROM centers WHERE id = $1', [postUpdate.center_id]);
+        const centerName = centerResult.rows[0]?.name || 'Unknown Center';
+        sendThresholdCrossingAlerts({
+          componentName: postUpdate.name,
+          centerId: postUpdate.center_id,
+          centerName,
+          previousAvailable: Number(component.available_quantity),
+          currentAvailable: Number(postUpdate.available_quantity),
+          totalQuantity: Number(postUpdate.total_quantity),
+        }).catch((err) => {
+          console.error('Threshold email alert handler failed:', err?.message || err);
+        });
+      }
     }
 
     return res.status(201).json(result.rows[0]);
@@ -743,8 +769,11 @@ router.post('/reports', async (req, res) => {
 router.get('/profiles', async (req, res) => {
   try {
     const result = await query(
-      `SELECT p.id, p.full_name, p.role, p.center_id, p.created_at, p.updated_at, c.name AS center_name, c.location AS center_location
+      `SELECT p.id, p.full_name, p.role, p.center_id, p.created_at, p.updated_at,
+              c.name AS center_name, c.location AS center_location,
+              u.email AS email
        FROM profiles p
+       LEFT JOIN app_users u ON u.id = p.id
        LEFT JOIN centers c ON c.id = p.center_id
        ORDER BY p.full_name`
     );
@@ -753,6 +782,7 @@ router.get('/profiles', async (req, res) => {
       full_name: row.full_name,
       role: row.role,
       center_id: row.center_id,
+      email: row.email ? String(row.email).toLowerCase() : '',
       created_at: row.created_at,
       updated_at: row.updated_at,
       center: row.center_name ? { id: row.center_id, name: row.center_name, location: row.center_location } : undefined,
@@ -835,11 +865,64 @@ router.post('/notifications/stock-alert', async (req, res) => {
 
 router.post('/notifications/bulk-stock-alert', async (req, res) => {
   try {
-    const result = await sendBulkStockAlert(req.body);
+    const { centerId, sendFullBundle, email, phone, components, centerName, senderName } = req.body;
+
+    if (sendFullBundle && centerId && email) {
+      const { rows } = await query(
+        `SELECT id, name, category, available_quantity, total_quantity, max_usage_limit, unit_cost, status, course_name, skill_tags
+         FROM components WHERE center_id = $1`,
+        [centerId]
+      );
+      const alertBundle = buildInventoryAlertsFromComponents(rows);
+      const result = await sendInventoryAlertBundle({ email, phone, ...alertBundle });
+      return res.json({ success: true, results: result, alertBundle });
+    }
+
+    const result = await sendBulkStockAlert({ email, phone, components, centerName, senderName });
     return res.json({ success: true, results: result });
   } catch (error) {
     console.error('Bulk stock alert failed:', error);
     return res.status(500).json({ error: 'Failed to send bulk stock alert' });
+  }
+});
+
+router.post('/notifications/shortage-alert', async (req, res) => {
+  try {
+    const result = await sendShortageAlertEmail(req.body);
+    return res.json({ success: true, results: result });
+  } catch (error) {
+    console.error('Shortage alert failed:', error);
+    return res.status(500).json({ error: 'Failed to send shortage alert' });
+  }
+});
+
+router.post('/notifications/purchase-recommendation', async (req, res) => {
+  try {
+    const result = await sendPurchaseRecommendationEmail(req.body);
+    return res.json({ success: true, results: result });
+  } catch (error) {
+    console.error('Purchase recommendation failed:', error);
+    return res.status(500).json({ error: 'Failed to send purchase recommendation' });
+  }
+});
+
+router.post('/notifications/inventory-alerts', async (req, res) => {
+  try {
+    const { email, phone, centerId } = req.body;
+    if (!email || !centerId) {
+      return res.status(400).json({ error: 'email and centerId are required' });
+    }
+    const { rows } = await query(
+      `SELECT id, name, category, available_quantity, total_quantity, max_usage_limit, unit_cost, status, course_name, skill_tags
+       FROM components WHERE center_id = $1`,
+      [centerId]
+    );
+    const alertBundle = buildInventoryAlertsFromComponents(rows);
+    const result = await sendInventoryAlertBundle({ email, phone, ...alertBundle });
+    return res.json({ success: true, results: result, alertBundle });
+  } catch (error) {
+    console.error('Inventory alerts failed:', error);
+    return res.status(500).json({ error: 'Failed to send inventory alerts' });
   }
 });
 
@@ -850,6 +933,8 @@ router.get('/notifications/check-stock', async (req, res) => {
     let sql = `
       SELECT c.id, c.name, c.category, c.available_quantity as "currentQty", 
              c.total_quantity as "totalQty", c.center_id as "centerId", 
+             c.max_usage_limit as "maxUsageLimit", c.unit_cost as "unitCost",
+             c.status, c.course_name as "courseName", c.skill_tags as "skillTags",
              ctr.name as "centerName"
       FROM components c
       LEFT JOIN centers ctr ON c.center_id = ctr.id
@@ -931,6 +1016,125 @@ router.post('/admin/cleanup-duplicates', async (req, res) => {
   }
 });
 
+// Hub Transfer Routes
+router.get('/hub-transfers', async (req, res) => {
+  try {
+    const { center_id } = req.query;
+    let sql = `
+      SELECT ht.*, 
+             c_src.name as source_center_name, 
+             c_dest.name as destination_center_name,
+             comp.name as component_name
+      FROM hub_transfer_requests ht
+      JOIN centers c_src ON ht.source_center_id = c_src.id
+      JOIN centers c_dest ON ht.destination_center_id = c_dest.id
+      JOIN components comp ON ht.component_id = comp.id
+    `;
+    const values = [];
+    if (center_id) {
+      sql += ' WHERE ht.source_center_id = $1 OR ht.destination_center_id = $1';
+      values.push(center_id);
+    }
+    sql += ' ORDER BY ht.created_at DESC';
+    const result = await query(sql, values);
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Fetch hub transfers failed:', error);
+    return res.status(500).json({ error: 'Failed to load transfer requests' });
+  }
+});
+
+router.post('/hub-transfers', async (req, res) => {
+  try {
+    const { source_center_id, destination_center_id, component_id, quantity, requested_by, notes } = req.body;
+    const result = await query(
+      `INSERT INTO hub_transfer_requests (source_center_id, destination_center_id, component_id, quantity, requested_by, notes)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [source_center_id, destination_center_id, component_id, quantity, requested_by, notes]
+    );
+    return res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Create hub transfer failed:', error);
+    return res.status(500).json({ error: 'Failed to create transfer request' });
+  }
+});
+
+router.patch('/hub-transfers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, approved_by } = req.body;
+
+    if (status === 'approved') {
+      await query('BEGIN');
+      
+      // 1. Get transfer details
+      const { rows } = await query('SELECT * FROM hub_transfer_requests WHERE id = $1', [id]);
+      const transfer = rows[0];
+      
+      if (!transfer) {
+        await query('ROLLBACK');
+        return res.status(404).json({ error: 'Transfer request not found' });
+      }
+
+      // 2. Deduct from source component
+      const deductRes = await query(
+        'UPDATE components SET available_quantity = available_quantity - $1, updated_at = NOW() WHERE id = $2 AND available_quantity >= $1 RETURNING *',
+        [transfer.quantity, transfer.component_id]
+      );
+
+      if (deductRes.rowCount === 0) {
+        await query('ROLLBACK');
+        return res.status(400).json({ error: 'Insufficient stock in source hub' });
+      }
+
+      // 3. Add to destination hub (find or create component)
+      const sourceComp = deductRes.rows[0];
+      const { rows: destCompRows } = await query(
+        'SELECT id FROM components WHERE name = $1 AND center_id = $2',
+        [sourceComp.name, transfer.destination_center_id]
+      );
+
+      if (destCompRows.length > 0) {
+        await query(
+          'UPDATE components SET total_quantity = total_quantity + $1, available_quantity = available_quantity + $1, updated_at = NOW() WHERE id = $2',
+          [transfer.quantity, destCompRows[0].id]
+        );
+      } else {
+        await query(
+          `INSERT INTO components (name, category, description, sku, total_quantity, available_quantity, center_id, status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [sourceComp.name, sourceComp.category, sourceComp.description, sourceComp.sku, transfer.quantity, transfer.quantity, transfer.destination_center_id, 'active']
+        );
+      }
+
+      // 4. Update request status
+      await query(
+        'UPDATE hub_transfer_requests SET status = $1, approved_by = $2, updated_at = NOW() WHERE id = $3',
+        ['completed', approved_by, id]
+      );
+
+      // 5. Record transactions for both hubs
+      await query(
+        `INSERT INTO inventory_transactions (component_id, center_id, transaction_type, quantity, notes, session_date)
+         VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)`,
+        [transfer.component_id, transfer.source_center_id, 'transfer', transfer.quantity, `Transferred to Hub: ${transfer.destination_center_id}`]
+      );
+
+      await query('COMMIT');
+      return res.json({ message: 'Transfer approved and completed' });
+    } else {
+      const { sql, values } = buildUpdateQuery('hub_transfer_requests', id, req.body);
+      const result = await query(sql, values);
+      return res.json(result.rows[0]);
+    }
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Update hub transfer failed:', error);
+    return res.status(500).json({ error: 'Failed to update transfer request' });
+  }
+});
+
 router.post('/admin/clear-demo-data', async (req, res) => {
   try {
     await query('BEGIN');
@@ -959,6 +1163,27 @@ router.post('/admin/reseed', async (req, res) => {
   } catch (error) {
     console.error('Reseed failed:', error);
     return res.status(500).json({ error: 'Failed to reseed database' });
+  }
+});
+
+router.post('/admin/cleanup-dummy-hubs', async (req, res) => {
+  try {
+    const { cleanupDummyCenters, seedSampleActivity } = await import('../seedData.js');
+    await cleanupDummyCenters();
+    await seedSampleActivity();
+    const { rows } = await query(`
+      SELECT DISTINCT ON (LOWER(TRIM(name))) id, name, location
+      FROM centers ORDER BY LOWER(TRIM(name)), created_at ASC
+    `);
+    return res.json({
+      success: true,
+      message: 'Dummy hubs removed and sample activity refreshed.',
+      hubCount: rows.length,
+      hubs: rows,
+    });
+  } catch (error) {
+    console.error('Cleanup dummy hubs failed:', error);
+    return res.status(500).json({ error: 'Failed to cleanup dummy hubs' });
   }
 });
 

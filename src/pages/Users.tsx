@@ -197,9 +197,12 @@ export default function Users() {
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">{user.full_name}</h3>
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
-                    <Mail size={12} className="text-indigo-400" /> {user.email?.toLowerCase() || 'NO EMAIL'}
-                  </div>
+                  {user.email ? (
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest mt-1">
+                      <Mail size={12} className="text-indigo-400 shrink-0" />
+                      <span className="lowercase">{user.email.toLowerCase()}</span>
+                    </div>
+                  ) : null}
                 </div>
               </div>
               

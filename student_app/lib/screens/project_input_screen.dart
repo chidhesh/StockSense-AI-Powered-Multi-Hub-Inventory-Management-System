@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'recommendation_screen.dart';
 
 class ProjectInputScreen extends StatelessWidget {
+  final String? rollNo;
   final TextEditingController title = TextEditingController();
   final TextEditingController desc = TextEditingController();
+
+  ProjectInputScreen({this.rollNo});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +57,11 @@ class ProjectInputScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        RecommendationScreen(project: title.text),
+                        RecommendationScreen(
+                          title: title.text, 
+                          description: desc.text,
+                          rollNo: rollNo,
+                        ),
                   ),
                 );
               },

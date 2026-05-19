@@ -104,6 +104,25 @@ export interface Student {
 
 export type TransactionType = 'issue' | 'return' | 'purchase' | 'transfer' | 'damaged';
 
+export type TransferStatus = 'pending' | 'approved' | 'rejected' | 'completed';
+
+export interface HubTransferRequest {
+  id: string;
+  source_center_id: string;
+  destination_center_id: string;
+  component_id: string;
+  quantity: number;
+  status: TransferStatus;
+  requested_by: string;
+  approved_by?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  component_name?: string;
+  source_center_name?: string;
+  destination_center_name?: string;
+}
+
 export interface InventoryTransaction {
   id: string;
   component_id: string;

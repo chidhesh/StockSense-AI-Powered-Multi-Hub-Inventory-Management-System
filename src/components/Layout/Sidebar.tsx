@@ -15,6 +15,7 @@ interface SidebarProps {
 const masterNavItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/centers', icon: Building2, label: 'Hubs' },
+  { to: '/transfers', icon: ArrowLeftRight, label: 'Hub Transfers' },
   { to: '/users', icon: Users, label: 'Users' },
   { to: '/inventory', icon: Package, label: 'Inventory' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
@@ -25,6 +26,7 @@ const masterNavItems = [
 const hubNavItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/students', icon: Users, label: 'Students' },
+  { to: '/transfers', icon: ArrowLeftRight, label: 'Hub Transfers' },
   { to: '/inventory', icon: Package, label: 'Inventory' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/qr-management', icon: QrCode, label: 'QR Scan' },

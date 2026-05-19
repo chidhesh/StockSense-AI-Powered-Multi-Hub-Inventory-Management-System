@@ -208,6 +208,13 @@ export default function Login() {
                 </>
               )}
             </button>
+            {mode === 'login' && (
+              <div className="mt-4 text-center">
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                  Students: Register first using your Roll Number to set a password.
+                </p>
+              </div>
+            )}
           </form>
 
           <div className="mt-8 text-center">

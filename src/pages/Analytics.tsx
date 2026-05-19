@@ -1,5 +1,33 @@
-import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, Minus, BarChart3, Target, Cpu, ShoppingBag, ExternalLink, Send, Lightbulb, AlertTriangle, Package, DollarSign, TrendingUp as TrendUp, Users, Bell, Mail, Activity, CheckCircle, Settings2, MapPin } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Minus, 
+  BarChart3, 
+  Target, 
+  Cpu, 
+  ShoppingBag, 
+  ExternalLink, 
+  Send, 
+  Lightbulb, 
+  AlertTriangle, 
+  Package, 
+  DollarSign, 
+  TrendingUp as TrendUp, 
+  Users, 
+  Bell, 
+  Mail, 
+  Activity, 
+  CheckCircle, 
+  Settings2, 
+  MapPin, 
+  Building2, 
+  ArrowLeftRight, 
+  FileText, 
+  CheckCircle2, 
+  Calendar, 
+  Grid
+} from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, ReferenceLine
@@ -22,6 +50,23 @@ export default function Analytics() {
   const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
   const [forecasts, setForecasts] = useState<ComponentForecast[]>([]);
   const [selectedForecast, setSelectedForecast] = useState<ComponentForecast | null>(null);
+  const [hubForecasts, setHubForecasts] = useState<{
+    hubName: string;
+    location: string;
+    currentStock: number;
+    predictedDemand: number;
+    trend: string;
+    coveragePct: number;
+    coverageLabel: string;
+  }[]>([]);
+  const [demandHeatmap, setDemandHeatmap] = useState<{
+    hubs: string[];
+    categories: string[];
+    values: number[][];
+    maxValue: number;
+  }>({ hubs: [], categories: [], values: [], maxValue: 1 });
+  const [heatmapData, setHeatmapData] = useState<{ day: string; value: number; label: string }[]>([]);
+  const [autoRequests, setAutoRequests] = useState<any[]>([]);
   const [loading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [categoryUsage, setCategoryUsage] = useState<{ category: string; issued: number; returned: number; damaged: number }[]>([]);
@@ -179,7 +224,7 @@ export default function Analytics() {
     try {
       const centerId = stateCenterId || (!isMasterAdmin ? profile?.center_id : undefined);
       const compsUrl = centerId ? `/api/components?center_id=${centerId}` : '/api/components';
-      const txsUrl = centerId ? `/api/inventory-transactions?center_id=${centerId}&limit=1000` : '/api/inventory-transactions?limit=1000';
+      const txsUrl = centerId ? `/api/inventory-transactions?center_id=${centerId}&limit=5000` : '/api/inventory-transactions?limit=5000';
 
       const [comps, txs] = await Promise.all([
         apiGet<Component[]>(compsUrl),
@@ -192,10 +237,127 @@ export default function Analytics() {
       const validComps = Array.isArray(comps) ? comps : [];
       const validTxs = Array.isArray(txs) ? txs : [];
 
+      // If Master Admin, aggregate forecasting by hub
+      const centersRes = isMasterAdmin ? await apiGet<any[]>('/api/centers') : [];
+      const calculatedHubForecasts = isMasterAdmin ? await Promise.all(
+        centersRes.map(async center => {
+          const centerComps = validComps.filter(c => String(c.center_id) === String(center.id));
+          const centerTxs = validTxs.filter(t => String(t.center_id) === String(center.id));
+          const totalStock = centerComps.reduce((sum, c) => sum + c.available_quantity, 0);
+          
+          const hubFc = centerComps.length > 0
+            ? await Promise.all(
+                centerComps.map(c => enhancedForecast(c.id, c.name, centerTxs, parameters.forecastDays, parameters.historicalDays))
+              )
+            : [];
+          
+          const avgPredicted = hubFc.reduce((sum, f) => sum + f.next_30_days, 0);
+
+          const predictedDemand = Math.round(avgPredicted);
+          const coveragePct = predictedDemand > 0
+            ? Math.min(100, Math.round((totalStock / predictedDemand) * 100))
+            : totalStock > 0 ? 100 : 0;
+          const coverageLabel = predictedDemand === 0
+            ? 'No demand forecast yet'
+            : coveragePct >= 80
+              ? 'Stock covers forecast'
+              : coveragePct >= 40
+                ? 'Monitor — may need restock'
+                : 'Low coverage — restock soon';
+
+          return {
+            hubName: center.name,
+            location: center.location || '',
+            currentStock: totalStock,
+            predictedDemand,
+            trend: predictedDemand > totalStock * 0.8 ? 'increasing' : 'stable',
+            coveragePct,
+            coverageLabel,
+          };
+        })
+      ) : [];
+
+      setHubForecasts(calculatedHubForecasts);
+
+      if (isMasterAdmin && centersRes.length > 0) {
+        const categories = [...new Set(validComps.map((c) => c.category).filter(Boolean))].sort();
+        const heatmapValues = centersRes.map((center) =>
+          categories.map((cat) =>
+            validTxs
+              .filter((t) => {
+                if (t.center_id !== center.id || t.transaction_type !== 'issue') return false;
+                const comp = validComps.find((c) => c.id === t.component_id);
+                return comp?.category === cat;
+              })
+              .reduce((sum, t) => sum + (Number(t.quantity) || 0), 0)
+          )
+        );
+        const maxValue = Math.max(1, ...heatmapValues.flat());
+        setDemandHeatmap({
+          hubs: centersRes.map((c) => c.name),
+          categories,
+          values: heatmapValues,
+          maxValue,
+        });
+      } else {
+        setDemandHeatmap({ hubs: [], categories: [], values: [], maxValue: 1 });
+      }
+
+      const isLowStock = (c: Component) =>
+        c.status === 'low_stock' ||
+        (c.total_quantity > 0 && c.available_quantity > 0 && c.available_quantity <= Math.max(2, Math.ceil(c.total_quantity * 0.2)));
+      const isOutOfStock = (c: Component) =>
+        c.status === 'out_of_stock' || c.available_quantity === 0;
+
+      const restockCandidates = validComps.filter(c => isLowStock(c) || isOutOfStock(c));
+      const forecastTargets = [
+        ...new Map(
+          [...restockCandidates, ...validComps.slice(0, 10)].map((c) => [c.id, c])
+        ).values(),
+      ];
+
       // Use the advanced LSTM model for forecasting with configurable days
       const fc = await Promise.all(
-        validComps.slice(0, 10).map(c => enhancedForecast(c.id, c.name, validTxs, parameters.forecastDays, parameters.historicalDays))
+        forecastTargets.map(c => enhancedForecast(c.id, c.name, validTxs, parameters.forecastDays, parameters.historicalDays))
       );
+      // Calculate Heatmap Data (Usage by Day of Week)
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const usageByDay = new Array(7).fill(0).map((_, i) => ({
+        day: dayNames[i],
+        value: 0,
+        label: `${dayNames[i]} Usage`
+      }));
+
+      validTxs.forEach(t => {
+        if (t.transaction_type === 'issue') {
+          const day = new Date(t.created_at).getDay();
+          usageByDay[day].value += t.quantity;
+        }
+      });
+      setHeatmapData(usageByDay);
+
+      // Generate Auto Purchase Requests (low + out of stock)
+      const needsRestock = validComps.filter(c => isLowStock(c) || isOutOfStock(c));
+      const autoReqs = needsRestock.map(c => {
+        const componentForecast = fc.find(f => f.component_id === c.id);
+        const shortfall = Math.max(0, c.total_quantity - c.available_quantity);
+        const needed = (componentForecast?.next_30_days || 0) + shortfall;
+        const suggestedQty = Math.max(needed, isOutOfStock(c) ? Math.max(5, Math.ceil(c.total_quantity * 0.3)) : 10);
+        return {
+          component_id: c.id,
+          name: c.name,
+          category: c.category,
+          current_stock: c.available_quantity,
+          total_stock: c.total_quantity,
+          predicted_demand: componentForecast?.next_30_days || 0,
+          suggested_quantity: suggestedQty,
+          estimated_cost: suggestedQty * (Number(c.unit_cost) || 100),
+          vendor: 'Preferred Vendor',
+          urgency: isOutOfStock(c) ? 'critical' : 'high',
+        };
+      });
+      setAutoRequests(autoReqs);
+
       setForecasts(fc);
       if (fc.length > 0) setSelectedForecast(fc[0]);
 
@@ -225,6 +387,7 @@ export default function Analytics() {
       setTransactions([]);
       setForecasts([]);
       setCategoryUsage([]);
+      setAutoRequests([]);
     } finally {
       setDataLoading(false);
     }
@@ -297,6 +460,31 @@ export default function Analytics() {
     }
   };
 
+  const forecastChartData = useMemo(() => {
+    if (!selectedForecast) return [];
+    return selectedForecast.forecast.map((point) => {
+      const isFuture = point.actual === undefined;
+      return {
+        date: point.date,
+        actual: isFuture ? null : (point.actual ?? 0),
+        predicted: point.predicted ?? 0,
+      };
+    });
+  }, [selectedForecast]);
+
+  const forecastYMax = useMemo(() => {
+    if (!forecastChartData.length) return 4;
+    const peak = Math.max(
+      ...forecastChartData.map(d => Math.max(d.actual ?? 0, d.predicted ?? 0))
+    );
+    return Math.max(2, Math.ceil(peak * 1.25));
+  }, [forecastChartData]);
+
+  const forecastProjectionDate = useMemo(
+    () => forecastChartData.find(p => p.actual === null)?.date,
+    [forecastChartData]
+  );
+
   if (dataLoading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900 dark:text-slate-100">
       <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
@@ -326,25 +514,285 @@ export default function Analytics() {
             )}
           </p>
         </div>
-        
-        {/* <div className="flex items-center gap-3">
-          {isInventoryManager && (
-            <button 
-              onClick={() => setShowNotificationPanel(!showNotificationPanel)}
-              className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest premium-shadow hover:border-indigo-500 transition-all text-slate-900 dark:text-white"
-            >
-              <Bell size={16} className={notificationSent.lowStock || notificationSent.highStock ? 'text-indigo-500' : 'text-slate-400'} />
-              Notifications
-            </button>
-          )}
+
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => setShowConfig(!showConfig)}
-            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest premium-shadow hover:border-indigo-500 transition-all text-slate-900 dark:text-white"
+            className={`p-3 rounded-xl transition-all ${showConfig ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-slate-800'}`}
           >
-            <Settings2 size={16} className="text-slate-400" />
-            Parameters
+            <Settings2 size={20} />
           </button>
-        </div> */}
+          <button 
+            onClick={() => fetchData()}
+            className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-xl border border-slate-100 dark:border-slate-800 font-black text-[10px] uppercase tracking-widest"
+          >
+            <Activity size={16} className="text-indigo-600" /> Refresh Intelligence
+          </button>
+        </div>
+      </div>
+
+      {/* Hub-Wide Forecasting Overview - Only for System Admin */}
+      {isMasterAdmin && hubForecasts.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg">
+              <Building2 size={20} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Multi-Hub Demand Outlook</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">
+                {hubForecasts.length} registered hub{hubForecasts.length !== 1 ? 's' : ''} • {parameters.forecastDays}-day forecast
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {hubForecasts.map((hub, idx) => (
+              <div key={idx} className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-indigo-500/30 transition-all group">
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{hub.hubName}</p>
+                <p className="text-[9px] font-bold text-indigo-500 flex items-center gap-1 mb-3">
+                  <MapPin size={10} /> {hub.location || 'Location N/A'}
+                </p>
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white">{hub.predictedDemand}</p>
+                    <p className="text-[9px] font-bold text-slate-500 uppercase">Units needed (forecast)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-black text-slate-700 dark:text-slate-200">{hub.currentStock}</p>
+                    <p className="text-[9px] font-bold text-slate-500 uppercase">In stock now</p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase">Coverage</span>
+                    <span className="text-[9px] font-black text-slate-900 dark:text-white">{hub.coveragePct}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${hub.coveragePct < 40 ? 'bg-rose-500' : hub.coveragePct < 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                      style={{ width: `${hub.coveragePct}%` }}
+                    />
+                  </div>
+                  <p className="text-[8px] font-bold text-slate-500 uppercase mt-2">{hub.coverageLabel}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 h-80 w-full min-h-[320px] relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={hubForecasts}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                <XAxis 
+                  dataKey="hubName" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  cursor={{ fill: '#f1f5f9' }}
+                />
+                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase' }} />
+                <Bar dataKey="currentStock" name="Current Stock" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="predictedDemand" name="Predicted Demand" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {isMasterAdmin && demandHeatmap.hubs.length > 0 && demandHeatmap.categories.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-violet-50 dark:bg-violet-900/20 text-violet-600 rounded-lg">
+              <Grid size={20} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Demand Forecast Heatmap</h2>
+              <p className="text-[10px] font-black text-slate-400 uppercase">
+                Issued units by hub and category — darker cells mean higher historical demand (used for forecasting)
+              </p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse min-w-[600px]">
+              <thead>
+                <tr>
+                  <th className="text-left text-[9px] font-black text-slate-400 uppercase p-2">Hub</th>
+                  {demandHeatmap.categories.map((cat) => (
+                    <th key={cat} className="text-center text-[8px] font-black text-slate-400 uppercase p-2 max-w-[72px]">
+                      {cat.split(' ')[0]}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {demandHeatmap.hubs.map((hub, rowIdx) => (
+                  <tr key={hub}>
+                    <td className="text-[9px] font-black text-slate-700 dark:text-slate-300 p-2 whitespace-nowrap">{hub}</td>
+                    {demandHeatmap.values[rowIdx]?.map((val, colIdx) => {
+                      const intensity = val / demandHeatmap.maxValue;
+                      const bg = intensity > 0.75 ? 'bg-indigo-700' : intensity > 0.5 ? 'bg-indigo-500' : intensity > 0.25 ? 'bg-indigo-300' : intensity > 0 ? 'bg-indigo-100' : 'bg-slate-100 dark:bg-slate-800';
+                      return (
+                        <td key={colIdx} className="p-1">
+                          <div
+                            className={`${bg} rounded-lg h-10 flex items-center justify-center text-[10px] font-black ${intensity > 0.4 ? 'text-white' : 'text-slate-600'}`}
+                            title={`${hub} • ${demandHeatmap.categories[colIdx]}: ${val} units issued`}
+                          >
+                            {val > 0 ? val : '—'}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase">
+            <span>Low demand</span>
+            <div className="flex gap-1">
+              <div className="w-4 h-4 bg-slate-100 dark:bg-slate-800 rounded" />
+              <div className="w-4 h-4 bg-indigo-100 rounded" />
+              <div className="w-4 h-4 bg-indigo-300 rounded" />
+              <div className="w-4 h-4 bg-indigo-500 rounded" />
+              <div className="w-4 h-4 bg-indigo-700 rounded" />
+            </div>
+            <span>High demand</span>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Usage Intensity Heatmap */}
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg">
+                <Grid size={20} />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Weekly Usage Pattern</h2>
+                <p className="text-[10px] font-black text-slate-400 uppercase">Issues by day of week (all hubs)</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 justify-between items-end">
+            {(() => {
+              const maxVal = Math.max(1, ...heatmapData.map(d => d.value));
+              return heatmapData.map((data, idx) => {
+                const intensity = data.value / maxVal;
+                const bg = intensity > 0.7 ? 'bg-indigo-600' : 
+                          intensity > 0.4 ? 'bg-indigo-400' : 
+                          intensity > 0.1 ? 'bg-indigo-200' : 
+                          'bg-slate-100 dark:bg-slate-800';
+                
+                // Scale height between 40px and 150px based on relative value
+                const height = 40 + (intensity * 110);
+                
+                return (
+                  <div key={idx} className="flex-1 min-w-[60px] text-center space-y-3">
+                    <div 
+                      className={`w-full rounded-2xl transition-all duration-500 hover:scale-110 cursor-pointer ${bg}`}
+                      style={{ height: `${height}px` }}
+                      title={`${data.value} units issued`}
+                    />
+                    <p className="text-[10px] font-black text-slate-400 uppercase">{data.day}</p>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+          <div className="mt-8 flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <span>Low Usage</span>
+            <div className="flex gap-1">
+              <div className="w-3 h-3 bg-slate-100 dark:bg-slate-800 rounded-sm" />
+              <div className="w-3 h-3 bg-indigo-200 rounded-sm" />
+              <div className="w-3 h-3 bg-indigo-400 rounded-sm" />
+              <div className="w-3 h-3 bg-indigo-600 rounded-sm" />
+            </div>
+            <span>High Usage</span>
+          </div>
+        </div>
+
+        {/* Automatic Purchase Requests */}
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                <ShoppingBag size={20} />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Auto Purchase Requests</h2>
+                <p className="text-[10px] font-black text-slate-400 uppercase">ML-driven procurement suggestions</p>
+              </div>
+            </div>
+            <button className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all">
+              Approve All
+            </button>
+          </div>
+
+          <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1">
+            {autoRequests.length === 0 ? (
+              <div className="py-10 text-center">
+                <CheckCircle2 className="mx-auto text-emerald-500 mb-3" size={32} />
+                <p className="text-[10px] font-black text-slate-400 uppercase">Stock levels are optimal</p>
+              </div>
+            ) : (
+              autoRequests.map((req) => (
+                <div key={req.component_id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm shrink-0">
+                        <Package size={16} className="text-indigo-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{req.name}</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase">{req.category}</p>
+                      </div>
+                    </div>
+                    <span
+                      className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                        req.urgency === 'critical'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                          : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                      }`}
+                    >
+                      {req.urgency}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[9px] font-bold uppercase text-slate-500">
+                    <div>
+                      <p className="text-slate-400 mb-0.5">Current</p>
+                      <p className="text-slate-900 dark:text-white font-black">{req.current_stock} / {req.total_stock}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 mb-0.5">30d Demand</p>
+                      <p className="text-slate-900 dark:text-white font-black">{Math.round(req.predicted_demand)}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 mb-0.5">Order Qty</p>
+                      <p className="text-indigo-600 dark:text-indigo-400 font-black">{req.suggested_quantity}</p>
+                    </div>
+                    <div className="text-right sm:text-left">
+                      <p className="text-slate-400 mb-0.5">Est. Cost</p>
+                      <p className="text-emerald-600 font-black">₹{req.estimated_cost.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-[9px] font-bold text-slate-400 uppercase">Vendor: {req.vendor}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -421,9 +869,9 @@ export default function Analytics() {
             
             {selectedForecast ? (
               <div className="space-y-6">
-                <div className="w-full min-w-0 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                  <ResponsiveContainer width="100%" aspect={2.5}>
-                    <LineChart data={selectedForecast.forecast}>
+                <div className="w-full min-h-[400px] bg-slate-50/50 p-4 rounded-2xl border border-slate-100 relative">
+                  <ResponsiveContainer width="100%" height={400}>
+                    <LineChart data={forecastChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                       <XAxis 
                         dataKey="date" 
@@ -435,7 +883,10 @@ export default function Analytics() {
                       <YAxis 
                         tick={{ fontSize: 9, fill: '#64748b', fontWeight: 'bold' }} 
                         tickLine={false} 
-                        axisLine={false} 
+                        axisLine={false}
+                        domain={[0, forecastYMax]}
+                        allowDecimals={false}
+                        label={{ value: 'Units', angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
                       />
                       <Tooltip 
                         contentStyle={{ 
@@ -446,13 +897,26 @@ export default function Analytics() {
                           padding: '12px'
                         }}
                         itemStyle={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }}
+                        formatter={(value: number, name: string) => [
+                          value != null ? `${value} units` : '—',
+                          name === 'actual' ? 'Actual Usage' : 'Predicted Demand'
+                        ]}
+                        labelFormatter={(label) => `Date: ${label}`}
                       />
-                      <ReferenceLine 
-                        x={selectedForecast.forecast.find(p => !p.actual)?.date} 
-                        stroke="#6366f1" 
-                        strokeDasharray="5 5" 
-                        label={{ value: 'Future Projection', position: 'top', fill: '#6366f1', fontSize: 10, fontWeight: '900' }} 
+                      <Legend
+                        verticalAlign="top"
+                        align="right"
+                        iconType="line"
+                        wrapperStyle={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}
                       />
+                      {forecastProjectionDate && (
+                        <ReferenceLine 
+                          x={forecastProjectionDate} 
+                          stroke="#6366f1" 
+                          strokeDasharray="5 5" 
+                          label={{ value: 'Forecast Start', position: 'top', fill: '#6366f1', fontSize: 10, fontWeight: '900' }} 
+                        />
+                      )}
                       <Line 
                         type="monotone" 
                         dataKey="actual" 
@@ -460,7 +924,7 @@ export default function Analytics() {
                         strokeWidth={3} 
                         dot={{ r: 3, fill: '#6366f1', strokeWidth: 0 }} 
                         activeDot={{ r: 6, strokeWidth: 0 }}
-                        name="Usage (Units)" 
+                        name="Actual Usage" 
                         connectNulls={false} 
                       />
                       <Line 
@@ -469,18 +933,34 @@ export default function Analytics() {
                         stroke="#f97316" 
                         strokeWidth={3} 
                         strokeDasharray="8 4" 
-                        dot={false} 
+                        dot={(props) => {
+                          const { cx, cy, payload } = props;
+                          if (cx == null || cy == null || !(payload?.predicted > 0)) return null;
+                          const isFuture = payload.actual === null;
+                          return (
+                            <circle cx={cx} cy={cy} r={isFuture ? 4 : 3} fill="#f97316" stroke="#fff" strokeWidth={2} />
+                          );
+                        }}
+                        activeDot={{ r: 6, fill: '#f97316', stroke: '#fff', strokeWidth: 2 }}
                         name="Predicted Demand" 
+                        connectNulls
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Expected Demand</p>
                     <p className="text-xl font-black text-indigo-900">{selectedForecast.next_30_days} Units</p>
                     <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-tight mt-1">Total projected for next 30 days</p>
+                  </div>
+                  <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
+                    <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">Predicted Demand</p>
+                    <p className="text-xl font-black text-orange-900">
+                      {forecastChartData.filter(p => p.actual === null).reduce((s, p) => s + (p.predicted ?? 0), 0)} Units
+                    </p>
+                    <p className="text-[9px] font-bold text-orange-600 uppercase tracking-tight mt-1">Next {parameters.forecastDays} days forecast</p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Stock Recommendation</p>
@@ -509,8 +989,8 @@ export default function Analytics() {
         {categoryUsage.length === 0 ? (
           <div className="text-center py-8 text-gray-400 text-sm">No transaction data available</div>
         ) : (
-          <div className="w-full min-w-0">
-            <ResponsiveContainer width="100%" aspect={2.5}>
+          <div className="w-full min-h-[400px] relative">
+            <ResponsiveContainer width="100%" height={400}>
               <BarChart data={categoryUsage} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="category" tick={{ fontSize: 10 }} tickLine={false} />

@@ -295,3 +295,177 @@ export async function sendBulkStockAlert({ email, phone, components, centerName,
 
   return results;
 }
+
+function renderAlertTable(rows, columns) {
+  if (!rows.length) return '<p style="color:#6b7280;">None</p>';
+  const header = columns.map((col) => `<th style="padding:8px;text-align:left;">${col.label}</th>`).join('');
+  const body = rows
+    .map(
+      (row) =>
+        `<tr>${columns
+          .map(
+            (col) =>
+              `<td style="padding:8px;border-bottom:1px solid #e5e7eb;">${col.render(row)}</td>`
+          )
+          .join('')}</tr>`
+    )
+    .join('');
+  return `<table style="width:100%;border-collapse:collapse;"><tr style="background:#f3f4f6;">${header}</tr>${body}</table>`;
+}
+
+/**
+ * Send combined inventory alert bundle (low stock, shortages, purchase recommendations).
+ */
+export async function sendInventoryAlertBundle({
+  email,
+  phone,
+  low_stock_alerts = [],
+  shortage_alerts = [],
+  purchase_recommendations = [],
+  purchase_reason = '',
+}) {
+  const results = [];
+  const hasAlerts =
+    low_stock_alerts.length > 0 ||
+    shortage_alerts.length > 0 ||
+    purchase_recommendations.length > 0;
+
+  if (!hasAlerts) {
+    return results;
+  }
+
+  const emailSubject = '📦 Smart Inventory Alert Bundle';
+  const emailHtml = `
+    <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">
+      <div style="background:#4f46e5;color:white;padding:20px;text-align:center;">
+        <h1 style="margin:0;">Inventory Alert Bundle</h1>
+        <p style="margin:5px 0 0;">Automated stock & procurement summary</p>
+      </div>
+      <div style="padding:20px;background:#f9fafb;">
+        ${purchase_reason ? `<p><strong>Summary:</strong> ${purchase_reason}</p>` : ''}
+
+        <div style="background:white;padding:15px;border-radius:8px;margin:15px 0;border-left:4px solid #dc2626;">
+          <h3 style="color:#dc2626;margin:0 0 10px;">Low stock (${low_stock_alerts.length})</h3>
+          ${renderAlertTable(low_stock_alerts, [
+            { label: 'Component', render: (r) => r.componentName },
+            { label: 'Current', render: (r) => r.currentStock },
+            { label: 'Minimum', render: (r) => r.minimumRequired },
+            { label: 'Weekly demand', render: (r) => r.predictedWeeklyDemand },
+          ])}
+        </div>
+
+        <div style="background:white;padding:15px;border-radius:8px;margin:15px 0;border-left:4px solid #b91c1c;">
+          <h3 style="color:#b91c1c;margin:0 0 10px;">Shortages (${shortage_alerts.length})</h3>
+          ${renderAlertTable(shortage_alerts, [
+            { label: 'Component', render: (r) => r.componentName },
+            { label: 'Stock', render: (r) => r.currentStock },
+            { label: 'Urgency', render: (r) => r.urgency || 'high' },
+            { label: 'Vendor', render: (r) => r.suggestedVendor || '—' },
+          ])}
+        </div>
+
+        <div style="background:white;padding:15px;border-radius:8px;margin:15px 0;border-left:4px solid #2563eb;">
+          <h3 style="color:#2563eb;margin:0 0 10px;">Purchase recommendations (${purchase_recommendations.length})</h3>
+          ${renderAlertTable(purchase_recommendations, [
+            { label: 'Component', render: (r) => r.componentName },
+            { label: 'Order qty', render: (r) => r.quantityToOrder },
+            { label: 'Est. cost', render: (r) => `₹${r.estimatedCost ?? 0}` },
+            { label: 'Vendor', render: (r) => r.suggestedVendor || '—' },
+          ])}
+        </div>
+
+        <p style="color:#6b7280;font-size:12px;margin-top:20px;">
+          Smart Inventory Forecasting System — ${new Date().toLocaleString('en-IN')}
+        </p>
+      </div>
+    </div>
+  `;
+
+  const smsMessage = `Inventory alerts: ${low_stock_alerts.length} low stock, ${shortage_alerts.length} shortages, ${purchase_recommendations.length} purchase items.`;
+
+  if (email) {
+    const emailResult = await sendEmail(email, emailSubject, emailHtml);
+    results.push({ type: 'email', ...emailResult });
+  }
+  if (phone) {
+    const smsResult = await sendSMS(phone, smsMessage);
+    results.push({ type: 'sms', ...smsResult });
+  }
+
+  return results;
+}
+
+/**
+ * Send shortage-specific alert email/SMS.
+ */
+export async function sendShortageAlertEmail({
+  email,
+  phone,
+  componentName,
+  currentStock = 0,
+  suggestedVendor,
+  courseName,
+  centerName,
+}) {
+  const results = [];
+  const subject = `🚨 Shortage Alert — ${componentName}`;
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <div style="background:#b91c1c;color:white;padding:20px;text-align:center;">
+        <h1 style="margin:0;">Critical Shortage</h1>
+      </div>
+      <div style="padding:20px;background:#f9fafb;">
+        <p><strong>Component:</strong> ${componentName}</p>
+        <p><strong>Center:</strong> ${centerName || 'N/A'}</p>
+        <p><strong>Current stock:</strong> ${currentStock}</p>
+        ${courseName ? `<p><strong>Course:</strong> ${courseName}</p>` : ''}
+        ${suggestedVendor ? `<p><strong>Suggested vendor:</strong> ${suggestedVendor}</p>` : ''}
+        <p style="color:#b91c1c;"><strong>Action:</strong> Place an emergency purchase order immediately.</p>
+      </div>
+    </div>
+  `;
+
+  const sms = `SHORTAGE: ${componentName} at ${centerName || 'hub'} — stock ${currentStock}. Reorder now.`;
+
+  if (email) results.push({ type: 'email', ...(await sendEmail(email, subject, html)) });
+  if (phone) results.push({ type: 'sms', ...(await sendSMS(phone, sms)) });
+  return results;
+}
+
+/**
+ * Send purchase recommendation email/SMS.
+ */
+export async function sendPurchaseRecommendationEmail({
+  email,
+  phone,
+  componentName,
+  quantityToOrder,
+  estimatedCost,
+  suggestedVendor,
+  reason,
+  centerName,
+}) {
+  const results = [];
+  const subject = `🛒 Purchase Recommendation — ${componentName}`;
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <div style="background:#2563eb;color:white;padding:20px;text-align:center;">
+        <h1 style="margin:0;">Purchase Recommendation</h1>
+      </div>
+      <div style="padding:20px;background:#f9fafb;">
+        <p><strong>Component:</strong> ${componentName}</p>
+        <p><strong>Center:</strong> ${centerName || 'N/A'}</p>
+        <p><strong>Recommended quantity:</strong> ${quantityToOrder}</p>
+        <p><strong>Estimated cost:</strong> ₹${estimatedCost ?? 0}</p>
+        <p><strong>Vendor:</strong> ${suggestedVendor || 'TBD'}</p>
+        <p><strong>Reason:</strong> ${reason || 'Forecast-based restock'}</p>
+      </div>
+    </div>
+  `;
+
+  const sms = `Purchase: order ${quantityToOrder} x ${componentName} (~₹${estimatedCost ?? 0}) from ${suggestedVendor || 'vendor'}.`;
+
+  if (email) results.push({ type: 'email', ...(await sendEmail(email, subject, html)) });
+  if (phone) results.push({ type: 'sms', ...(await sendSMS(phone, sms)) });
+  return results;
+}

@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
+  // For physical devices, you MUST use your PC's local IP address (e.g., 10.20.216.211)
+  // Run 'ipconfig' (Windows) or 'ifconfig' (Mac/Linux) to find your IPv4 address.
   static const String baseUrl = String.fromEnvironment(
     'BACKEND_URL',
-    defaultValue: 'http://192.168.209.211:8787',
+    defaultValue: 'http://10.20.216.211:8787', // AUTO-DETECTED IP
   );
 
   static Map<String, String> get headers => {

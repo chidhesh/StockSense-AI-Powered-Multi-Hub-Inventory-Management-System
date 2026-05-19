@@ -1,8 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Search, ArrowLeftRight, Loader2, CheckCircle, AlertCircle, Filter, X, QrCode, Zap, MapPin, Clock } from 'lucide-react';
+import { Plus, Search, ArrowLeftRight, Loader2, CheckCircle, AlertCircle, Filter, X, QrCode, Zap, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { Html5Qrcode } from 'html5-qrcode';
+import {
+  isSecureCameraContext,
+  mapCameraError,
+  scanQrFromFile,
+  startLiveQrScanner,
+  stopLiveQrScanner,
+} from '../lib/qrScanner';
 import { apiGet, apiPost } from '../lib/api';
 import { useAuth } from '../context/useAuth';
 import { InventoryTransaction, Component, Student, Center } from '../types';
@@ -23,7 +30,12 @@ export default function Transactions() {
   const isMaster = profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator';
   const location = useLocation();
   const navigate = useNavigate();
-  const { centerId: initialCenterId, centerName: initialCenterName } = (location.state || {}) as { centerId?: string; centerName?: string };
+  const { centerId: initialCenterId, centerName: initialCenterName, date: filterDate } = (location.state || {}) as {
+    centerId?: string;
+    centerName?: string;
+    date?: string;
+    filter?: TxFilter;
+  };
 
   const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
@@ -35,80 +47,82 @@ export default function Transactions() {
   const [selectedComponentId, setSelectedComponentId] = useState<string>('');
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [selectedHubId, setSelectedHubId] = useState<string>('');
-  const [currentCenterId, setCurrentCenterId] = useState<string>(initialCenterId || '');
+  const [currentCenterId, setCurrentCenterId] = useState<string>(initialCenterId || (!isMaster ? profile?.center_id || '' : ''));
   const [currentCenterName, setCurrentCenterName] = useState<string>(initialCenterName || '');
+  const [viewMode, setViewMode] = useState<'hubs' | 'details'>((initialCenterId || filterDate || !isMaster) ? 'details' : 'hubs');
 
   useEffect(() => {
-    if (initialCenterId) {
-      setCurrentCenterId(initialCenterId);
+    if (initialCenterId || filterDate || !isMaster) {
+      if (initialCenterId) {
+        setCurrentCenterId(initialCenterId);
+      } else if (!isMaster && profile?.center_id) {
+        setCurrentCenterId(profile.center_id);
+      }
+      setViewMode('details');
     }
     if (initialCenterName) {
       setCurrentCenterName(initialCenterName);
     }
-  }, [initialCenterId, initialCenterName]);
+  }, [initialCenterId, initialCenterName, filterDate, isMaster, profile]);
+
+  useEffect(() => {
+    if (filterDate) {
+      setFilter(location.state?.filter === 'issue' ? 'issue' : 'all');
+    }
+  }, [filterDate, location.state?.filter]);
+
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [showQRScanner, setShowQRScanner] = useState(false);
 
+  const txScannerRef = useRef<Html5Qrcode | null>(null);
+
   useEffect(() => {
-    let scanner: Html5Qrcode | null = null;
-    if (showQRScanner && showModal) {
-      const html5QrCode = new Html5Qrcode("qr-reader-tx");
-      scanner = html5QrCode;
-      
-      const startScanner = async () => {
-          if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-            setErrMsg("Camera requires a secure connection (HTTPS).");
-            setShowQRScanner(false);
-            return;
-          }
+    let cancelled = false;
 
-          try {
-            // Get available cameras first
-            const cameras = await Html5Qrcode.getCameras();
-            if (!cameras || cameras.length === 0) {
-              throw new Error('No cameras found');
-            }
-
-            await html5QrCode.start(
-              { facingMode: "environment" },
-              {
-                fps: 20,
-                qrbox: (viewfinderWidth, viewfinderHeight) => {
-                  const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-                  const qrboxSize = Math.floor(minEdge * 0.8);
-                  return { width: qrboxSize, height: qrboxSize };
-                },
-              },
-              (decodedText) => {
-                playBeep();
-                handleQRScan(decodedText);
-                html5QrCode.stop().catch(console.error);
-                setShowQRScanner(false);
-              },
-              () => {}
-            );
-          } catch (err: any) {
-            console.error("Scanner start error:", err);
-            let msg = "Could not access camera.";
-            if (err.name === 'NotAllowedError' || err.message?.includes('Permission')) {
-              msg = "CAMERA ACCESS DENIED: Please enable camera in your browser settings and refresh.";
-            } else if (err.name === 'NotReadableError' || err.message?.includes('in use')) {
-              msg = "Camera is in use by another app (like Zoom).";
-            }
-            setErrMsg(msg);
-            setShowQRScanner(false);
-          }
-        };
-
-      startScanner();
-    }
-    return () => {
-      if (scanner && scanner.isScanning) {
-        scanner.stop().catch(console.error);
+    const run = async () => {
+      if (!showQRScanner || !showModal) {
+        await stopLiveQrScanner(txScannerRef.current);
+        txScannerRef.current = null;
+        return;
       }
+
+      if (!isSecureCameraContext()) {
+        setErrMsg('Camera requires HTTPS or localhost.');
+        setShowQRScanner(false);
+        return;
+      }
+
+      try {
+        txScannerRef.current = await startLiveQrScanner({
+          elementId: 'qr-reader-tx',
+          scanner: txScannerRef.current,
+          onScan: async (decodedText) => {
+            if (cancelled) return;
+            playBeep();
+            await handleQRScan(decodedText);
+            await stopLiveQrScanner(txScannerRef.current);
+            txScannerRef.current = null;
+            setShowQRScanner(false);
+          },
+        });
+      } catch (err) {
+        if (!cancelled) {
+          setErrMsg(mapCameraError(err));
+          setShowQRScanner(false);
+        }
+      }
+    };
+
+    const timer = window.setTimeout(() => { void run(); }, 150);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      void stopLiveQrScanner(txScannerRef.current);
+      txScannerRef.current = null;
     };
   }, [showQRScanner, showModal]);
   
@@ -243,12 +257,19 @@ export default function Transactions() {
       return;
     }
 
-    if (parsed.type === 'student' || parsed.studentId) {
-      const student = students.find(s => 
-        (parsed.studentId && s.id === parsed.studentId) || 
-        (parsed.rollNumber && s.roll_number.toLowerCase() === parsed.rollNumber.toLowerCase()) ||
-        (s.id === result)
-      );
+    if (parsed.type === 'student' || parsed.studentId || parsed.rollNumber) {
+      const student = students.find(s => {
+        const dbId = String(s.id).toLowerCase();
+        const dbRoll = String(s.roll_number).toLowerCase();
+        const scanId = parsed.studentId ? String(parsed.studentId).toLowerCase() : '';
+        const scanRoll = parsed.rollNumber ? String(parsed.rollNumber).toLowerCase() : '';
+        const scanRaw = result.toLowerCase();
+
+        return (scanId && dbId === scanId) || 
+               (scanRoll && dbRoll === scanRoll) ||
+               (dbId === scanRaw) ||
+               (dbRoll === scanRaw);
+      });
 
       if (student) {
         setForm(prev => ({
@@ -270,13 +291,13 @@ export default function Transactions() {
   const handleQRUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const scanner = new Html5Qrcode("qr-reader-tx-hidden");
     try {
-      const result = await scanner.scanFile(file, true);
-      handleQRScan(result);
-    } catch (err) {
-      setErrMsg('Could not detect QR code in image.');
+      const result = await scanQrFromFile(file, 'qr-reader-tx-hidden');
+      await handleQRScan(result);
+    } catch {
+      setErrMsg('Could not detect QR code in image. Use a clear photo of the full QR code.');
     }
+    e.target.value = '';
   };
 
   if (loading) return (
@@ -288,7 +309,7 @@ export default function Transactions() {
 
   const filtered = transactions.filter(t => {
     // Primary filter: ensure transactions belong to the currentCenterId if set
-    if (currentCenterId && t.center_id !== currentCenterId) {
+    if (currentCenterId && String(t.center_id) !== String(currentCenterId)) {
       return false;
     }
 
@@ -540,76 +561,167 @@ export default function Transactions() {
         </div>
       )}
 
-      <div className="glass-card overflow-hidden rounded-[32px] premium-shadow">
+      <div className="glass-card overflow-hidden rounded-[32px] premium-shadow min-h-[400px]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/50">
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Asset Information</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tx Type</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Qty</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Beneficiary</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Timestamp</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-20">
-                    <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-slate-100">
-                      <ArrowLeftRight size={32} className="text-slate-200" />
-                    </div>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No matching ledger entries</p>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map(tx => {
-                  const comp = (tx as any).component || components.find(c => c.id === tx.component_id);
-                  return (
-                    <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-6 py-5">
-                        <p className="font-black text-slate-900 uppercase tracking-tight leading-none mb-1.5">
-                          {comp?.name || (tx.component_id ? `Asset #${tx.component_id.slice(0, 4)}` : 'Unknown Asset')}
-                        </p>
-                        <div className="flex flex-col gap-0.5">
-                          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">{comp?.category || 'General'}</p>
-                          {comp?.sku && (
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                              <span className="opacity-50">Code:</span> {comp.sku}
-                            </p>
-                          )}
+          {viewMode === 'hubs' ? (
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Inventory Hubs</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select a hub to view detailed transactions</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {centers.length > 0 ? (
+                  centers.map(center => {
+                    const hubTransactions = transactions.filter(t => t.center_id === center.id);
+                    const hubTxCount = hubTransactions.length;
+                    const lastTx = hubTransactions[0]; // Sorted by date usually
+                    
+                    return (
+                      <button
+                        key={center.id}
+                        onClick={() => {
+                          setCurrentCenterId(center.id);
+                          setCurrentCenterName(center.name);
+                          setViewMode('details');
+                        }}
+                        className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all text-left group relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                          <MapPin size={80} />
                         </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <span className={`px-3 py-1 rounded-xl text-[8px] font-black uppercase tracking-widest border ${
-                          tx.transaction_type === 'issue' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                          tx.transaction_type === 'return' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                          'bg-rose-50 text-rose-600 border-rose-100'
-                        }`}>
-                          {tx.transaction_type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-5">
-                        <p className="font-black text-slate-900 text-lg tracking-tighter">{tx.quantity}</p>
-                      </td>
-                  <td className="px-6 py-5">
-                        <p className="font-black text-slate-900 uppercase tracking-tighter leading-none mb-1.5">{tx.student_name || 'System'}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{tx.student_id || 'Internal'}</p>
-                      </td>
-                      <td className="px-6 py-5">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{format(new Date(tx.created_at), 'dd MMM yyyy')}</p>
-                        <p className="text-[10px] font-black text-slate-900 mt-1">{format(new Date(tx.created_at), 'HH:mm')}</p>
-                      </td>
-                      <td className="px-6 py-5 max-w-[200px]">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate group-hover:whitespace-normal group-hover:overflow-visible transition-all">{tx.notes || 'No Remarks'}</p>
+                        <div className="flex items-start justify-between mb-6">
+                          <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-[20px] group-hover:scale-110 transition-transform">
+                            <MapPin size={28} />
+                          </div>
+                          <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 dark:border-slate-700">
+                            {hubTxCount} Tx
+                          </span>
+                        </div>
+                        <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-1.5">{center.name}</h4>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mb-6">
+                          <MapPin size={12} className="text-indigo-500" /> {center.location}
+                        </p>
+                        <div className="mt-auto pt-6 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest mb-1">Status</span>
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Active Hub</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                            View Ledger <ChevronRight size={14} />
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="col-span-full py-20 text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                      <MapPin size={32} className="text-slate-200" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No hubs registered in the system</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-0">
+              {currentCenterId && (
+                <div className="px-8 py-4 bg-indigo-50/50 border-b border-indigo-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => {
+                        setCurrentCenterId('');
+                        setCurrentCenterName('');
+                        setViewMode('hubs');
+                      }}
+                      className="p-2 hover:bg-white rounded-xl text-indigo-600 transition-all"
+                    >
+                      <ArrowLeftRight size={18} className="rotate-180" />
+                    </button>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">{currentCenterName}</h4>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Viewing Hub Ledger</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-white rounded-lg text-[10px] font-black text-indigo-600 border border-indigo-100 shadow-sm">
+                    {filtered.length} Entries Found
+                  </span>
+                </div>
+              )}
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50/50">
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Asset Information</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tx Type</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Qty</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Beneficiary</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Timestamp</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-20">
+                        <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                          <ArrowLeftRight size={32} className="text-slate-200" />
+                        </div>
+                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                          {location.state?.date ? 'No transactions done today' : 'No matching ledger entries'}
+                        </p>
                       </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                  ) : (
+                    filtered.map(tx => {
+                      const comp = (tx as any).component || components.find(c => c.id === tx.component_id);
+                      return (
+                        <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors group">
+                          <td className="px-6 py-5">
+                            <p className="font-black text-slate-900 uppercase tracking-tight leading-none mb-1.5">
+                              {comp?.name || (tx.component_id ? `Asset #${tx.component_id.slice(0, 4)}` : 'Unknown Asset')}
+                            </p>
+                            <div className="flex flex-col gap-0.5">
+                              <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">{comp?.category || 'General'}</p>
+                              {comp?.sku && (
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                  <span className="opacity-50">Code:</span> {comp.sku}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-5">
+                            <span className={`px-3 py-1 rounded-xl text-[8px] font-black uppercase tracking-widest border ${
+                              tx.transaction_type === 'issue' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                              tx.transaction_type === 'return' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                              'bg-rose-50 text-rose-600 border-rose-100'
+                            }`}>
+                              {tx.transaction_type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5">
+                            <p className="font-black text-slate-900 text-lg tracking-tighter">{tx.quantity}</p>
+                          </td>
+                      <td className="px-6 py-5">
+                            <p className="font-black text-slate-900 uppercase tracking-tighter leading-none mb-1.5">{tx.student_name || 'System'}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{tx.student_id || 'Internal'}</p>
+                          </td>
+                          <td className="px-6 py-5">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{format(new Date(tx.created_at), 'dd MMM yyyy')}</p>
+                            <p className="text-[10px] font-black text-slate-900 mt-1">{format(new Date(tx.created_at), 'HH:mm')}</p>
+                          </td>
+                          <td className="px-6 py-5 max-w-[200px]">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate group-hover:whitespace-normal group-hover:overflow-visible transition-all">{tx.notes || 'No Remarks'}</p>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 

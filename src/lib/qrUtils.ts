@@ -35,17 +35,24 @@ export interface ParsedQR {
 export function parseQRData(raw: string): ParsedQR | null {
   if (!raw) return null;
   
+  const trimmedRaw = raw.trim();
+  
   // Try JSON first
   try {
-    const parsed = JSON.parse(raw);
-    if (parsed.type === 'inventory_component' || parsed.type === 'student') return parsed;
+    const parsed = JSON.parse(trimmedRaw);
+    if (parsed.type === 'inventory_component' || parsed.type === 'student') {
+      return {
+        ...parsed,
+        type: parsed.type, // Ensure it's the right type
+      };
+    }
   } catch {
     // Not JSON
   }
 
   // Handle INV:CENTER_ID:SKU format
-  if (raw.startsWith('INV:')) {
-    const parts = raw.split(':');
+  if (trimmedRaw.startsWith('INV:')) {
+    const parts = trimmedRaw.split(':');
     if (parts.length >= 3) {
       return {
         type: 'inventory_component',
@@ -57,21 +64,19 @@ export function parseQRData(raw: string): ParsedQR | null {
 
   // Handle plain ID format (UUID)
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (uuidRegex.test(raw)) {
-    // If it's just a UUID, we don't know if it's a student or component yet.
-    // Return a generic 'unknown' type or both, let the caller decide based on their data.
+  if (uuidRegex.test(trimmedRaw)) {
     return {
-      type: 'inventory_component', // Keeping existing behavior but adding the ID
-      componentId: raw,
-      studentId: raw, // Also include as studentId so caller can check both
+      type: 'inventory_component',
+      componentId: trimmedRaw,
+      studentId: trimmedRaw,
     };
   }
 
   // Handle plain roll numbers (alphanumeric, hyphens)
-  if (/^[a-zA-Z0-9-]+$/.test(raw) && raw.length >= 3) {
+  if (/^[a-zA-Z0-9-]+$/.test(trimmedRaw) && trimmedRaw.length >= 3) {
     return {
       type: 'student',
-      rollNumber: raw,
+      rollNumber: trimmedRaw,
     };
   }
 

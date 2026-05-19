@@ -12,6 +12,16 @@ import { useAuth } from '../context/useAuth';
 import { Component, Student } from '../types';
 import { parseQRData, playBeep } from '../lib/qrUtils';
 import { Html5Qrcode } from 'html5-qrcode';
+import {
+  isSecureCameraContext,
+  listCameras,
+  mapCameraError,
+  pickPreferredCameraId,
+  requestCameraPermission,
+  scanQrFromFile,
+  startLiveQrScanner,
+  stopLiveQrScanner,
+} from '../lib/qrScanner';
 
 export default function QRManagement() {
   const { profile, user } = useAuth();
@@ -31,11 +41,13 @@ export default function QRManagement() {
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
   const [scannedItems, setScannedItems] = useState<Component[]>([]);
   const [unitSelectionComp, setUnitSelectionComp] = useState<Component | null>(null);
+  const [scanMode, setScanMode] = useState<'identity' | 'assets'>('identity');
   const [studentHoldings, setStudentHoldings] = useState<Record<string, string[]>>({});
   const [allIssuedUnits, setAllIssuedUnits] = useState<Record<string, string[]>>({});
   const [sessionActivity, setSessionActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingFile, setProcessingFile] = useState(false);
+  const [startingCamera, setStartingCamera] = useState(false);
   const [availableCameras, setAvailableCameras] = useState<{ id: string; label: string }[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>('');
   
@@ -150,10 +162,29 @@ export default function QRManagement() {
     fetchStudents();
     fetchAllIssuedUnits();
     return () => {
-      if (scannerRef.current?.isScanning) scannerRef.current.stop();
+      stopLiveQrScanner(scannerRef.current);
       if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
     };
   }, [profile, isMasterAdmin, fetchComponents, fetchStudents, fetchAllIssuedUnits]);
+
+  useEffect(() => {
+    if (isMasterAdmin) return;
+    let cancelled = false;
+    (async () => {
+      if (!isSecureCameraContext()) return;
+      const granted = await requestCameraPermission();
+      if (!granted || cancelled) return;
+      try {
+        const cameras = await listCameras();
+        if (cancelled || !cameras.length) return;
+        setAvailableCameras(cameras);
+        setSelectedCameraId((prev) => prev || pickPreferredCameraId(cameras) || cameras[0].id);
+      } catch {
+        /* camera list optional until user starts scanner */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isMasterAdmin]);
 
   useEffect(() => {
     if (selectedStudent || (studentName && studentId)) {
@@ -164,28 +195,41 @@ export default function QRManagement() {
   }, [selectedStudent, studentName, studentId, txType, fetchStudentHoldings]);
 
   const handleScannedData = async (raw: string) => {
-    if (lastScannedRef.current === raw) return;
+    console.log('--- QR SCAN TRIGGERED ---');
+    console.log('Raw Scanned Data:', raw);
+    console.log('Total Registered Students in Memory:', students.length);
+    
+    if (lastScannedRef.current === raw) {
+      console.log('Skipping repeat scan');
+      return;
+    }
     lastScannedRef.current = raw;
     if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
     scanTimeoutRef.current = setTimeout(() => { lastScannedRef.current = null; }, 3000); // 3s cool down
 
     playBeep();
     const parsed = parseQRData(raw);
-    if (!parsed) {
-      setScanResult({ success: false, message: 'Invalid QR code format.' });
-      return;
-    }
+    
+    // 1. Try to find student in local memory first (already robust)
+    const foundStudent = students.find(s => {
+      const dbId = String(s.id).toLowerCase();
+      const dbRoll = String(s.roll_number).toLowerCase();
+      const scanId = parsed?.studentId ? String(parsed.studentId).toLowerCase() : '';
+      const scanRoll = parsed?.rollNumber ? String(parsed.rollNumber).toLowerCase() : '';
+      const scanRaw = raw.toLowerCase();
 
-    // AUTO-DETECTION LOGIC
-    // 1. Check if it's a Student
-    const foundStudent = students.find(s => 
-      (parsed.studentId && s.id === parsed.studentId) || 
-      (parsed.rollNumber && s.roll_number.toLowerCase() === parsed.rollNumber.toLowerCase()) ||
-      (s.id === raw) ||
-      (s.roll_number.toLowerCase() === raw.toLowerCase())
-    );
+      const match = (scanId && dbId === scanId) || 
+                   (scanRoll && dbRoll === scanRoll) ||
+                   (dbId === scanRaw) ||
+                   (dbRoll === scanRaw) ||
+                   (raw.includes(s.roll_number));
+      
+      if (match) console.log(`Matched student: ${s.full_name} via ${dbRoll}`);
+      return match;
+    });
 
     if (foundStudent) {
+      console.log('Student found:', foundStudent.full_name);
       setSelectedStudent({
         studentId: foundStudent.id,
         fullName: foundStudent.full_name,
@@ -194,13 +238,57 @@ export default function QRManagement() {
         phone: foundStudent.phone,
         department: foundStudent.department,
         batch: foundStudent.batch,
-        history: parsed.history || null
+        history: parsed?.history || null
       });
       setScanResult({ 
         success: true, 
-        message: `Student Identity Verified: ${foundStudent.full_name}` 
+        message: `Identity Verified: ${foundStudent.full_name}. You can now scan assets.` 
       });
-      // Do not stop camera, allow scanning items next
+      setScanMode('assets');
+      return;
+    }
+
+    // 2. If student not found, and data is valid JSON or starts with {
+    if (raw.trim().startsWith('{')) {
+      try {
+        const data = JSON.parse(raw);
+        if (data.type === 'student' || data.rollNumber) {
+          // Manually search student by roll number if not in local list
+          const roll = data.rollNumber || data.roll_no;
+          if (roll) {
+            console.log('Searching for student by roll number:', roll);
+            const s = students.find(st => st.roll_number.toLowerCase() === String(roll).toLowerCase());
+            if (s) {
+              setSelectedStudent({
+                studentId: s.id,
+                fullName: s.full_name,
+                rollNumber: s.roll_number,
+                email: s.email,
+                phone: s.phone
+              });
+              setScanResult({ success: true, message: `Identity Verified: ${s.full_name}` });
+              setScanMode('assets');
+              return;
+            }
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    if (!parsed) {
+      console.log('Parse failed for:', raw);
+      setScanResult({ success: false, message: 'Invalid QR code format.' });
+      return;
+    }
+
+    console.log('Parsed QR Content:', parsed);
+
+    // If we are in identity mode but scanned something else, warn
+    if (scanMode === 'identity') {
+      setScanResult({
+        success: false,
+        message: 'Please scan a valid Student QR first to verify identity.'
+      });
       return;
     }
 
@@ -241,87 +329,61 @@ export default function QRManagement() {
   };
 
   const startCamera = async () => {
-    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-      setScanResult({ 
-        success: false, 
-        message: 'Camera requires a secure connection (HTTPS). Please contact your administrator.' 
+    if (!isSecureCameraContext()) {
+      setScanResult({
+        success: false,
+        message: 'Camera requires HTTPS or localhost. Upload a QR image if you cannot use HTTPS.',
       });
       return;
     }
 
+    setStartingCamera(true);
+    setScanResult(null);
+    setScanning(true);
+
     try {
-      // First, request permissions and get cameras
-      const cameras = await Html5Qrcode.getCameras();
-      if (cameras && cameras.length > 0) {
-        setAvailableCameras(cameras.map(c => ({ id: c.id, label: c.label })));
-        if (!selectedCameraId) setSelectedCameraId(cameras[0].id);
-      } else {
-        throw new Error('No cameras found');
-      }
+      const cameras = await listCameras();
+      if (!cameras.length) throw new Error('No cameras found');
+      setAvailableCameras(cameras);
+      const cameraId = selectedCameraId || pickPreferredCameraId(cameras) || cameras[0].id;
+      if (!selectedCameraId) setSelectedCameraId(cameraId);
 
-      if (!scannerRef.current) scannerRef.current = new Html5Qrcode('qr-reader');
-      setScanning(true);
-      setScanResult(null);
-
-      const config = { 
-        fps: 20, 
-        qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const qrboxSize = Math.floor(minEdge * 0.8);
-          return { width: qrboxSize, height: qrboxSize };
-        },
-        aspectRatio: 1.0,
-        disableFlip: false
-      };
-
-      const cameraId = selectedCameraId || cameras[0].id;
-
-      // Use cameraId directly if we have it, otherwise fallback to environment mode
-      if (cameraId) {
-        await scannerRef.current.start(
-          cameraId,
-          config,
-          async (decodedText) => {
-            try {
-              await handleScannedData(decodedText);
-            } catch (err) {
-              console.error('Scan processing error:', err);
-            }
-          },
-          () => {}
-        );
-      } else {
-        await scannerRef.current.start(
-          { facingMode: "environment" },
-          config,
-          async (decodedText) => {
-            try {
-              await handleScannedData(decodedText);
-            } catch (err) {
-              console.error('Scan processing error:', err);
-            }
-          },
-          () => {}
-        );
-      }
-    } catch (err: any) {
+      scannerRef.current = await startLiveQrScanner({
+        elementId: 'qr-reader',
+        cameraId,
+        scanner: scannerRef.current,
+        onScan: handleScannedData,
+      });
+    } catch (err) {
       setScanning(false);
-      let msg = 'Camera access denied.';
-      if (err.name === 'NotAllowedError' || err.message?.includes('Permission')) {
-        msg = 'CAMERA ACCESS DENIED: Please click the lock icon in your browser address bar and set Camera to "Allow", then refresh the page.';
-      } else if (err.name === 'NotFoundError' || err.message === 'No cameras found') {
-        msg = 'No camera found on this device. Please connect a camera.';
-      } else if (err.name === 'NotReadableError' || err.message?.includes('in use')) {
-        msg = 'Camera is in use by another application (like Zoom or Teams). Please close other apps and try again.';
-      }
-      setScanResult({ success: false, message: msg });
+      setScanResult({ success: false, message: mapCameraError(err) });
+    } finally {
+      setStartingCamera(false);
     }
   };
 
   const stopCamera = async () => {
-    if (scannerRef.current?.isScanning) {
-      try { await scannerRef.current.stop(); setScanning(false); } catch (err) { console.error(err); }
-    } else { setScanning(false); }
+    await stopLiveQrScanner(scannerRef.current);
+    setScanning(false);
+  };
+
+  const switchCamera = async (cameraId: string) => {
+    setSelectedCameraId(cameraId);
+    if (!scanning) return;
+    setStartingCamera(true);
+    try {
+      scannerRef.current = await startLiveQrScanner({
+        elementId: 'qr-reader',
+        cameraId,
+        scanner: scannerRef.current,
+        onScan: handleScannedData,
+      });
+    } catch (err) {
+      setScanning(false);
+      setScanResult({ success: false, message: mapCameraError(err) });
+    } finally {
+      setStartingCamera(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -379,6 +441,7 @@ export default function QRManagement() {
     setScanResult({ success: true, message: `Processed ${successCount}/${scannedItems.length} assets for ${sName}.` });
     setScannedItems([]);
     setSelectedStudent(null);
+    setScanMode('identity');
     setStudentName('');
     setStudentId('');
     await fetchComponents();
@@ -391,11 +454,10 @@ export default function QRManagement() {
     if (!file) return;
     setProcessingFile(true);
     try {
-      const html5QrCode = new Html5Qrcode('qr-reader-fallback');
-      const result = await html5QrCode.scanFile(file, true);
-      handleScannedData(result);
-    } catch (err) {
-      setScanResult({ success: false, message: 'QR recognition failed. Please ensure the image is clear.' });
+      const result = await scanQrFromFile(file, 'qr-reader-fallback');
+      await handleScannedData(result);
+    } catch {
+      setScanResult({ success: false, message: 'QR recognition failed. Use a clear, well-lit image of the full code.' });
     } finally {
       setProcessingFile(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -495,9 +557,24 @@ export default function QRManagement() {
             
             <div className="p-8">
               <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${scanning ? 'bg-green-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-700'}`} />
-                  <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Live Feed Terminal</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${scanning ? 'bg-green-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                    <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                      Live Feed Terminal — {scanMode === 'identity' ? 'Identity Mode' : 'Asset Mode'}
+                    </span>
+                  </div>
+                  {scanMode === 'assets' && selectedStudent && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest">Scanning for: {selectedStudent.fullName}</span>
+                      <button 
+                        onClick={() => { setScanMode('identity'); setSelectedStudent(null); }}
+                        className="text-[8px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+                      >
+                        Reset Identity
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <button 
@@ -552,20 +629,35 @@ export default function QRManagement() {
                     )}
                     <button
                       onClick={startCamera}
-                      className="metamask-button w-full flex items-center justify-center gap-4 px-12 py-5 bg-blue-600 text-white rounded-[24px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-600/40 hover:bg-blue-700 transition-all"
+                      disabled={startingCamera}
+                      className="metamask-button w-full flex items-center justify-center gap-4 px-12 py-5 bg-blue-600 text-white rounded-[24px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-600/40 hover:bg-blue-700 transition-all disabled:opacity-60"
                     >
                       <Camera size={20} />
-                      Initialize Scanner
+                      {startingCamera ? 'Starting Camera…' : 'Initialize Scanner'}
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={stopCamera}
-                    className="metamask-button flex items-center gap-4 px-12 py-5 bg-rose-500 text-white rounded-[24px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-rose-500/40 hover:bg-rose-600 transition-all"
-                  >
-                    <X size={20} />
-                    Terminate Feed
-                  </button>
+                  <div className="flex flex-col items-center gap-3 w-full max-w-md">
+                    {availableCameras.length > 1 && (
+                      <select
+                        value={selectedCameraId}
+                        onChange={(e) => switchCamera(e.target.value)}
+                        disabled={startingCamera}
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+                        {availableCameras.map(camera => (
+                          <option key={camera.id} value={camera.id}>{camera.label}</option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      onClick={stopCamera}
+                      className="metamask-button flex items-center gap-4 px-12 py-5 bg-rose-500 text-white rounded-[24px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-rose-500/40 hover:bg-rose-600 transition-all w-full justify-center"
+                    >
+                      <X size={20} />
+                      Terminate Feed
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

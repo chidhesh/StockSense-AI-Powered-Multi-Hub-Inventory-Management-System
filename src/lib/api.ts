@@ -46,23 +46,53 @@ export async function apiRequest<T>(
     headers['Content-Type'] = 'application/json';
     rest.body = JSON.stringify(json);
   }
-  const url = `${apiBase()}${path}`;
-  let res: Response;
+  const base = apiBase();
+  const primaryUrl = `${base}${path}`;
+  const fallbackUrl = import.meta.env.DEV && base === '' && path.startsWith('/api')
+    ? `http://localhost:8787${path}`
+    : null;
+
+  let res: Response | null = null;
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 30000);
+  let lastError: unknown;
+
+  const fetchRequest = async (requestUrl: string) => {
+    return fetch(requestUrl, { ...rest, headers, signal: ctrl.signal });
+  };
+
   try {
-    res = await fetch(url, { ...rest, headers, signal: ctrl.signal });
+    try {
+      res = await fetchRequest(primaryUrl);
+      if (
+        fallbackUrl &&
+        res &&
+        !res.ok &&
+        import.meta.env.DEV &&
+        [500, 502, 503, 504].includes(res.status)
+      ) {
+        lastError = new Error(`Proxy returned ${res.status}`);
+        res = await fetchRequest(fallbackUrl);
+      }
+    } catch (e) {
+      lastError = e;
+      if (fallbackUrl) {
+        res = await fetchRequest(fallbackUrl);
+      } else {
+        throw e;
+      }
+    }
   } catch (e) {
     const isAbort = e instanceof Error && e.name === 'AbortError';
-    throw new ApiError(
-      isAbort
-        ? 'Request timed out. Is the API running? Use npm run dev (starts API + site) or npm run dev:server.'
-        : 'Cannot reach the API server. From the project folder run npm run dev (starts the API on port 8787 and the website). PostgreSQL must be running. Frontend-only: npm run dev:web plus npm run dev:server in another terminal.',
-      0
-    );
+    const baseError = isAbort
+      ? 'Request timed out. Is the API running? Use npm run dev (starts API + site) or npm run dev:server.'
+      : 'Cannot reach the API server. From the project folder run npm run dev (starts the API on port 8787 and the website). PostgreSQL must be running. Frontend-only: npm run dev:web plus npm run dev:server in another terminal.';
+    const fallbackNote = fallbackUrl && lastError !== undefined ? ' The dev proxy failed; retrying directly to http://localhost:8787 failed as well.' : '';
+    throw new ApiError(baseError + fallbackNote, 0);
   } finally {
     clearTimeout(t);
   }
+
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   let parsed: unknown;

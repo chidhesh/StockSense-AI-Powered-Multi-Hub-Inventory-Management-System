@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserPlus, Search, QrCode, History, Phone, Mail, MapPin, Download, Trash2, Edit, FileDown, AlertTriangle, Users, Zap, X } from 'lucide-react';
 import { apiGet, apiPost, apiPatch, apiDelete } from '../lib/api';
@@ -8,6 +8,12 @@ import { generateQRCode, parseQRData, playBeep } from '../lib/qrUtils';
 import { format } from 'date-fns';
 import { generateStudentReportPDF } from '../lib/pdfUtils';
 import { Html5Qrcode } from 'html5-qrcode';
+import {
+  isSecureCameraContext,
+  mapCameraError,
+  startLiveQrScanner,
+  stopLiveQrScanner,
+} from '../lib/qrScanner';
 
 export default function Students() {
   const { profile } = useAuth();
@@ -163,75 +169,66 @@ export default function Students() {
     }
   };
 
+  const studentScannerRef = useRef<Html5Qrcode | null>(null);
+
   useEffect(() => {
-    let scanner: Html5Qrcode | null = null;
-    if (showScanner) {
-      const html5QrCode = new Html5Qrcode("student-scanner");
-      scanner = html5QrCode;
-      
-      const startScanner = async () => {
-          if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-            setScannerError("Camera requires a secure connection (HTTPS).");
-            setShowScanner(false);
-            return;
-          }
+    let cancelled = false;
 
-          try {
-            // Get available cameras first
-            const cameras = await Html5Qrcode.getCameras();
-            if (!cameras || cameras.length === 0) {
-              throw new Error('No cameras found');
-            }
-
-            await html5QrCode.start(
-              { facingMode: "environment" },
-              {
-                fps: 20,
-                qrbox: (viewfinderWidth, viewfinderHeight) => {
-                  const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-                  const qrboxSize = Math.floor(minEdge * 0.8);
-                  return { width: qrboxSize, height: qrboxSize };
-                },
-              },
-              (decodedText) => {
-                playBeep();
-                const parsed = parseQRData(decodedText);
-                if (parsed && (parsed.type === 'student' || parsed.studentId)) {
-                  const found = students.find(s => 
-                    (parsed.studentId && s.id === parsed.studentId) || 
-                    (parsed.rollNumber && s.roll_number.toLowerCase() === parsed.rollNumber.toLowerCase())
-                  );
-                  if (found) {
-                    setSearch(found.roll_number);
-                    setShowScanner(false);
-                  } else {
-                    setScannerError('Student not found in registry');
-                  }
-                } else {
-                  setScannerError('Invalid Student ID format');
-                }
-              },
-              () => {}
-            );
-          } catch (err: any) {
-            console.error("Scanner start error:", err);
-            let msg = "Could not access camera.";
-            if (err.name === 'NotAllowedError' || err.message?.includes('Permission')) {
-              msg = "CAMERA ACCESS DENIED: Please enable camera in browser settings and refresh.";
-            } else if (err.name === 'NotReadableError' || err.message?.includes('in use')) {
-              msg = "Camera is in use by another app (like Zoom).";
-            }
-            setScannerError(msg);
-            setShowScanner(false);
-          }
-        };
-
-      startScanner();
-    }
-    return () => {
-      if (scanner && scanner.isScanning) {
-        scanner.stop().catch(console.error);
+    const run = async () => {
+      if (!showScanner) {
+        await stopLiveQrScanner(studentScannerRef.current);
+        studentScannerRef.current = null;
+        return;
       }
+
+      if (!isSecureCameraContext()) {
+        setScannerError('Camera requires HTTPS or localhost.');
+        setShowScanner(false);
+        return;
+      }
+
+      try {
+        studentScannerRef.current = await startLiveQrScanner({
+          elementId: 'student-scanner',
+          scanner: studentScannerRef.current,
+          onScan: async (decodedText) => {
+            if (cancelled) return;
+            playBeep();
+            const parsed = parseQRData(decodedText);
+            if (parsed && (parsed.type === 'student' || parsed.studentId)) {
+              const found = students.find(s =>
+                (parsed.studentId && s.id === parsed.studentId) ||
+                (parsed.rollNumber && s.roll_number.toLowerCase() === parsed.rollNumber.toLowerCase())
+              );
+              if (found) {
+                setSearch(found.roll_number);
+                setScannerError('');
+                await stopLiveQrScanner(studentScannerRef.current);
+                studentScannerRef.current = null;
+                setShowScanner(false);
+              } else {
+                setScannerError('Student not found in registry');
+              }
+            } else {
+              setScannerError('Invalid Student ID format');
+            }
+          },
+        });
+      } catch (err) {
+        if (!cancelled) {
+          setScannerError(mapCameraError(err));
+          setShowScanner(false);
+        }
+      }
+    };
+
+    const timer = window.setTimeout(() => { void run(); }, 150);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      void stopLiveQrScanner(studentScannerRef.current);
+      studentScannerRef.current = null;
     };
   }, [showScanner, students]);
 

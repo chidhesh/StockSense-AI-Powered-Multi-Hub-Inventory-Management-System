@@ -194,7 +194,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       mainAxisSpacing: 12,
                       children: [
                         _menuCard(context, "Project", Icons.add_circle,
-                            ProjectInputScreen()),
+                            ProjectInputScreen(rollNo: widget.rollNo)),
                         _menuCard(context, "My QR", Icons.qr_code,
                             StudentQR(rollNo: widget.rollNo ?? '', studentName: studentName)),
                         _menuCard(context, "History", Icons.history,
@@ -202,7 +202,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         _menuCard(context, "Inventory", Icons.inventory,
                             InventoryScreen(centerId: centerId)),
                         _menuCard(context, "Recent Projects",
-                            Icons.lightbulb, RecentProjectsScreen()),
+                            Icons.lightbulb, RecentProjectsScreen(rollNo: widget.rollNo)),
                       ],
                     ),
 

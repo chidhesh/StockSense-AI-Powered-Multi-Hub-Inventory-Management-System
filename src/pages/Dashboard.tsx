@@ -46,6 +46,7 @@ export default function Dashboard() {
     damagedToday: 0,
   });
   const [recentTransactions, setRecentTransactions] = useState<InventoryTransaction[]>([]);
+  const [todayBorrowedTx, setTodayBorrowedTx] = useState<InventoryTransaction[]>([]);
   const [categoryData, setCategoryData] = useState<{ name: string; value: number }[]>([]);
   const [trendData, setTrendData] = useState<{ date: string; issued: number; returned: number }[]>([]);
   const [lowStockItems, setLowStockItems] = useState<Component[]>([]);
@@ -139,6 +140,8 @@ export default function Dashboard() {
         damagedToday: todayTx.filter(t => t.transaction_type === 'damaged').reduce((s, t) => s + t.quantity, 0),
       });
 
+      const todayIssues = todayTx.filter(t => t.transaction_type === 'issue');
+      setTodayBorrowedTx(todayIssues);
       setRecentTransactions(filteredTransactions.slice(0, 8));
 
       const catMap = new Map<string, number>();
@@ -263,6 +266,12 @@ export default function Dashboard() {
   }
 
   const navCenterState = stateCenterId ? { centerId: stateCenterId } : {};
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const borrowedTodayNav = {
+    ...navCenterState,
+    date: todayStr,
+    filter: 'all' as const,
+  };
 
   return (
     <div className="space-y-10 pb-20 max-w-[1400px] mx-auto text-slate-900 dark:text-slate-100 transition-colors duration-500">
@@ -321,7 +330,10 @@ export default function Dashboard() {
             <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase">Server Load: 12% • DB Usage: 4%</p>
           </div>
           
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 group hover:shadow-md transition-all">
+          <div
+            onClick={() => navigate('/centers')}
+            className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 group hover:shadow-md transition-all cursor-pointer"
+          >
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl">
                 <Building2 size={24} />
@@ -331,10 +343,15 @@ export default function Dashboard() {
                 <p className="text-lg font-black text-slate-900 dark:text-white">{stats.centersCount} Active Hubs</p>
               </div>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">100% Operational Compliance</p>
+            <Link to="/centers" className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline">
+              Open Hub Management →
+            </Link>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 group hover:shadow-md transition-all">
+          <Link
+            to="/users"
+            className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 group hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 transition-all block"
+          >
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl">
                 <Users size={24} />
@@ -344,8 +361,8 @@ export default function Dashboard() {
                 <p className="text-lg font-black text-slate-900 dark:text-white">{dashboardSummary?.total_students || 0} Registered</p>
               </div>
             </div>
-            <Link to="/users" className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 hover:underline uppercase tracking-widest">Manage User Access →</Link>
-          </div>
+            <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Open User Directory →</p>
+          </Link>
         </div>
       )}
 
@@ -437,7 +454,7 @@ export default function Dashboard() {
             value: stats.totalComponents,
             icon: Package,
             color: 'indigo',
-            detail: `${stats.availableQty} available`,
+            detail: `${stats.availableQty} units available (${stats.totalQuantity} total units)`,
             onClick: () => navigate('/inventory', { state: navCenterState })
           },
           {
@@ -458,11 +475,13 @@ export default function Dashboard() {
           },
           {
             label: 'Borrowed Today',
-            value: stats.todayIssued,
+            value: todayBorrowedTx.length,
             icon: Activity,
             color: 'blue',
-            detail: `+${stats.todayReturned} returned`,
-            onClick: () => navigate('/transactions', { state: navCenterState })
+            detail: todayBorrowedTx.length === 0
+              ? 'No transactions done today'
+              : `${stats.todayIssued} unit${stats.todayIssued !== 1 ? 's' : ''} issued • ${stats.todayReturned} returned`,
+            onClick: () => navigate('/transactions', { state: borrowedTodayNav })
           },
           { label: 'System Health', value: stats.totalComponents > 0 ? Math.round((stats.availableQty / stats.totalQuantity) * 100) : 100, icon: CheckCircle, color: 'emerald', detail: 'Operational', isPercent: true }
         ].map((stat, i) => (
@@ -488,6 +507,53 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Borrowed Today — only today's issue transactions */}
+      <div className="bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Borrowed Today</h3>
+            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              {format(new Date(), 'EEEE, MMMM d, yyyy')}
+            </p>
+          </div>
+          <Link
+            to="/transactions"
+            state={borrowedTodayNav}
+            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1"
+          >
+            View all <ChevronRight size={14} />
+          </Link>
+        </div>
+        <div className="p-8">
+          {todayBorrowedTx.length === 0 ? (
+            <p className="text-center text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest py-8">
+              No transactions done today
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {todayBorrowedTx.map((tx) => (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700"
+                >
+                  <div>
+                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                      {(tx as InventoryTransaction & { component_name?: string }).component_name || 'Component'}
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                      {tx.student_name || 'Walk-in'} • {format(new Date(tx.created_at), 'hh:mm a')}
+                    </p>
+                  </div>
+                  <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">
+                    {tx.quantity} unit{Number(tx.quantity) !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Analytics Chart */}
         <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
@@ -507,7 +573,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="h-[350px] w-full">
+          <div className="h-[350px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
@@ -535,7 +601,7 @@ export default function Dashboard() {
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">Stock Allocation</h3>
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-8 uppercase tracking-widest">Distribution by category</p>
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] relative">
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie data={categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={5} dataKey="value">

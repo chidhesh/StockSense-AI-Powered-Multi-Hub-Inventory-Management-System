@@ -133,7 +133,10 @@ The system recommends suitable IoT components such as sensors, microcontrollers,
 
 ## 📱 Flutter Student Dashboard
 
-![Flutter Dashboard](images/flutter-dashboard.png)
+![Flutter Dashboard](images/Flutter_Dashboard.jpeg)
+
+---
+
 # Future Enhancements
 
 - Blockchain-based inventory security

@@ -131,9 +131,11 @@ The system recommends suitable IoT components such as sensors, microcontrollers,
 
 ---
 
-## 📱 Flutter Student Dashboard
+## 📱 Flutter Student Mobile Application
 
-![Flutter Dashboard](images/Flutter_Dashboard.jpeg)
+<p>
+  <img src="images/Flutter_Dashboard.jpeg" width="280" alt="Flutter Dashboard"/>
+</p>
 
 ---
 

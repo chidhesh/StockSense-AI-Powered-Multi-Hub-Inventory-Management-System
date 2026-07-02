@@ -581,8 +581,9 @@ export default function Analytics() {
           </div>
 
           <div className="mt-8 h-80 w-full min-h-[320px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={hubForecasts}>
+            {(hubForecasts.length > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={hubForecasts}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <XAxis 
                   dataKey="hubName" 
@@ -602,8 +603,13 @@ export default function Analytics() {
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase' }} />
                 <Bar dataKey="currentStock" name="Current Stock" fill="#6366f1" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="predictedDemand" name="Predicted Demand" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-400">
+                <p className="text-sm font-black uppercase">No hub forecasts available</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -870,8 +876,9 @@ export default function Analytics() {
             {selectedForecast ? (
               <div className="space-y-6">
                 <div className="w-full min-h-[400px] bg-slate-50/50 p-4 rounded-2xl border border-slate-100 relative">
-                  <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={forecastChartData}>
+                  {(forecastChartData.length > 0) ? (
+                    <ResponsiveContainer width="100%" height={400}>
+                      <LineChart data={forecastChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                       <XAxis 
                         dataKey="date" 
@@ -897,10 +904,10 @@ export default function Analytics() {
                           padding: '12px'
                         }}
                         itemStyle={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }}
-                        formatter={(value: number, name: string) => [
+                        formatter={(value: any, name?: any) => [
                           value != null ? `${value} units` : '—',
                           name === 'actual' ? 'Actual Usage' : 'Predicted Demand'
-                        ]}
+                        ] as any}
                         labelFormatter={(label) => `Date: ${label}`}
                       />
                       <Legend
@@ -946,19 +953,24 @@ export default function Analytics() {
                         connectNulls
                       />
                     </LineChart>
-                  </ResponsiveContainer>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-slate-400 min-h-[400px]">
+                      <p className="text-sm font-black uppercase">No forecast data available</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Expected Demand</p>
-                    <p className="text-xl font-black text-indigo-900">{selectedForecast.next_30_days} Units</p>
-                    <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-tight mt-1">Total projected for next 30 days</p>
+                    <p className="text-xl font-black text-indigo-900">{selectedForecast.historical_30_days} Units</p>
+                    <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-tight mt-1">Total used in last 30 days</p>
                   </div>
                   <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
                     <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">Predicted Demand</p>
                     <p className="text-xl font-black text-orange-900">
-                      {forecastChartData.filter(p => p.actual === null).reduce((s, p) => s + (p.predicted ?? 0), 0)} Units
+                      {selectedForecast.next_30_days} Units
                     </p>
                     <p className="text-[9px] font-bold text-orange-600 uppercase tracking-tight mt-1">Next {parameters.forecastDays} days forecast</p>
                   </div>

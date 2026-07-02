@@ -1,15 +1,23 @@
 import QRCode from 'qrcode';
 
 export async function generateQRCode(data: string): Promise<string> {
+  // Generate higher quality QR code
   return QRCode.toDataURL(data, {
-    width: 256,
-    margin: 2,
-    color: { dark: '#0F62FE', light: '#FFFFFF' },
+    width: 512, // Larger size for better scanning
+    margin: 4,   // Larger quiet zone
+    errorCorrectionLevel: 'H', // High error correction
+    color: { dark: '#000000', light: '#FFFFFF' }, // High contrast black/white
   });
 }
 
 export async function generateQRCodeSVG(data: string): Promise<string> {
-  return QRCode.toString(data, { type: 'svg', margin: 2 });
+  // Generate high-quality SVG
+  return QRCode.toString(data, { 
+    type: 'svg', 
+    margin: 4,
+    errorCorrectionLevel: 'H',
+    width: 512
+  });
 }
 
 export function generateComponentQRData(componentId: string, componentName: string, centerId: string): string {
@@ -51,7 +59,7 @@ export function parseQRData(raw: string): ParsedQR | null {
   }
 
   // Handle INV:CENTER_ID:SKU format
-  if (trimmedRaw.startsWith('INV:')) {
+  if (trimmedRaw.toUpperCase().startsWith('INV:')) {
     const parts = trimmedRaw.split(':');
     if (parts.length >= 3) {
       return {
@@ -72,14 +80,15 @@ export function parseQRData(raw: string): ParsedQR | null {
     };
   }
 
-  // Handle plain roll numbers (alphanumeric, hyphens)
-  if (/^[a-zA-Z0-9-]+$/.test(trimmedRaw) && trimmedRaw.length >= 3) {
+  // Handle plain roll numbers (alphanumeric, hyphens, underscores)
+  if (/^[a-zA-Z0-9-_]+$/.test(trimmedRaw) && trimmedRaw.length >= 3) {
     return {
       type: 'student',
       rollNumber: trimmedRaw,
     };
   }
 
+  // Last resort: if it looks like a component or student in some other format
   return null;
 }
 

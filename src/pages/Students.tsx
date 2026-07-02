@@ -29,7 +29,9 @@ export default function Students() {
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedCenterId, setSelectedCenterId] = useState<string>(initialCenterId || '');
+  const [selectedCenterId, setSelectedCenterId] = useState<string>(
+    initialCenterId || (!isMaster ? profile?.center_id || '' : '')
+  );
   const [showModal, setShowModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [history, setHistory] = useState<InventoryTransaction[]>([]);

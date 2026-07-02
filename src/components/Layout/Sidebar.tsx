@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Package, QrCode, ArrowLeftRight,
   FileText, Receipt, Building2, BarChart3, LogOut,
-  ChevronLeft, ChevronRight, Bell, Users, ShoppingCart, Activity
+  ChevronLeft, ChevronRight, Bell, Users, ShoppingCart, Activity, Settings, AlertTriangle, Zap
 } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 
@@ -12,10 +12,13 @@ interface SidebarProps {
   notifications: number;
 }
 
-const masterNavItems = [
+const mainAdminNavItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/notifications', icon: Bell, label: 'Notifications' },
+  { to: '/ai-decision-center', icon: Zap, label: 'AI Decision Center' },
+  { to: '/purchase-approval', icon: ShoppingCart, label: 'Purchase Approval' },
+  { to: '/admin', icon: Settings, label: 'Admin' },
   { to: '/centers', icon: Building2, label: 'Hubs' },
-  { to: '/transfers', icon: ArrowLeftRight, label: 'Hub Transfers' },
   { to: '/users', icon: Users, label: 'Users' },
   { to: '/inventory', icon: Package, label: 'Inventory' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
@@ -23,10 +26,24 @@ const masterNavItems = [
   { to: '/reports', icon: FileText, label: 'Reports' },
 ];
 
-const hubNavItems = [
+const systemAdminNavItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/students', icon: Users, label: 'Students' },
+  { to: '/notifications', icon: Bell, label: 'Notifications' },
+  { to: '/ai-decision-center', icon: Zap, label: 'AI Decision Center' },
+  { to: '/procurement-queue', icon: ShoppingCart, label: 'Procurement Queue' },
+  { to: '/centers', icon: Building2, label: 'Hubs' },
   { to: '/transfers', icon: ArrowLeftRight, label: 'Hub Transfers' },
+  { to: '/inventory', icon: Package, label: 'Inventory' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/reports', icon: FileText, label: 'Reports' },
+];
+
+const centerAdminNavItems = [
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/notifications', icon: Bell, label: 'Notifications' },
+  { to: '/transfer-requests', icon: ArrowLeftRight, label: 'Transfer Requests' },
+  { to: '/incoming-transfers', icon: Package, label: 'Incoming Transfers' },
+  { to: '/students', icon: Users, label: 'Students' },
   { to: '/inventory', icon: Package, label: 'Inventory' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/qr-management', icon: QrCode, label: 'QR Scan' },
@@ -41,9 +58,17 @@ const studentNavItems = [
 
 export default function Sidebar({ collapsed, onToggle, notifications }: SidebarProps) {
   const { profile, signOut } = useAuth();
-  const isMaster = profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator';
-  const isStudent = profile?.role === 'student';
-  const navItems = isMaster ? masterNavItems : (isStudent ? studentNavItems : hubNavItems);
+  const normalizedRole = profile?.role?.toLowerCase() || '';
+  const isMainAdmin = normalizedRole === 'main_admin' || normalizedRole.includes('master admin') || normalizedRole.includes('top level admin');
+  const isSystemAdmin = normalizedRole === 'system_admin' || normalizedRole.includes('system administrator');
+  const isCenterAdmin = normalizedRole === 'center_admin' || normalizedRole.includes('inventory manager');
+  const isStudent = normalizedRole === 'student';
+  
+  let navItems;
+  if (isMainAdmin) navItems = mainAdminNavItems;
+  else if (isSystemAdmin) navItems = systemAdminNavItems;
+  else if (isStudent) navItems = studentNavItems;
+  else navItems = centerAdminNavItems;
 
   return (
     <aside 

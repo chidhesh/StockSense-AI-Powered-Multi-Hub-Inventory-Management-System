@@ -525,7 +525,7 @@ export async function enhancedForecast(
   
   const today = startOfDay(new Date());
   
-  // Historical points (last 14 days)
+  // Historical points (last 14 days) and calculate last 30 days total
   const historicalPoints: ForecastPoint[] = [];
   const dayMap = new Map<string, number>();
   
@@ -536,6 +536,13 @@ export async function enhancedForecast(
       dayMap.set(day, current + t.quantity);
     }
   });
+  
+  // Calculate last 30 days total historical usage
+  let historical30Days = 0;
+  for (let i = 30; i >= 1; i--) {
+    const date = format(subDays(today, i), 'yyyy-MM-dd');
+    historical30Days += dayMap.get(date) || 0;
+  }
   
   for (let i = 14; i >= 1; i--) {
     const date = format(subDays(today, i), 'yyyy-MM-dd');
@@ -589,6 +596,7 @@ export async function enhancedForecast(
     forecast: [...historicalPoints, ...futurePoints],
     trend: mlResult.trend,
     next_30_days: Math.round(next30Total),
+    historical_30_days: Math.round(historical30Days),
     confidence: mlResult.confidence,
     anomaly_detected: mlResult.anomalyScore > 0.5
   };

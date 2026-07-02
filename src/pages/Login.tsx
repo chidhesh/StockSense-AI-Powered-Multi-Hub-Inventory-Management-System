@@ -13,6 +13,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [centers, setCenters] = useState<Center[]>([]);
+  const [adminExists, setAdminExists] = useState(false);
 
   const [form, setForm] = useState({
     email: '',
@@ -25,6 +26,7 @@ export default function Login() {
   useEffect(() => {
     if (mode === 'register') {
       fetchCenters();
+      checkAdminExists();
     }
   }, [mode]);
 
@@ -32,6 +34,18 @@ export default function Login() {
     try {
       const data = await apiGet<Center[]>('/api/public/centers');
       setCenters(data);
+    } catch {
+      // ignore
+    }
+  };
+
+  const checkAdminExists = async () => {
+    try {
+      const result = await apiGet<{ exists: boolean }>('/api/public/admin-exists');
+      setAdminExists(result.exists);
+      if (result.exists && form.role === 'master_admin') {
+        setForm(f => ({ ...f, role: 'center_admin' }));
+      }
     } catch {
       // ignore
     }
@@ -170,7 +184,7 @@ export default function Login() {
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
                     className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20 text-sm font-bold text-slate-900 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="master_admin">System Administrator</option>
+                    {!adminExists && <option value="master_admin">System Administrator</option>}
                     <option value="center_admin">Inventory Manager</option>
                     <option value="student">Student</option>
                   </select>

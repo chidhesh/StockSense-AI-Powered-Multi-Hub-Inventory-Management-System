@@ -7,6 +7,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -15,6 +16,7 @@
     "nodemailer": "^8.0.6",
     "pg": "^8.13.1",
     "pg-mem": "^3.0.14",
+    "qrcode": "^1.5.4",
     "twilio": "^6.0.0"
   }
 }

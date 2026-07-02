@@ -38,6 +38,7 @@ export interface Component {
   unit_cost: number;
   center_id: string;
   status: ComponentStatus;
+  min_stock_threshold?: number;
   // Course/Skill tagging for training institutes
   course_id?: string;
   course_name?: string;
@@ -220,6 +221,7 @@ export interface ComponentForecast {
   forecast: ForecastPoint[];
   trend: 'increasing' | 'decreasing' | 'stable';
   next_30_days: number;
+  historical_30_days: number;
   confidence?: number;
   anomaly_detected?: boolean;
 }

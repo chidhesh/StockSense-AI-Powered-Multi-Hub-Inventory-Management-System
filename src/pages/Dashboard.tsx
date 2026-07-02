@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { 
   Package, AlertTriangle, CheckCircle, TrendingUp, 
   Building2, Activity, Zap, Plus,
-  ArrowUpRight, ArrowDownRight, Clock, ChevronRight,
+  ArrowUpRight, ArrowDownRight, ArrowLeftRight, Clock, ChevronRight,
   Brain, Sparkles, AlertCircle, Bell, Mail, Send, TrendingDown, History,
   LayoutDashboard, Search, Filter, Database,
-  Server, Users, ShoppingCart, Smartphone
+  Server, Users, ShoppingCart, Smartphone, XCircle, MapPin
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -34,10 +34,12 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const stateCenterId = location.state?.centerId;
   const normalizedRole = profile?.role?.toLowerCase() || '';
-  const isMaster = normalizedRole === 'master_admin' || normalizedRole === 'system administrator';
-  const isManager = normalizedRole === 'center_admin';
+  const isMainAdmin = normalizedRole === 'main_admin' || normalizedRole.includes('master admin') || normalizedRole.includes('top level admin');
+  const isSystemAdmin = normalizedRole === 'system_admin' || normalizedRole.includes('system administrator');
+  const isMaster = isMainAdmin || isSystemAdmin;
+  const isManager = normalizedRole === 'center_admin' || normalizedRole.includes('inventory manager');
   const isStudent = normalizedRole === 'student';
-  const isInventoryManager = isManager || normalizedRole.includes('inventory manager') || normalizedRole.includes('inventory_manager');
+  const isInventoryManager = isManager;
   const hubName = profile?.center?.name || profile?.center?.location || '';
 
   const [stats, setStats] = useState({
@@ -52,6 +54,17 @@ export default function Dashboard() {
   const [lowStockItems, setLowStockItems] = useState<Component[]>([]);
   const [centerPerformance, setCenterPerformance] = useState<{ name: string; activity: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stockAlerts, setStockAlerts] = useState<any[]>([]);
+  const [centers, setCenters] = useState<any[]>([]); // Initialize empty array!
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<any>(null);
+  const [transferForm, setTransferForm] = useState<any>({
+    source_center_id: '',
+    destination_center_id: '',
+    component_id: '',
+    quantity: 1,
+    notes: ''
+  });
   
   // Stock Notification System
   const { 
@@ -90,19 +103,31 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     if (!profile) return;
+    console.log('Dashboard Profile:', profile);
+    console.log('Profile Role:', profile?.role);
     setLoading(true);
-    const master = profile.role === 'master_admin' || profile.role?.toLowerCase() === 'system administrator';
+    const master = isMainAdmin || isSystemAdmin;
     const centerId = stateCenterId || (!master ? (profile.center_id || profile.center?.id || '') : '');
     
     try {
       // Force cache-busting by adding a timestamp
       const timestamp = Date.now();
-      const [components, transactions, centersList, studentsList] = await Promise.all([
+      const [components, transactions, centersList, studentsList, alertsRes, allCenters] = await Promise.all([
         apiGet<Component[]>(`/api/components?t=${timestamp}`),
         apiGet<InventoryTransaction[]>(`/api/inventory-transactions?limit=2000&t=${timestamp}`),
         master ? apiGet<any[]>(`/api/centers?t=${timestamp}`) : Promise.resolve([]),
-        apiGet<any[]>(`/api/students?t=${timestamp}`)
+        apiGet<any[]>(`/api/students?t=${timestamp}`),
+        isSystemAdmin || isMainAdmin ? apiGet<any[]>(`/api/stock-alerts?t=${timestamp}`) : Promise.resolve([]),
+        isSystemAdmin || isMainAdmin ? apiGet<any[]>(`/api/centers?t=${timestamp}`) : Promise.resolve([])
       ]);
+
+      console.log('Fetched allCenters:', allCenters);
+
+      if (isSystemAdmin || isMainAdmin) {
+        console.log('Setting stockAlerts and centers!');
+        setStockAlerts(alertsRes);
+        setCenters(allCenters);
+      }
 
       const filteredComponents = centerId ? components.filter(c => c.center_id === centerId) : components;
       const filteredTransactions = centerId ? (transactions || []).filter(t => t.center_id === centerId) : (transactions || []);
@@ -221,11 +246,16 @@ export default function Dashboard() {
           ? studentsWithHub.filter(s => s.hub_id === stateCenterId)
           : studentsWithHub;
           
+        // Filter students by current hub if not master admin
+        const filteredStudentsList = centerId 
+          ? (studentsList || []).filter(s => s.center_id === centerId) 
+          : (studentsList || []);
+          
         setStudentStats(filteredStudentStats.slice(0, 5));
-        setStudentCount((studentsList || []).length);
+        setStudentCount(filteredStudentsList.length);
         setDashboardSummary({
           ...summary,
-          total_students: studentsList.length, // Exact total count
+          total_students: filteredStudentsList.length, // Exact count for current hub
           active_students_this_month: activeMonthly
         });
       } catch (analyticsError) {
@@ -249,6 +279,32 @@ export default function Dashboard() {
       alert('Failed to reseed: ' + (e as any).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenTransferModal = (alert: any) => {
+    setSelectedAlert(alert);
+    setTransferForm({
+      source_center_id: alert.transfer_options[0]?.source_center_id || '',
+      destination_center_id: alert.center_id,
+      component_id: alert.component_id,
+      quantity: alert.transfer_options[0]?.suggested_transfer_quantity || 1,
+      notes: ''
+    });
+    setShowTransferModal(true);
+  };
+
+  const handleSubmitTransfer = async () => {
+    try {
+      await apiPost('/api/hub-transfers', {
+        ...transferForm,
+        requested_by: profile?.id
+      });
+      setShowTransferModal(false);
+      alert('Transfer request created successfully!');
+      await fetchDashboardData();
+    } catch (e) {
+      alert('Failed to create transfer request');
     }
   };
 
@@ -554,63 +610,328 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Analytics Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Inventory Liquidity</h3>
-            <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">14-day asset movement trend</p>
-          </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Returned</span>
+      {/* ML-Powered Stock Alerts for System Admin/Main Admin */}
+      {(isSystemAdmin || isMainAdmin) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
+                  <Sparkles className="text-indigo-600 dark:text-indigo-400" size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">
+                    ML Stock Predictions
+                  </h3>
+                  <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    Demand & Restock Recommendations
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Issued</span>
+            </div>
+            <div className="p-8 max-h-[450px] overflow-y-auto">
+              {stockAlerts.length === 0 ? (
+                <div className="text-center py-10">
+                  <CheckCircle className="mx-auto mb-4 text-emerald-500" size={40} />
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    All stock levels healthy!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {stockAlerts.map((alert, idx) => (
+                    <div
+                      key={alert.id}
+                      className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                            {alert.component_name}
+                          </p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            {alert.center_name}
+                          </p>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                          alert.status === 'out_of_stock'
+                            ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                        }`}>
+                          {alert.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                            Current Stock
+                          </p>
+                          <p className="text-xl font-black text-slate-900 dark:text-white">
+                            {alert.available_quantity} / {alert.total_quantity}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                            ML Predicted Demand (30d)
+                          </p>
+                          <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                            {alert.predicted_demand_30_days} units
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                          Recommendation
+                        </p>
+                        <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase ${
+                          alert.recommendation === 'transfer'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                            : 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
+                        }`}>
+                          {alert.recommendation === 'transfer' ? (
+                            <ArrowLeftRight size={12} />
+                          ) : (
+                            <ShoppingCart size={12} />
+                          )}
+                          {alert.recommendation === 'transfer' ? 'Transfer from other centers' : 'Purchase new stock'}
+                        </span>
+                      </div>
+                      {alert.recommendation === 'transfer' && alert.transfer_options && alert.transfer_options.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                            Transfer Options
+                          </p>
+                          <div className="space-y-3">
+                            {alert.transfer_options.map((option: any, optIdx: number) => (
+                              <div key={optIdx} className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm font-black text-slate-900 dark:text-white">
+                                    {option.source_center_name}
+                                  </p>
+                                  <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                                    {option.available_excess} units excess
+                                  </p>
+                                </div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">
+                                  Suggested transfer: {option.suggested_transfer_quantity} units
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {alert.uses_ml_prediction && (
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">
+                          <Brain size={12} />
+                          ML-Powered Prediction
+                        </div>
+                      )}
+                      {alert.recommendation === 'transfer' && alert.transfer_options && alert.transfer_options.length > 0 && (
+                        <button
+                          onClick={() => handleOpenTransferModal(alert)}
+                          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all"
+                        >
+                          <ArrowLeftRight size={14} />
+                          Create Transfer Request
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8">
+            {/* Main Analytics Chart */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Inventory Liquidity</h3>
+                  <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">14-day asset movement trend</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Returned</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Issued</span>
+                  </div>
+                </div>
+              </div>
+              <div className="h-[350px] w-full relative min-h-[350px]">
+            {(trendData.length > 0 || !loading) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                    <defs>
+                      <linearGradient id="issuedGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="returnedGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#f1f5f9'} />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} />
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', backgroundColor: theme === 'dark' ? '#0f172a' : '#fff', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                    <Area type="monotone" dataKey="issued" stroke="#10b981" strokeWidth={3} fill="url(#issuedGrad)" />
+                    <Area type="monotone" dataKey="returned" stroke="#6366f1" strokeWidth={3} fill="url(#returnedGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-400">
+                <p className="text-sm font-black uppercase">No data to display</p>
+              </div>
+            )}
+            </div>
+            </div>
+
+            {/* Category Breakdown */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">Stock Allocation</h3>
+              <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-8 uppercase tracking-widest">Distribution by category</p>
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] relative">
+                {(categoryData.length > 0 || !loading) ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
+                    <Pie data={categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={5} dataKey="value">
+                      {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-slate-400">
+                    <p className="text-sm font-black uppercase">No data to display</p>
+                  </div>
+                )}
+                <div className="w-full mt-8 space-y-3">
+                  {categoryData.slice(0, 4).map((cat, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100/50 dark:border-slate-700/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">{cat.name}</span>
+                      </div>
+                      <span className="text-xs font-black text-slate-900 dark:text-white">{cat.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Hubs/Centers Section */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter">Hubs</h3>
+                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">All inventory centers</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {centers.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Building2 className="mx-auto mb-3 text-slate-300" size={32} />
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No hubs available</p>
+                  </div>
+                ) : (
+                  centers.map((center) => (
+                    <div key={center.id} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                            <Building2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{center.name}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{center.location}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
-          <div className="h-[350px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData}>
-                <defs>
-                  <linearGradient id="issuedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="returnedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#f1f5f9'} />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', backgroundColor: theme === 'dark' ? '#0f172a' : '#fff', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
-                <Area type="monotone" dataKey="issued" stroke="#10b981" strokeWidth={3} fill="url(#issuedGrad)" />
-                <Area type="monotone" dataKey="returned" stroke="#6366f1" strokeWidth={3} fill="url(#returnedGrad)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
         </div>
+      )}
+
+      {/* Regular grid for non-system admin users */}
+      {!(isSystemAdmin || isMainAdmin) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Analytics Chart */}
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Inventory Liquidity</h3>
+                <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">14-day asset movement trend</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Returned</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Issued</span>
+                </div>
+              </div>
+            </div>
+            <div className="h-[350px] w-full relative min-h-[350px]">
+              {(trendData.length > 0 || !loading) ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="issuedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="returnedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1e293b' : '#f1f5f9'} />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', backgroundColor: theme === 'dark' ? '#0f172a' : '#fff', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                  <Area type="monotone" dataKey="issued" stroke="#10b981" strokeWidth={3} fill="url(#issuedGrad)" />
+                  <Area type="monotone" dataKey="returned" stroke="#6366f1" strokeWidth={3} fill="url(#returnedGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-400">
+                <p className="text-sm font-black uppercase">No data to display</p>
+              </div>
+            )}
+            </div>
+          </div>
 
         {/* Category Breakdown */}
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">Stock Allocation</h3>
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-8 uppercase tracking-widest">Distribution by category</p>
           <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] relative">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
+                {(categoryData.length > 0 || !loading) ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
                 <Pie data={categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={5} dataKey="value">
                   {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="w-full mt-8 space-y-3">
+                  </PieChart>
+                </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-slate-400">
+                    <p className="text-sm font-black uppercase">No data to display</p>
+                  </div>
+                )}
+                <div className="w-full mt-8 space-y-3">
               {categoryData.slice(0, 4).map((cat, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100/50 dark:border-slate-700/50">
                   <div className="flex items-center gap-3">
@@ -623,7 +944,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Priority Alerts & AI Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -765,6 +1087,83 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Transfer Request Modal */}
+      {showTransferModal && selectedAlert && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-lg p-10 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in zoom-in-95 duration-300">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Create Transfer</h2>
+              <button onClick={() => setShowTransferModal(false)} className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all">
+                <XCircle className="text-slate-400" size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Source Hub</label>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <select
+                    value={transferForm.source_center_id}
+                    onChange={(e) => setTransferForm({ ...transferForm, source_center_id: e.target.value })}
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
+                  >
+                    <option value="">Select Source</option>
+                    {selectedAlert.transfer_options.map((opt: any) => (
+                      <option key={opt.source_center_id} value={opt.source_center_id}>
+                        {opt.source_center_name} ({opt.available_excess} available)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Component</label>
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                  <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{selectedAlert.component_name}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Destination Hub</label>
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                  <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{selectedAlert.center_name}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Quantity</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={transferForm.quantity}
+                  onChange={(e) => setTransferForm({ ...transferForm, quantity: parseInt(e.target.value) || 0 })}
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Notes (Optional)</label>
+                <textarea
+                  value={transferForm.notes}
+                  onChange={(e) => setTransferForm({ ...transferForm, notes: e.target.value })}
+                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <button
+                onClick={handleSubmitTransfer}
+                className="w-full py-5 bg-indigo-600 text-white rounded-2xl shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-4"
+              >
+                Submit Request
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

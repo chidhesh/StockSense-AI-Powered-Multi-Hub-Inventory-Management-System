@@ -3,6 +3,7 @@ import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/ThemeProvider';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiPatch } from '../../lib/api';
 
 interface HeaderProps {
   title: string;
@@ -45,8 +46,13 @@ export default function Header({ title, notifications }: HeaderProps) {
     return () => clearTimeout(timer);
   }, [toastQueue]);
 
-  const handleViewNotification = (n: { route?: string; state?: Record<string, unknown> }) => {
-    if (n.route) navigate(n.route, { state: n.state });
+  const handleViewNotification = async (n: { id: string; route?: string; state?: Record<string, unknown> }) => {
+    try {
+      await apiPatch(`/api/notifications/${n.id}/read`, {});
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+    navigate(`/notifications/${n.id}`);
     setShowNotifications(false);
   };
 

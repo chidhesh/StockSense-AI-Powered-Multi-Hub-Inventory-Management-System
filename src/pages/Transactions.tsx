@@ -307,6 +307,36 @@ export default function Transactions() {
     </div>
   );
 
+  // Group transactions function
+  const groupTransactions = (txs: InventoryTransaction[]): InventoryTransaction[] => {
+    const groups: Record<string, InventoryTransaction> = {};
+    
+    txs.forEach(tx => {
+      // Create a unique key: student_uuid + component_id + transaction_type + date part of created_at
+      const key = `${tx.student_uuid || 'system'}-${tx.component_id}-${tx.transaction_type}-${format(new Date(tx.created_at), 'yyyy-MM-dd-HH-mm')}`;
+      
+      if (groups[key]) {
+        // Merge the transactions: sum the quantities
+        groups[key].quantity += tx.quantity;
+        
+        // Optionally, combine notes or other fields
+        if (tx.notes && groups[key].notes) {
+          if (!groups[key].notes.includes(tx.notes)) {
+            groups[key].notes += `; ${tx.notes}`;
+          }
+        } else if (tx.notes) {
+          groups[key].notes = tx.notes;
+        }
+      } else {
+        // Create a new group entry
+        groups[key] = { ...tx };
+      }
+    });
+    
+    // Return sorted groups by created_at descending
+    return Object.values(groups).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  };
+
   const filtered = transactions.filter(t => {
     // Primary filter: ensure transactions belong to the currentCenterId if set
     if (currentCenterId && String(t.center_id) !== String(currentCenterId)) {
@@ -346,6 +376,8 @@ export default function Transactions() {
            matchColComponent && matchColType && matchColStudent &&
            matchColCenter && matchColNotes;
   });
+
+  const groupedAndFiltered = groupTransactions(filtered);
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900">
@@ -646,7 +678,7 @@ export default function Transactions() {
                     </div>
                   </div>
                   <span className="px-3 py-1 bg-white rounded-lg text-[10px] font-black text-indigo-600 border border-indigo-100 shadow-sm">
-                    {filtered.length} Entries Found
+                    {groupedAndFiltered.length} Entries Found
                   </span>
                 </div>
               )}
@@ -662,7 +694,7 @@ export default function Transactions() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {filtered.length === 0 ? (
+                  {groupedAndFiltered.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-20">
                         <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-slate-100">
@@ -674,7 +706,7 @@ export default function Transactions() {
                       </td>
                     </tr>
                   ) : (
-                    filtered.map(tx => {
+                    groupedAndFiltered.map(tx => {
                       const comp = (tx as any).component || components.find(c => c.id === tx.component_id);
                       return (
                         <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors group">

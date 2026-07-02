@@ -273,36 +273,31 @@ export const seedStudentData = async () => {
 
     await syncComponentStatuses();
 
-    const adminEmail = 'admin@smartinv.local';
-    const adminPassword = await bcrypt.hash('admin123', 10);
-    const adminId = '00000000-0000-0000-0000-000000000003';
+    // --- Create Main Admin ---
+    const mainAdminEmail = 'admin@techhub.in';
+    const mainAdminPassword = await bcrypt.hash('admin123', 10);
+    const mainAdminId = '00000000-0000-0000-0000-000000000003';
 
-    // 1. Check if user exists by email
-    const { rows: existingUsers } = await pool.query('SELECT id FROM app_users WHERE email = $1', [adminEmail]);
-    
-    let targetAdminId = adminId;
-    if (existingUsers.length > 0) {
-      targetAdminId = existingUsers[0].id;
-      // Update password just in case
-      await pool.query('UPDATE app_users SET password_hash = $1 WHERE id = $2', [adminPassword, targetAdminId]);
+    const { rows: existingMainAdmin } = await pool.query('SELECT id FROM app_users WHERE email = $1', [mainAdminEmail]);
+    if (existingMainAdmin.length > 0) {
+      await pool.query('UPDATE app_users SET password_hash = $1 WHERE email = $2', [mainAdminPassword, mainAdminEmail]);
     } else {
-      await pool.query(
-        'INSERT INTO app_users (id, email, password_hash) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
-        [adminId, adminEmail, adminPassword]
-      );
+      await pool.query('INSERT INTO app_users (id, email, password_hash) VALUES ($1, $2, $3)', [mainAdminId, mainAdminEmail, mainAdminPassword]);
     }
+    await pool.query('INSERT INTO profiles (id, full_name, role, center_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET role = $3', [mainAdminId, 'Main Administrator', 'main_admin', null]);
 
-    // 2. Ensure profile exists
-    await pool.query(
-      'INSERT INTO profiles (id, full_name, role, center_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-      [targetAdminId, 'System Administrator', 'master_admin', null]
-    );
+    // --- Create System Admin ---
+    const systemAdminEmail = 'system@techhub.in';
+    const systemAdminPassword = await bcrypt.hash('admin123', 10);
+    const systemAdminId = '00000000-0000-0000-0000-000000000004';
 
-    // Also update existing profile if it was already there
-    await pool.query(
-      'UPDATE profiles SET role = $1 WHERE id = $2',
-      ['master_admin', targetAdminId]
-    );
+    const { rows: existingSystemAdmin } = await pool.query('SELECT id FROM app_users WHERE email = $1', [systemAdminEmail]);
+    if (existingSystemAdmin.length > 0) {
+      await pool.query('UPDATE app_users SET password_hash = $1 WHERE email = $2', [systemAdminPassword, systemAdminEmail]);
+    } else {
+      await pool.query('INSERT INTO app_users (id, email, password_hash) VALUES ($1, $2, $3)', [systemAdminId, systemAdminEmail, systemAdminPassword]);
+    }
+    await pool.query('INSERT INTO profiles (id, full_name, role, center_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET role = $3', [systemAdminId, 'System Administrator', 'system_admin', null]);
 
     await seedSampleActivity();
     console.log('Database maintenance seed complete');

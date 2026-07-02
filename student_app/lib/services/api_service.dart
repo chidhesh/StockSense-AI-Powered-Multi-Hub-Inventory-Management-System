@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // --- CONNECTIVITY CONFIGURATION ---
-  // 1. WIRELESS: Use your PC's IP (e.g. 10.52.10.211)
+  // 1. WIRELESS: Use your PC's IP (e.g. 10.165.212.211)
   // 2. WIRED (USB): Use 'http://localhost:8787' AFTER running 'adb reverse tcp:8787 tcp:8787'
-  static const String _networkIp = '10.52.10.211'; 
+  static const String _networkIp = '10.182.9.219'; 
   
   static String get baseUrl {
     // If you are using USB debugging, run: adb reverse tcp:8787 tcp:8787

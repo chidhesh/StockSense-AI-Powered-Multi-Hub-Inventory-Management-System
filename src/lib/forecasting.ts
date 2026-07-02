@@ -44,6 +44,13 @@ export function forecastDemand(
   const historicalPoints: ForecastPoint[] = [];
   const x: number[] = [];
   const y: number[] = [];
+  
+  // Calculate last 30 days total historical usage
+  let historical30Days = 0;
+  for (let i = 30; i >= 1; i--) {
+    const date = format(subDays(today, i), 'yyyy-MM-dd');
+    historical30Days += dayMap.get(date) || 0;
+  }
 
   for (let i = 60; i >= 0; i--) {
     const date = format(subDays(today, i), 'yyyy-MM-dd');
@@ -78,6 +85,7 @@ export function forecastDemand(
     forecast: [...historicalPoints.slice(-14), ...futurePoints],
     trend,
     next_30_days: next30Total,
+    historical_30_days: historical30Days,
   };
 }
 

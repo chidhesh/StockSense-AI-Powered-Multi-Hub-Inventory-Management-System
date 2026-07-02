@@ -1,29 +1,36 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, CheckCircle, XCircle, Clock, Loader2, Plus, Info, MapPin, Package, AlertCircle } from 'lucide-react';
-import { apiGet, apiPost, apiPatch } from '../lib/api';
+import {
+  ArrowLeftRight,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Package,
+  Truck,
+  Inbox,
+  Send,
+  Clock,
+  History
+} from 'lucide-react';
+import { apiGet, apiPatch, apiPost } from '../lib/api';
 import { useAuth } from '../context/useAuth';
-import { HubTransferRequest, Center, Component } from '../types';
+import { HubTransferRequest, TransferRequest as NewTransferRequest, Center, Component } from '../types';
 import { format } from 'date-fns';
+
+type TabType = 'transfer-requests' | 'incoming-transfers' | 'transfer-history';
 
 export default function Transfers() {
   const { profile } = useAuth();
-  const isMaster = profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator';
+  const normalizedRole = profile?.role?.toLowerCase() || '';
+  const isMainAdmin = normalizedRole === 'main_admin' || normalizedRole.includes('master admin') || normalizedRole.includes('top level admin');
+  const isCenterAdmin = normalizedRole === 'center_admin' || normalizedRole.includes('inventory manager');
+  const isSystemAdmin = normalizedRole === 'system_admin' || normalizedRole.includes('system administrator');
   
-  const [transfers, setTransfers] = useState<HubTransferRequest[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>('transfer-requests');
+  const [hubTransfers, setHubTransfers] = useState<HubTransferRequest[]>([]);
+  const [aiTransfers, setAiTransfers] = useState<NewTransferRequest[]>([]);
   const [centers, setCenters] = useState<Center[]>([]);
   const [components, setComponents] = useState<Component[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  
-  const [form, setForm] = useState({
-    source_center_id: '',
-    destination_center_id: '',
-    component_id: '',
-    quantity: 1,
-    notes: ''
-  });
 
   useEffect(() => {
     fetchData();
@@ -32,59 +39,54 @@ export default function Transfers() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const centerQuery = !isMaster ? `?center_id=${profile?.center_id}` : '';
-      const [transfersRes, centersRes, componentsRes] = await Promise.all([
+      const centerQuery = isCenterAdmin ? `?center_id=${profile?.center_id}` : '';
+      const [hubTransfersRes, aiTransfersRes, centersRes, componentsRes] = await Promise.all([
         apiGet<HubTransferRequest[]>(`/api/hub-transfers${centerQuery}`),
+        apiGet<NewTransferRequest[]>('/api/transfer-requests'),
         apiGet<Center[]>('/api/centers'),
         apiGet<Component[]>('/api/components')
       ]);
-      setTransfers(transfersRes);
+      setHubTransfers(hubTransfersRes);
+      setAiTransfers(aiTransfersRes);
       setCenters(centersRes);
       setComponents(componentsRes);
     } catch (e) {
-      console.error('Failed to fetch transfers', e);
+      console.error('Failed to fetch transfers:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateTransfer = async () => {
-    if (!form.source_center_id || !form.destination_center_id || !form.component_id || form.quantity <= 0) {
-      setError('Please fill all required fields');
-      return;
-    }
-    if (form.source_center_id === form.destination_center_id) {
-      setError('Source and Destination hubs cannot be the same');
-      return;
-    }
-
-    const sourceComp = components.find(c => c.id === form.component_id && c.center_id === form.source_center_id);
-    if (!sourceComp || sourceComp.available_quantity < form.quantity) {
-      setError('Insufficient stock in source hub');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      await apiPost('/api/hub-transfers', {
-        ...form,
-        requested_by: profile?.id
-      });
-      setShowModal(false);
-      setForm({ source_center_id: '', destination_center_id: '', component_id: '', quantity: 1, notes: '' });
-      await fetchData();
-    } catch (e) {
-      setError('Failed to create transfer request');
-    } finally {
-      setSaving(false);
+  const getStatusBadge = (status: string) => {
+    const normalizedStatus = status?.toLowerCase() || '';
+    switch (normalizedStatus) {
+      case 'pending':
+      case 'pending approval':
+        return <span className="px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full text-[10px] font-black uppercase">Pending Approval</span>;
+      case 'main_admin_approved':
+      case 'approved':
+        return <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full text-[10px] font-black uppercase">Approved</span>;
+      case 'source_center_approved':
+        return <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-full text-[10px] font-black uppercase">Source Approved</span>;
+      case 'in_transit':
+      case 'in transit':
+        return <span className="px-3 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 rounded-full text-[10px] font-black uppercase">In Transit</span>;
+      case 'delivered':
+        return <span className="px-3 py-1 bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300 rounded-full text-[10px] font-black uppercase">Delivered</span>;
+      case 'completed':
+        return <span className="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 rounded-full text-[10px] font-black uppercase">Completed</span>;
+      case 'rejected':
+        return <span className="px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 rounded-full text-[10px] font-black uppercase">Rejected</span>;
+      default:
+        return null;
     }
   };
 
-  const handleUpdateStatus = async (id: string, status: 'approved' | 'rejected') => {
+  const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await apiPatch(`/api/hub-transfers/${id}`, {
         status,
-        approved_by: profile?.id
+        user_id: profile?.id
       });
       await fetchData();
     } catch (e) {
@@ -92,211 +94,414 @@ export default function Transfers() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending': return <span className="px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 rounded-full text-[10px] font-black uppercase">Pending Approval</span>;
-      case 'approved': return <span className="px-3 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 rounded-full text-[10px] font-black uppercase">Approved</span>;
-      case 'completed': return <span className="px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 rounded-full text-[10px] font-black uppercase">Completed</span>;
-      case 'rejected': return <span className="px-3 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 rounded-full text-[10px] font-black uppercase">Rejected</span>;
-      default: return null;
+  const handleAiTransferAction = async (id: string, action: string) => {
+    try {
+      if (action === 'confirm-delivery') {
+        await apiPost(`/api/transfer-requests/${id}/confirm-delivery`, {});
+      } else {
+        await apiPatch(`/api/transfer-requests/${id}/approve`, { status: action });
+      }
+      await fetchData();
+    } catch (e) {
+      alert('Failed to update transfer');
     }
   };
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900 dark:text-slate-100">
-      <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm font-black uppercase tracking-widest animate-pulse">Syncing Transfers...</p>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900 dark:text-slate-100">
+        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm font-black uppercase tracking-widest animate-pulse">Syncing Transfers...</p>
+      </div>
+    );
+  }
+
+  const filterTransfers = () => {
+    let sourceTransfers = aiTransfers.filter(t => t.source_hub_id === profile?.center_id);
+    let destinationTransfers = aiTransfers.filter(t => t.destination_hub_id === profile?.center_id);
+    let historyTransfers = [...aiTransfers];
+
+    if (isSystemAdmin || isMainAdmin) {
+      sourceTransfers = aiTransfers.filter(t => ['Pending Approval', 'Approved', 'Rejected'].includes(t.status));
+      destinationTransfers = aiTransfers.filter(t => ['In Transit', 'Delivered'].includes(t.status));
+      historyTransfers = aiTransfers.filter(t => ['Completed', 'Rejected'].includes(t.status));
+    }
+
+    return {
+      sourceTransfers,
+      destinationTransfers,
+      historyTransfers
+    };
+  };
+
+  const { sourceTransfers, destinationTransfers, historyTransfers } = filterTransfers();
 
   return (
-    <div className="space-y-8 max-w-[1400px] mx-auto pb-20 text-slate-900 dark:text-slate-100 transition-colors duration-500">
+    <div className="space-y-8 max-w-[1600px] mx-auto pb-20 text-slate-900 dark:text-slate-100 transition-colors duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase flex items-center gap-3">
             <ArrowLeftRight className="text-indigo-600" size={32} />
-            Hub Transfers
+            Transfer Management
           </h1>
           <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2">
-            Manage inter-hub component movements
+            Complete inter-hub component transfer workflow
           </p>
         </div>
-        
+      </div>
+
+      <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+        {isCenterAdmin && (
+          <>
+            <button
+              onClick={() => setActiveTab('transfer-requests')}
+              className={`pb-4 px-2 border-b-2 font-black text-[11px] uppercase tracking-widest transition-all ${
+                activeTab === 'transfer-requests'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Send size={16} />
+                Transfer Requests
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('incoming-transfers')}
+              className={`pb-4 px-2 border-b-2 font-black text-[11px] uppercase tracking-widest transition-all ${
+                activeTab === 'incoming-transfers'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Inbox size={16} />
+                Incoming Transfers
+              </div>
+            </button>
+          </>
+        )}
+        {(isSystemAdmin || isMainAdmin) && (
+          <>
+            <button
+              onClick={() => setActiveTab('transfer-requests')}
+              className={`pb-4 px-2 border-b-2 font-black text-[11px] uppercase tracking-widest transition-all ${
+                activeTab === 'transfer-requests'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Clock size={16} />
+                Pending Transfers
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('incoming-transfers')}
+              className={`pb-4 px-2 border-b-2 font-black text-[11px] uppercase tracking-widest transition-all ${
+                activeTab === 'incoming-transfers'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Truck size={16} />
+                Active Transfers
+              </div>
+            </button>
+          </>
+        )}
         <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-[20px] shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition-all font-black text-[10px] uppercase tracking-widest"
+          onClick={() => setActiveTab('transfer-history')}
+          className={`pb-4 px-2 border-b-2 font-black text-[11px] uppercase tracking-widest transition-all ${
+            activeTab === 'transfer-history'
+              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+          }`}
         >
-          <Plus size={18} /> New Transfer Request
+          <div className="flex items-center gap-2">
+            <History size={16} />
+            Transfer History
+          </div>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        {transfers.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] p-20 text-center border border-slate-100 dark:border-slate-800">
-            <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ArrowLeftRight className="text-slate-300 dark:text-slate-600" size={40} />
+      <div className="space-y-6">
+        {activeTab === 'transfer-requests' && (
+          <div className="bg-white dark:bg-slate-900 rounded-[24px] overflow-hidden border border-slate-100 dark:border-slate-800">
+            <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                {isCenterAdmin ? 'Requests to Approve & Send' : 'Pending Approval'}
+              </h3>
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[9px] font-black text-slate-600 dark:text-slate-400">
+                {sourceTransfers.length}
+              </span>
             </div>
-            <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">No Transfer Requests</h3>
-            <p className="text-slate-400 dark:text-slate-500 text-sm mt-2 font-bold uppercase tracking-widest">Inventory movements will appear here</p>
-          </div>
-        ) : (
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Component</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">From → To</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Quantity</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
-                {transfers.map((t) => (
-                  <tr key={t.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                          <Package size={16} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{t.component_name}</p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">{format(new Date(t.created_at), 'MMM dd, yyyy')}</p>
+            {sourceTransfers.length === 0 ? (
+              <div className="p-12 text-center">
+                <Send className="mx-auto mb-4 text-slate-300 dark:text-slate-600" size={40} />
+                <p className="text-sm font-bold text-slate-500">No pending transfer requests</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {sourceTransfers.map((transfer) => (
+                  <div key={transfer.id} className="p-6 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <div className="flex flex-col md:flex-row md:items-start gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-xl">
+                          <Package size={24} />
                         </div>
                       </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase">{t.source_center_name}</span>
-                        <ArrowLeftRight size={12} className="text-slate-300" />
-                        <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase">{t.destination_center_name}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <p className="text-sm font-black text-slate-900 dark:text-white">{t.quantity} units</p>
-                    </td>
-                    <td className="px-8 py-6">
-                      {getStatusBadge(t.status)}
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      {isMaster && t.status === 'pending' ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleUpdateStatus(t.id, 'approved')}
-                            className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all"
-                            title="Approve"
-                          >
-                            <CheckCircle size={20} />
-                          </button>
-                          <button
-                            onClick={() => handleUpdateStatus(t.id, 'rejected')}
-                            className="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
-                            title="Reject"
-                          >
-                            <XCircle size={20} />
-                          </button>
+
+                      <div className="flex-1 space-y-4">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div>
+                            <p className="text-lg font-black text-slate-900 dark:text-white">{transfer.component_name}</p>
+                            <div className="flex items-center gap-3 mt-1 text-[10px]">
+                              <span className="font-black text-slate-600 dark:text-slate-400 uppercase">
+                                Request ID: {transfer.request_id}
+                              </span>
+                              <span className="text-slate-300">•</span>
+                              <span className="font-bold text-slate-500 uppercase">
+                                Created: {format(new Date(transfer.created_at), 'MMM dd, yyyy hh:mm a')}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {getStatusBadge(transfer.status)}
+                          </div>
                         </div>
-                      ) : (
-                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Processed</span>
-                      )}
-                    </td>
-                  </tr>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              From Hub
+                            </p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.source_hub_name}</p>
+                          </div>
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              To Hub
+                            </p>
+                            <p className="text-sm font-black text-indigo-600 dark:text-indigo-400">{transfer.destination_hub_name}</p>
+                          </div>
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              Quantity
+                            </p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.quantity} units</p>
+                          </div>
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              Reason
+                            </p>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">
+                              {transfer.reason || 'Stock replenishment'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              Destination Manager
+                            </p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.destination_manager_name || 'N/A'}</p>
+                            <p className="text-xs font-bold text-slate-500">{transfer.destination_manager_phone || 'N/A'}</p>
+                          </div>
+                          {transfer.system_admin_name && (
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                                System Admin
+                              </p>
+                              <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.system_admin_name}</p>
+                            </div>
+                          )}
+                          {transfer.inventory_manager_name && (
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                                Requested By
+                              </p>
+                              <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.inventory_manager_name}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-end gap-3 pt-4">
+                          {isCenterAdmin && transfer.source_hub_id === profile?.center_id && transfer.status === 'Pending Approval' && (
+                            <>
+                              <button
+                                onClick={() => handleAiTransferAction(transfer.id, 'Approved')}
+                                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-emerald-700 transition-all"
+                              >
+                                <CheckCircle size={14} />
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleAiTransferAction(transfer.id, 'Rejected')}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-red-700 transition-all"
+                              >
+                                <XCircle size={14} />
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {isCenterAdmin && transfer.source_hub_id === profile?.center_id && transfer.status === 'Approved' && (
+                            <button
+                              onClick={() => handleAiTransferAction(transfer.id, 'In Transit')}
+                              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-yellow-700 transition-all"
+                            >
+                              <Truck size={14} />
+                              Mark as Shipped
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'incoming-transfers' && (
+          <div className="bg-white dark:bg-slate-900 rounded-[24px] overflow-hidden border border-slate-100 dark:border-slate-800">
+            <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                {isCenterAdmin ? 'Transfers to Receive' : 'Active Transfers'}
+              </h3>
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[9px] font-black text-slate-600 dark:text-slate-400">
+                {destinationTransfers.length}
+              </span>
+            </div>
+            {destinationTransfers.length === 0 ? (
+              <div className="p-12 text-center">
+                <Inbox className="mx-auto mb-4 text-slate-300 dark:text-slate-600" size={40} />
+                <p className="text-sm font-bold text-slate-500">No incoming transfers</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {destinationTransfers.map((transfer) => (
+                  <div key={transfer.id} className="p-6 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <div className="flex flex-col md:flex-row md:items-start gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                          <Truck size={24} />
+                        </div>
+                      </div>
+
+                      <div className="flex-1 space-y-4">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div>
+                            <p className="text-lg font-black text-slate-900 dark:text-white">{transfer.component_name}</p>
+                            <div className="flex items-center gap-3 mt-1 text-[10px]">
+                              <span className="font-black text-slate-600 dark:text-slate-400 uppercase">
+                                Request ID: {transfer.request_id}
+                              </span>
+                              <span className="text-slate-300">•</span>
+                              <span className="font-bold text-slate-500 uppercase">
+                                Created: {format(new Date(transfer.created_at), 'MMM dd, yyyy hh:mm a')}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {getStatusBadge(transfer.status)}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              Source Hub
+                            </p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.source_hub_name}</p>
+                          </div>
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                              Quantity
+                            </p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.quantity} units</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-end gap-3 pt-4">
+                          {isCenterAdmin && transfer.destination_hub_id === profile?.center_id && transfer.status === 'In Transit' && (
+                            <button
+                              onClick={() => handleAiTransferAction(transfer.id, 'confirm-delivery')}
+                              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase hover:bg-emerald-700 transition-all"
+                            >
+                              <CheckCircle size={14} />
+                              Confirm Receipt
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'transfer-history' && (
+          <div className="bg-white dark:bg-slate-900 rounded-[24px] overflow-hidden border border-slate-100 dark:border-slate-800">
+            <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                Transfer History
+              </h3>
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[9px] font-black text-slate-600 dark:text-slate-400">
+                {historyTransfers.length}
+              </span>
+            </div>
+            {historyTransfers.length === 0 ? (
+              <div className="p-12 text-center">
+                <History className="mx-auto mb-4 text-slate-300 dark:text-slate-600" size={40} />
+                <p className="text-sm font-bold text-slate-500">No transfer history</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                      <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Component</th>
+                      <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">From → To</th>
+                      <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Quantity</th>
+                      <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                      <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {historyTransfers.map((transfer) => (
+                      <tr key={transfer.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="px-8 py-4">
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.component_name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase">{transfer.request_id}</p>
+                        </td>
+                        <td className="px-8 py-4">
+                          <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{transfer.source_hub_name} → {transfer.destination_hub_name}</p>
+                        </td>
+                        <td className="px-8 py-4">
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{transfer.quantity} units</p>
+                        </td>
+                        <td className="px-8 py-4">
+                          {getStatusBadge(transfer.status)}
+                        </td>
+                        <td className="px-8 py-4">
+                          <p className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                            {format(new Date(transfer.updated_at || transfer.created_at), 'MMM dd, yyyy')}
+                          </p>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
-
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 rounded-[40px] w-full max-w-lg p-10 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">New Transfer</h2>
-              <button onClick={() => setShowModal(false)} className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all">
-                <XCircle className="text-slate-400" size={24} />
-              </button>
-            </div>
-
-            {error && (
-              <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-2xl flex items-center gap-3 text-rose-600 dark:text-rose-400">
-                <AlertCircle size={20} />
-                <p className="text-[10px] font-black uppercase tracking-widest">{error}</p>
-              </div>
-            )}
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Source Hub</label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <select
-                    value={form.source_center_id}
-                    onChange={(e) => setForm({ ...form, source_center_id: e.target.value, component_id: '' })}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
-                  >
-                    <option value="">Select Source</option>
-                    {centers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Component to Transfer</label>
-                <div className="relative">
-                  <Package className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <select
-                    value={form.component_id}
-                    onChange={(e) => setForm({ ...form, component_id: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
-                    disabled={!form.source_center_id}
-                  >
-                    <option value="">Select Component</option>
-                    {components
-                      .filter(c => c.center_id === form.source_center_id && c.available_quantity > 0)
-                      .map(c => <option key={c.id} value={c.id}>{c.name} ({c.available_quantity} available)</option>)
-                    }
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Destination Hub</label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <select
-                    value={form.destination_center_id}
-                    onChange={(e) => setForm({ ...form, destination_center_id: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
-                  >
-                    <option value="">Select Destination</option>
-                    {centers.filter(c => c.id !== form.source_center_id).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.quantity}
-                  onChange={(e) => setForm({ ...form, quantity: parseInt(e.target.value) || 0 })}
-                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white"
-                />
-              </div>
-
-              <button
-                onClick={handleCreateTransfer}
-                disabled={saving}
-                className="w-full py-5 bg-indigo-600 text-white rounded-2xl shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 disabled:opacity-50 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-4"
-              >
-                {saving ? <Loader2 className="animate-spin mx-auto" size={20} /> : 'Submit Request'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

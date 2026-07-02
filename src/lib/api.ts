@@ -5,12 +5,15 @@
  * - In production, '' = same host (configure reverse proxy for /api).
  */
 function apiBase(): string {
-  const raw = import.meta.env.VITE_API_URL;
+  const env = (import.meta as any).env;
+  const raw = env.VITE_API_URL;
   if (raw != null && String(raw).trim() !== '') {
     return String(raw).replace(/\/$/, '');
   }
-  if (import.meta.env.DEV) {
-    return '';
+  if (env.DEV) {
+    // In development, call the backend directly so `/api/auth/login` uses the PostgreSQL-backed API.
+    // The backend already allows CORS, so this avoids depending on Vite proxy behavior.
+    return 'http://localhost:8787';
   }
   return '';
 }
@@ -46,9 +49,10 @@ export async function apiRequest<T>(
     headers['Content-Type'] = 'application/json';
     rest.body = JSON.stringify(json);
   }
+  const env = (import.meta as any).env;
   const base = apiBase();
   const primaryUrl = `${base}${path}`;
-  const fallbackUrl = import.meta.env.DEV && base === '' && path.startsWith('/api')
+  const fallbackUrl = env.DEV && base === '' && path.startsWith('/api')
     ? `http://localhost:8787${path}`
     : null;
 
@@ -68,7 +72,7 @@ export async function apiRequest<T>(
         fallbackUrl &&
         res &&
         !res.ok &&
-        import.meta.env.DEV &&
+        env.DEV &&
         [500, 502, 503, 504].includes(res.status)
       ) {
         lastError = new Error(`Proxy returned ${res.status}`);
@@ -107,11 +111,11 @@ export async function apiRequest<T>(
         ? String((parsed as { error: string }).error)
         : res.statusText;
     const detail =
-      typeof parsed === 'object' && parsed !== null && 'detail' in parsed
-        ? String((parsed as { detail: string }).detail)
+      typeof parsed === 'object' && parsed !== null && 'details' in parsed
+        ? String((parsed as { details: string }).details)
         : '';
     if (detail) msg = `${msg}: ${detail}`;
-    if (import.meta.env.DEV && (res.status === 502 || res.status === 503 || res.status === 504)) {
+    if (env.DEV && (res.status === 502 || res.status === 503 || res.status === 504)) {
       msg +=
         ' — The dev proxy could not reach the API. Ensure the backend is running. From the project folder run npm run dev (starts API + Vite). The API uses PostgreSQL when DATABASE_URL works; otherwise it falls back to in-memory data.';
     }

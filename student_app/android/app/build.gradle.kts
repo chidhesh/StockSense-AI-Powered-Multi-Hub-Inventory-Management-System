@@ -8,6 +8,8 @@ android {
     namespace = "com.example.student_app"
     compileSdk = 36
 
+    ndkVersion = "28.2.13676358"
+
     defaultConfig {
         applicationId = "com.example.student_app"
         minSdk = flutter.minSdkVersion

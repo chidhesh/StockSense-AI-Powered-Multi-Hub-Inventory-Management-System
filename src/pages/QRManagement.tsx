@@ -475,7 +475,7 @@ export default function QRManagement() {
       .slice(0, 3);
     
     const units = [];
-    const totalQty = comp.total_quantity || comp.available_quantity;
+    const totalQty = comp.total_quantity ?? 0; // Ensure we use total_quantity
     for (let i = 1; i <= totalQty; i++) {
       units.push(`${prefix}-${String(i).padStart(3, '0')}`);
     }
@@ -871,12 +871,11 @@ export default function QRManagement() {
                   return studentHoldings[unitSelectionComp.id] || [];
                 }
 
-                // For issue flow, only show currently issuable units so this view
-                // stays aligned with the "available units" count shown outside.
+                // For issue flow, show all units based on total quantity, mark issued ones as disabled
                 const allUnits = getUnitIds(unitSelectionComp);
                 const issuedSet = new Set(allIssuedUnits[unitSelectionComp.id] || []);
                 const issuableUnits = allUnits.filter(unitId => !issuedSet.has(unitId));
-                return issuableUnits.slice(0, Math.max(0, unitSelectionComp.available_quantity));
+                return allUnits;
               })();
               
               if (units.length === 0) {

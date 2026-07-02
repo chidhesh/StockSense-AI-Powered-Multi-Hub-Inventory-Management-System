@@ -2,8 +2,10 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
+import pool from '../config/db.js';
 import { query } from '../config/db.js';
 import { JWT_SECRET } from '../config/env.js';
+import aiService from '../services/aiService.js';
 import {
   sendStockAlert,
   sendBulkStockAlert,
@@ -16,10 +18,37 @@ import { generateSimpleInventory, generateSimpleTransactions, convertToCSV } fro
 
 const router = express.Router();
 
-const authMiddleware = (req, res, next) => {
+// #region debug-point A:replenishment-debug-reporter
+const reportReplenishmentDebug = (message, payload = {}) => {
+  const url = process.env.DEBUG_SERVER_URL || 'http://127.0.0.1:7777/event';
+  void fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: process.env.DEBUG_SESSION_ID || 'replenishment-404',
+      runId: process.env.DEBUG_RUN_ID || 'pre-fix',
+      hypothesisId: payload.hypothesisId || 'A',
+      message,
+      payload,
+      ts: new Date().toISOString(),
+    }),
+  }).catch(() => {});
+};
+// #endregion debug-point A:replenishment-debug-reporter
+
+export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) {
+    // #region debug-point B:replenishment-auth-missing-token
+    if (req.originalUrl?.includes('/replenishment-requests')) {
+      reportReplenishmentDebug('Missing auth token on replenishment request', {
+        hypothesisId: 'B',
+        method: req.method,
+        url: req.originalUrl,
+      });
+    }
+    // #endregion debug-point B:replenishment-auth-missing-token
     return res.status(401).json({ error: 'Missing or invalid authorization token' });
   }
   try {
@@ -27,6 +56,16 @@ const authMiddleware = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (error) {
+    // #region debug-point B:replenishment-auth-invalid-token
+    if (req.originalUrl?.includes('/replenishment-requests')) {
+      reportReplenishmentDebug('Invalid auth token on replenishment request', {
+        hypothesisId: 'B',
+        method: req.method,
+        url: req.originalUrl,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+    // #endregion debug-point B:replenishment-auth-invalid-token
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
@@ -119,6 +158,47 @@ router.get('/health', (req, res) => {
   res.json({ app: 'smart-inventory-api', ok: true, timestamp: new Date() });
 });
 
+router.get('/public/admin-exists', async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id FROM profiles WHERE role = 'main_admin' LIMIT 1`
+    );
+    res.json({ exists: result.rows.length > 0 });
+  } catch (error) {
+    console.error('Check admin exists failed:', error);
+    res.status(500).json({ error: 'Failed to check admin status' });
+  }
+});
+
+router.get('/notifications', authMiddleware, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC`,
+      [req.user.id]
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Notifications fetch failed:', error);
+    return res.status(500).json({ error: 'Failed to load notifications' });
+  }
+});
+
+router.patch('/notifications/:id/read', authMiddleware, async (req, res) => {
+  try {
+    const result = await query(
+      `UPDATE notifications SET is_read = TRUE WHERE id = $1 AND user_id = $2 RETURNING *`,
+      [req.params.id, req.user.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Mark notification read failed:', error);
+    return res.status(500).json({ error: 'Failed to mark notification as read' });
+  }
+});
+
 router.post('/auth/register', async (req, res) => {
   const { email, password, full_name, role, center_id } = req.body;
   if (!email || !password || !full_name || !role) {
@@ -129,6 +209,16 @@ router.post('/auth/register', async (req, res) => {
     const existing = await query('SELECT id FROM app_users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    const isMainAdminRequest = role === 'main_admin';
+    if (isMainAdminRequest) {
+      const existingAdmin = await query(
+        `SELECT id FROM profiles WHERE role = 'main_admin' LIMIT 1`
+      );
+      if (existingAdmin.rows.length > 0) {
+        return res.status(403).json({ error: 'A main administrator already exists. Only one main administrator is allowed.' });
+      }
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -210,6 +300,7 @@ router.get('/auth/me', async (req, res) => {
         full_name: row.full_name,
         role: row.role,
         center_id: row.center_id,
+        email: row.email,
         created_at: row.profile_created_at,
         updated_at: row.profile_updated_at,
       },
@@ -221,13 +312,22 @@ router.get('/auth/me', async (req, res) => {
 
 router.get('/public/centers', async (req, res) => {
   try {
-    const result = await query(`
+    // By default return all centers. If the client wants to omit known demo hubs,
+    // set ?exclude_demo=true which will filter a small set of seed/demo names.
+    const { exclude_demo } = req.query;
+    const demoNames = ['main iot hub', 'secondary lab', 'secondary hub'];
+    let sql = `
       SELECT DISTINCT ON (LOWER(TRIM(name)))
         id, name, location, admin_name, contact_email, contact_phone, capacity, type, created_at, updated_at
       FROM centers
-      WHERE LOWER(TRIM(name)) NOT IN ('main iot hub', 'secondary lab', 'secondary hub')
-      ORDER BY LOWER(TRIM(name)), created_at ASC
-    `);
+    `;
+    const params = [];
+    if (String(exclude_demo) === 'true') {
+      sql += ` WHERE LOWER(TRIM(name)) NOT IN (${demoNames.map((_, i) => `$${i + 1}`).join(', ')})`;
+      params.push(...demoNames);
+    }
+    sql += ' ORDER BY LOWER(TRIM(name)), created_at ASC';
+    const result = await query(sql, params);
     return res.json(result.rows);
   } catch (error) {
     console.error('Public centers failed:', error);
@@ -237,13 +337,21 @@ router.get('/public/centers', async (req, res) => {
 
 router.get('/centers', async (req, res) => {
   try {
-    const result = await query(`
+    // Return all centers by default. Use ?exclude_demo=true to hide known demo hubs.
+    const { exclude_demo } = req.query;
+    const demoNames = ['main iot hub', 'secondary lab', 'secondary hub'];
+    let sql = `
       SELECT DISTINCT ON (LOWER(TRIM(name)))
         id, name, location, admin_name, contact_email, contact_phone, capacity, type, created_at, updated_at
       FROM centers
-      WHERE LOWER(TRIM(name)) NOT IN ('main iot hub', 'secondary lab', 'secondary hub')
-      ORDER BY LOWER(TRIM(name)), created_at ASC
-    `);
+    `;
+    const params = [];
+    if (String(exclude_demo) === 'true') {
+      sql += ` WHERE LOWER(TRIM(name)) NOT IN (${demoNames.map((_, i) => `$${i + 1}`).join(', ')})`;
+      params.push(...demoNames);
+    }
+    sql += ' ORDER BY LOWER(TRIM(name)), created_at ASC';
+    const result = await query(sql, params);
     return res.json(result.rows);
   } catch (error) {
     console.error('Centers fetch failed:', error);
@@ -322,6 +430,7 @@ router.get('/components', async (req, res) => {
 
 router.post('/components', async (req, res) => {
   try {
+    console.log('POST /api/components req.body:', JSON.stringify(req.body, null, 2));
     const {
       name,
       category,
@@ -335,28 +444,64 @@ router.post('/components', async (req, res) => {
       unit_cost = 0,
       center_id,
       status = 'active',
+      min_stock_threshold = 5,
+      course_id = null,
+      course_name = null,
+      skill_tags = null,
+      is_shared_component = false,
     } = req.body;
 
     const result = await query(
-      `INSERT INTO components (name, category, description, sku, qr_code, total_quantity, available_quantity, max_usage_limit, usage_count, unit_cost, center_id, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+      `INSERT INTO components (name, category, description, sku, qr_code, total_quantity, available_quantity, max_usage_limit, usage_count, unit_cost, center_id, status, min_stock_threshold, course_id, course_name, skill_tags, is_shared_component)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
        ON CONFLICT (name, center_id) DO UPDATE SET
          total_quantity = components.total_quantity + EXCLUDED.total_quantity,
          available_quantity = components.available_quantity + EXCLUDED.available_quantity,
          updated_at = NOW()
        RETURNING *`,
-      [name, category, description, sku, qr_code, total_quantity, available_quantity, max_usage_limit, usage_count, unit_cost, center_id, status]
+      [name, category, description, sku, qr_code, total_quantity, available_quantity, max_usage_limit, usage_count, unit_cost, center_id, status, min_stock_threshold, course_id, course_name, skill_tags, is_shared_component]
     );
     return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Component creation failed:', error);
-    return res.status(500).json({ error: 'Failed to create component' });
+    console.error('Error stack:', error.stack);
+    return res.status(500).json({ error: 'Failed to create component', details: error.message });
   }
 });
 
 router.patch('/components/:id', async (req, res) => {
   try {
-    const update = buildUpdateQuery('components', req.params.id, req.body);
+    const componentId = req.params.id;
+    
+    // If we're updating total_quantity, recalculate available_quantity properly
+    if (req.body.total_quantity !== undefined) {
+      // First, get current issued/damaged quantities from transactions
+      const txResult = await query(`
+        SELECT 
+          SUM(CASE WHEN transaction_type = 'issue' THEN quantity ELSE 0 END) as issued,
+          SUM(CASE WHEN transaction_type = 'return' THEN quantity ELSE 0 END) as returned,
+          SUM(CASE WHEN transaction_type = 'damaged' THEN quantity ELSE 0 END) as damaged
+        FROM inventory_transactions
+        WHERE component_id = $1
+      `, [componentId]);
+      
+      const txData = txResult.rows[0];
+      const issued = Number(txData.issued) || 0;
+      const returned = Number(txData.returned) || 0;
+      const damaged = Number(txData.damaged) || 0;
+      
+      // Calculate net issued: issued - returned
+      const netIssued = Math.max(0, issued - returned);
+      
+      // Calculate new available_quantity: total_quantity - net_issued - damaged
+      const newTotal = Number(req.body.total_quantity);
+      const newAvailable = Math.max(0, newTotal - netIssued - damaged);
+      
+      // Update available_quantity in the request body
+      req.body.available_quantity = newAvailable;
+    }
+    
+    const update = buildUpdateQuery('components', componentId, req.body);
     if (!update) return res.status(400).json({ error: 'No fields to update' });
     const result = await query(update.sql, update.values);
     return res.json(result.rows[0]);
@@ -1016,6 +1161,190 @@ router.post('/admin/cleanup-duplicates', async (req, res) => {
   }
 });
 
+// Stock Alerts and Predictions
+// Import TensorFlow.js
+import * as tf from '@tensorflow/tfjs';
+
+// Simple demand forecasting model using TensorFlow.js
+const trainDemandModel = async () => {
+  // Create a simple sequential model for regression
+  const model = tf.sequential();
+  
+  // Input layer: [available_quantity, total_quantity, center_id_encoded, component_id_encoded]
+  model.add(tf.layers.dense({ units: 16, activation: 'relu', inputShape: [4] }));
+  model.add(tf.layers.dense({ units: 8, activation: 'relu' }));
+  model.add(tf.layers.dense({ units: 1, activation: 'linear' })); // Regression output
+  
+  model.compile({
+    optimizer: tf.train.adam(0.001),
+    loss: 'meanSquaredError',
+    metrics: ['mae']
+  });
+  
+  // Generate some synthetic training data
+  // Features: [available_qty, total_qty, center_code, component_code]
+  // Target: predicted_demand_30_days
+  const trainingData = [];
+  const targets = [];
+  
+  for (let i = 0; i < 100; i++) {
+    const available = Math.floor(Math.random() * 50);
+    const total = available + Math.floor(Math.random() * 50);
+    const centerCode = Math.random();
+    const componentCode = Math.random();
+    const demand = Math.max(5, Math.floor((total - available) * 2 + Math.random() * 20));
+    
+    trainingData.push([available, total, centerCode, componentCode]);
+    targets.push(demand);
+  }
+  
+  const xs = tf.tensor2d(trainingData);
+  const ys = tf.tensor2d(targets, [100, 1]);
+  
+  // Train the model
+  await model.fit(xs, ys, {
+    epochs: 100,
+    verbose: 0
+  });
+  
+  return model;
+};
+
+let trainedModel = null;
+
+// Initialize model on server start
+trainDemandModel().then(model => {
+  trainedModel = model;
+  console.log('ML Demand Forecasting model trained successfully!');
+}).catch(err => {
+  console.error('Failed to train ML model:', err);
+});
+
+// Endpoint to get ML-powered stock alerts with predictions
+router.get('/stock-alerts', async (req, res) => {
+  try {
+    const { rows: components } = await query(`
+      SELECT c.*, cnt.name as center_name
+      FROM components c
+      JOIN centers cnt ON c.center_id = cnt.id
+      WHERE c.status IN ('low_stock', 'out_of_stock')
+      ORDER BY c.status DESC, c.updated_at DESC
+    `);
+
+    const alerts = [];
+    for (const comp of components) {
+      // Use ML model to predict demand
+      let predictedDemand = Math.max(5, Math.ceil(comp.total_quantity * 0.3)); // Fallback
+      
+      if (trainedModel) {
+        try {
+          // Simple encoding for center and component IDs
+          const centerCode = comp.center_id ? comp.center_id.charCodeAt(0) / 255 : 0.5;
+          const componentCode = comp.id ? comp.id.charCodeAt(0) / 255 : 0.5;
+          
+          // Create input tensor
+          const input = tf.tensor2d([[
+            comp.available_quantity, 
+            comp.total_quantity, 
+            centerCode, 
+            componentCode
+          ]]);
+          
+          // Predict demand
+          const prediction = trainedModel.predict(input);
+          const predictionValue = prediction.dataSync()[0];
+          predictedDemand = Math.max(5, Math.ceil(predictionValue));
+          
+          // Clean up
+          input.dispose();
+          prediction.dispose();
+        } catch (err) {
+          console.warn('ML prediction failed, using fallback:', err);
+        }
+      }
+      
+      // Find other centers with excess of this component
+      const { rows: excessCenters } = await query(`
+        SELECT c2.*, cnt2.name as center_name
+        FROM components c2
+        JOIN centers cnt2 ON c2.center_id = cnt2.id
+        WHERE c2.name = $1 AND c2.center_id != $2
+        AND (c2.available_quantity / c2.total_quantity) >= 0.7
+        ORDER BY (c2.available_quantity / c2.total_quantity) DESC
+      `, [comp.name, comp.center_id]);
+
+      const transferOptions = excessCenters.map(ec => ({
+        source_center_id: ec.center_id,
+        source_center_name: ec.center_name,
+        available_excess: ec.available_quantity - Math.ceil(ec.total_quantity * 0.5),
+        suggested_transfer_quantity: Math.min(
+          predictedDemand - comp.available_quantity,
+          ec.available_quantity - Math.ceil(ec.total_quantity * 0.5)
+        )
+      })).filter(opt => opt.suggested_transfer_quantity > 0);
+
+      alerts.push({
+        id: `${comp.id}-${Date.now()}`,
+        component_id: comp.id,
+        component_name: comp.name,
+        center_id: comp.center_id,
+        center_name: comp.center_name,
+        available_quantity: comp.available_quantity,
+        total_quantity: comp.total_quantity,
+        status: comp.status,
+        predicted_demand_30_days: predictedDemand,
+        recommendation: transferOptions.length > 0 ? 'transfer' : 'purchase',
+        transfer_options: transferOptions,
+        created_at: new Date().toISOString(),
+        uses_ml_prediction: !!trainedModel
+      });
+    }
+
+    return res.json(alerts);
+  } catch (error) {
+    console.error('Fetch stock alerts failed:', error);
+    return res.status(500).json({ error: 'Failed to load stock alerts' });
+  }
+});
+
+// Create split transfer requests
+router.post('/hub-transfers/split', async (req, res) => {
+  try {
+    const { destination_center_id, component_id, splits, requested_by, notes } = req.body;
+    
+    await query('BEGIN');
+    
+    const parentId = crypto.randomUUID();
+    
+    // First create parent request (optional, for tracking)
+    const totalQuantity = splits.reduce((sum, s) => sum + s.quantity, 0);
+    await query(`
+      INSERT INTO hub_transfer_requests 
+      (id, source_center_id, destination_center_id, component_id, quantity, status, requested_by, notes)
+      VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7)
+    `, [parentId, splits[0]?.source_center_id || null, destination_center_id, component_id, totalQuantity, requested_by, notes]);
+
+    // Create individual split requests
+    const createdTransfers = [];
+    for (const split of splits) {
+      const result = await query(`
+        INSERT INTO hub_transfer_requests 
+        (source_center_id, destination_center_id, component_id, quantity, status, requested_by, parent_transfer_id, notes)
+        VALUES ($1, $2, $3, $4, 'pending', $5, $6, $7)
+        RETURNING *
+      `, [split.source_center_id, destination_center_id, component_id, split.quantity, requested_by, parentId, notes]);
+      createdTransfers.push(result.rows[0]);
+    }
+
+    await query('COMMIT');
+    return res.status(201).json({ parent_id: parentId, transfers: createdTransfers });
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Create split transfers failed:', error);
+    return res.status(500).json({ error: 'Failed to create split transfer requests' });
+  }
+});
+
 // Hub Transfer Routes
 router.get('/hub-transfers', async (req, res) => {
   try {
@@ -1060,24 +1389,34 @@ router.post('/hub-transfers', async (req, res) => {
   }
 });
 
+// Update transfer status (supports multi-step approval)
 router.patch('/hub-transfers/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, approved_by } = req.body;
+    const { status, user_id } = req.body;
 
-    if (status === 'approved') {
-      await query('BEGIN');
-      
-      // 1. Get transfer details
-      const { rows } = await query('SELECT * FROM hub_transfer_requests WHERE id = $1', [id]);
-      const transfer = rows[0];
-      
-      if (!transfer) {
-        await query('ROLLBACK');
-        return res.status(404).json({ error: 'Transfer request not found' });
-      }
+    await query('BEGIN');
+    
+    // Get transfer details
+    const { rows } = await query('SELECT * FROM hub_transfer_requests WHERE id = $1', [id]);
+    const transfer = rows[0];
+    
+    if (!transfer) {
+      await query('ROLLBACK');
+      return res.status(404).json({ error: 'Transfer request not found' });
+    }
 
-      // 2. Deduct from source component
+    const updateData = { status, updated_at: new Date() };
+
+    if (status === 'main_admin_approved') {
+      updateData.approved_by_main = user_id;
+    } else if (status === 'source_center_approved') {
+      updateData.approved_by_source = user_id;
+    } else if (status === 'completed') {
+      updateData.completed_by = user_id;
+      
+      // Actually perform the inventory transfer now
+      // 1. Deduct from source component
       const deductRes = await query(
         'UPDATE components SET available_quantity = available_quantity - $1, updated_at = NOW() WHERE id = $2 AND available_quantity >= $1 RETURNING *',
         [transfer.quantity, transfer.component_id]
@@ -1088,7 +1427,7 @@ router.patch('/hub-transfers/:id', async (req, res) => {
         return res.status(400).json({ error: 'Insufficient stock in source hub' });
       }
 
-      // 3. Add to destination hub (find or create component)
+      // 2. Add to destination hub
       const sourceComp = deductRes.rows[0];
       const { rows: destCompRows } = await query(
         'SELECT id FROM components WHERE name = $1 AND center_id = $2',
@@ -1103,31 +1442,28 @@ router.patch('/hub-transfers/:id', async (req, res) => {
       } else {
         await query(
           `INSERT INTO components (name, category, description, sku, total_quantity, available_quantity, center_id, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [sourceComp.name, sourceComp.category, sourceComp.description, sourceComp.sku, transfer.quantity, transfer.quantity, transfer.destination_center_id, 'active']
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
+          [sourceComp.name, sourceComp.category, sourceComp.description, sourceComp.sku, transfer.quantity, transfer.quantity, transfer.destination_center_id]
         );
       }
 
-      // 4. Update request status
+      // Record transaction
       await query(
-        'UPDATE hub_transfer_requests SET status = $1, approved_by = $2, updated_at = NOW() WHERE id = $3',
-        ['completed', approved_by, id]
+        `INSERT INTO inventory_transactions (component_id, center_id, transaction_type, quantity, notes, session_date, performed_by)
+         VALUES ($1, $2, 'transfer', $3, $4, CURRENT_DATE, $5)`,
+        [transfer.component_id, transfer.source_center_id, transfer.quantity, `Transferred to Hub: ${transfer.destination_center_id}`, user_id]
       );
-
-      // 5. Record transactions for both hubs
-      await query(
-        `INSERT INTO inventory_transactions (component_id, center_id, transaction_type, quantity, notes, session_date)
-         VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)`,
-        [transfer.component_id, transfer.source_center_id, 'transfer', transfer.quantity, `Transferred to Hub: ${transfer.destination_center_id}`]
-      );
-
-      await query('COMMIT');
-      return res.json({ message: 'Transfer approved and completed' });
-    } else {
-      const { sql, values } = buildUpdateQuery('hub_transfer_requests', id, req.body);
-      const result = await query(sql, values);
-      return res.json(result.rows[0]);
     }
+
+    const updateQuery = buildUpdateQuery('hub_transfer_requests', id, updateData);
+    if (!updateQuery) {
+      await query('ROLLBACK');
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const result = await query(updateQuery.sql, updateQuery.values);
+    await query('COMMIT');
+    return res.json(result.rows[0]);
   } catch (error) {
     await query('ROLLBACK');
     console.error('Update hub transfer failed:', error);
@@ -1184,6 +1520,345 @@ router.post('/admin/cleanup-dummy-hubs', async (req, res) => {
   } catch (error) {
     console.error('Cleanup dummy hubs failed:', error);
     return res.status(500).json({ error: 'Failed to cleanup dummy hubs' });
+  }
+});
+
+router.post('/replenishment-requests', authMiddleware, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    // #region debug-point C:replenishment-route-hit
+    reportReplenishmentDebug('Replenishment POST route hit', {
+      hypothesisId: 'C',
+      method: req.method,
+      url: req.originalUrl,
+      bodyKeys: Object.keys(req.body || {}),
+      userId: req.user?.id || null,
+    });
+    // #endregion debug-point C:replenishment-route-hit
+    const { componentId, centerId, requiredQuantity, reason } = req.body;
+    if (!componentId || !centerId || !requiredQuantity) {
+      // #region debug-point D:replenishment-validation-failed
+      reportReplenishmentDebug('Replenishment validation failed', {
+        hypothesisId: 'D',
+        componentId: Boolean(componentId),
+        centerId: Boolean(centerId),
+        requiredQuantity: Boolean(requiredQuantity),
+      });
+      // #endregion debug-point D:replenishment-validation-failed
+      return res.status(400).json({ error: 'componentId, centerId, and requiredQuantity are required' });
+    }
+
+    await client.query('BEGIN');
+
+    const componentResult = await client.query(
+      `SELECT id, name, center_id, available_quantity, min_stock_threshold
+       FROM components
+       WHERE id = $1`,
+      [componentId]
+    );
+    const component = componentResult.rows[0];
+    if (!component) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Component not found' });
+    }
+    if (component.center_id !== centerId) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Component does not belong to the selected center' });
+    }
+
+    const centerResult = await client.query(
+      `SELECT id, name FROM centers WHERE id = $1`,
+      [centerId]
+    );
+    const center = centerResult.rows[0];
+    if (!center) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Center not found' });
+    }
+
+    const requestId = `RR-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+    const forecast = await aiService.forecastDemand(componentId, centerId);
+    const decision = await aiService.decideTransferOrPurchase(
+      componentId,
+      centerId,
+      Number(requiredQuantity)
+    );
+
+    let allocation = null;
+    if (decision.decisionType === 'TRANSFER') {
+      allocation = await aiService.allocateTransfers(
+        decision.availableExcess || [],
+        Number(requiredQuantity),
+        componentId,
+        centerId
+      );
+    }
+
+    const insertResult = await client.query(
+      `INSERT INTO replenishment_requests (
+        id,
+        request_id,
+        component_id,
+        component_name,
+        center_id,
+        center_name,
+        current_quantity,
+        min_stock_threshold,
+        required_quantity,
+        reason,
+        requested_by,
+        ai_forecast_quantity,
+        ai_forecast_confidence,
+        ai_decision_type,
+        ai_decision_confidence,
+        ai_reason,
+        ai_transfer_allocation,
+        ai_debug_info,
+        status
+      ) VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19
+      )
+      RETURNING *`,
+      [
+        crypto.randomUUID(),
+        requestId,
+        component.id,
+        component.name,
+        center.id,
+        center.name,
+        Number(component.available_quantity) || 0,
+        Number(component.min_stock_threshold) || 0,
+        Number(requiredQuantity),
+        reason || `Low stock detected for ${component.name}`,
+        req.user.id,
+        Number(forecast.forecastQuantity) || Number(requiredQuantity),
+        Number(forecast.confidenceScore) || 0.5,
+        decision.decisionType,
+        Number(decision.confidenceScore) || 0.5,
+        decision.reason,
+        allocation ? JSON.stringify(allocation.allocationPlan) : null,
+        decision.debugInfo ? JSON.stringify(decision.debugInfo) : null,
+        'PENDING_AI_REVIEW'
+      ]
+    );
+
+    const adminRecipients = await client.query(
+      `SELECT u.id
+       FROM app_users u
+       JOIN profiles p ON p.id = u.id
+       WHERE p.role IN ('system_admin', 'main_admin', 'master_admin')`
+    );
+
+    for (const admin of adminRecipients.rows) {
+      await client.query(
+        `INSERT INTO notifications (
+          user_id, title, message, type, reference_id, reference_type, redirect_url, data
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          admin.id,
+          'New Replenishment Request',
+          `${component.name} needs ${Number(requiredQuantity)} units at ${center.name}.`,
+          'replenishment_request',
+          insertResult.rows[0].id,
+          'replenishment',
+          '/ai-decision-center',
+          JSON.stringify({
+            replenishmentRequestId: insertResult.rows[0].id,
+            requestId,
+            componentId: component.id,
+            componentName: component.name,
+            centerId: center.id,
+            centerName: center.name,
+            aiDecisionType: decision.decisionType,
+          }),
+        ]
+      );
+    }
+
+    // Automatically complete AI review
+    const updatedResult = await client.query(
+      `UPDATE replenishment_requests
+       SET status = 'AI_REVIEW_COMPLETE', updated_at = NOW()
+       WHERE id = $1
+       RETURNING *`,
+      [insertResult.rows[0].id]
+    );
+
+    await client.query('COMMIT');
+    // #region debug-point E:replenishment-success
+    reportReplenishmentDebug('Replenishment request created', {
+      hypothesisId: 'E',
+      requestId: updatedResult.rows[0]?.request_id || null,
+      componentId,
+      centerId,
+      requiredQuantity: Number(requiredQuantity),
+    });
+    // #endregion debug-point E:replenishment-success
+    return res.status(201).json(updatedResult.rows[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    // #region debug-point E:replenishment-error
+    reportReplenishmentDebug('Replenishment request failed', {
+      hypothesisId: 'E',
+      method: req.method,
+      url: req.originalUrl,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    // #endregion debug-point E:replenishment-error
+    console.error('Create replenishment request failed:', error);
+    return res.status(500).json({
+      error: 'Failed to create replenishment request',
+      details: error.message,
+    });
+  } finally {
+    client.release();
+  }
+});
+
+router.get('/replenishment-requests', authMiddleware, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT *
+       FROM replenishment_requests
+       ORDER BY created_at DESC`
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Get replenishment requests failed:', error);
+    return res.status(500).json({ error: 'Failed to load replenishment requests' });
+  }
+});
+
+// Endpoint to generate purchase request from replenishment request
+router.post('/replenishment-requests/:id/generate-purchase-request', authMiddleware, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    await client.query('BEGIN');
+
+    // Get replenishment request
+    const repReqResult = await client.query('SELECT * FROM replenishment_requests WHERE id = $1', [id]);
+    const replenishmentRequest = repReqResult.rows[0];
+    if (!replenishmentRequest) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Replenishment request not found' });
+    }
+
+    // Generate purchase request ID
+    const purchaseRequestId = `PR-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+
+    // Calculate estimated cost (use component's unit cost if available)
+    let estimatedCost = null;
+    const componentResult = await client.query(
+      'SELECT unit_cost FROM components WHERE id = $1',
+      [replenishmentRequest.component_id]
+    );
+    if (componentResult.rows.length > 0) {
+      estimatedCost = Number(componentResult.rows[0].unit_cost || 0) * Number(replenishmentRequest.required_quantity);
+    }
+
+    // Insert into purchase_requests
+    const insertResult = await client.query(
+      `INSERT INTO purchase_requests (
+        id,
+        request_id,
+        component_name,
+        required_quantity,
+        estimated_cost,
+        destination_hub_id,
+        reason,
+        ai_decision_type,
+        ai_decision_confidence,
+        ai_reason,
+        created_by,
+        status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING *`,
+      [
+        crypto.randomUUID(),
+        purchaseRequestId,
+        replenishmentRequest.component_name,
+        Number(replenishmentRequest.required_quantity),
+        estimatedCost,
+        replenishmentRequest.center_id,
+        replenishmentRequest.reason,
+        replenishmentRequest.ai_decision_type,
+        replenishmentRequest.ai_decision_confidence,
+        replenishmentRequest.ai_reason,
+        req.user.id,
+        'PENDING_ADMIN_APPROVAL'
+      ]
+    );
+
+    // Update replenishment request status
+    await client.query(
+      `UPDATE replenishment_requests
+       SET status = 'PURCHASE_REQUEST_GENERATED', updated_at = NOW()
+       WHERE id = $1`,
+      [id]
+    );
+
+    // Notify admins
+    const adminRecipients = await client.query(
+      `SELECT u.id
+       FROM app_users u
+       JOIN profiles p ON p.id = u.id
+       WHERE p.role IN ('system_admin', 'main_admin', 'master_admin')`
+    );
+
+    for (const admin of adminRecipients.rows) {
+      await client.query(
+        `INSERT INTO notifications (
+          user_id, title, message, type, reference_id, reference_type, redirect_url, data
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          admin.id,
+          'New Purchase Request',
+          `${replenishmentRequest.component_name} purchase request generated for ${replenishmentRequest.center_name}.`,
+          'purchase_approval',
+          insertResult.rows[0].id,
+          'purchase',
+          '/purchase-approval-center',
+          JSON.stringify({
+            purchaseRequestId: insertResult.rows[0].id,
+            requestId: purchaseRequestId,
+            replenishmentRequestId: id,
+            componentName: replenishmentRequest.component_name,
+            centerName: replenishmentRequest.center_name
+          })
+        ]
+      );
+    }
+
+    await client.query('COMMIT');
+    return res.status(201).json(insertResult.rows[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Generate purchase request failed:', error);
+    return res.status(500).json({ error: 'Failed to generate purchase request', details: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+// Endpoint to mark AI review as complete (transitions from PENDING_AI_REVIEW → AI_REVIEW_COMPLETE)
+router.patch('/replenishment-requests/:id/complete-ai-review', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await query(
+      `UPDATE replenishment_requests
+       SET status = 'AI_REVIEW_COMPLETE', updated_at = NOW()
+       WHERE id = $1
+       RETURNING *`,
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Replenishment request not found' });
+    }
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Complete AI review failed:', error);
+    return res.status(500).json({ error: 'Failed to complete AI review' });
   }
 });
 

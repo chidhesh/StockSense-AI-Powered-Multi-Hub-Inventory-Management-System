@@ -6,7 +6,7 @@ class ApiService {
   // Run 'ipconfig' (Windows) or 'ifconfig' (Mac/Linux) to find your IPv4 address.
   static const String baseUrl = String.fromEnvironment(
     'BACKEND_URL',
-    defaultValue: 'http://10.20.216.211:8787', // AUTO-DETECTED IP
+    defaultValue: 'http://172.23.142.211', // AUTO-DETECTED IP
   );
 
   static Map<String, String> get headers => {
@@ -24,7 +24,8 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> login(String rollNo, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String rollNo, String password) async {
     final response = await http.post(
       _uri('/api/student/login'),
       headers: headers,
@@ -37,7 +38,8 @@ class ApiService {
     throw Exception(_readError(response));
   }
 
-  static Future<Map<String, dynamic>> register(String rollNo, String password) async {
+  static Future<Map<String, dynamic>> register(
+      String rollNo, String password) async {
     final response = await http.post(
       _uri('/api/student/register'),
       headers: headers,
@@ -50,7 +52,8 @@ class ApiService {
     throw Exception(_readError(response));
   }
 
-  static Future<Map<String, dynamic>> resetPassword(String rollNo, String newPassword) async {
+  static Future<Map<String, dynamic>> resetPassword(
+      String rollNo, String newPassword) async {
     final response = await http.post(
       _uri('/api/student/reset-password'),
       headers: headers,
@@ -97,7 +100,8 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> getVendors(String component) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/api/student/vendors/${Uri.encodeComponent(component)}'),
+      Uri.parse(
+          '$baseUrl/api/student/vendors/${Uri.encodeComponent(component)}'),
       headers: headers,
     );
 

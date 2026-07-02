@@ -30,3 +30,4 @@ if (!useMemoryFallback && DATABASE_URL) {
 
 export const query = (text, params) => pool.query(text, params);
 export default pool;
+export const IS_MEMORY = useMemoryFallback;

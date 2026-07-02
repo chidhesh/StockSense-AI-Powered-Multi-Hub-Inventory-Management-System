@@ -50,8 +50,11 @@ const displayStatusLabels: Record<AssetDisplayStatus, string> = {
 
 export default function Inventory() {
   const { profile, user } = useAuth();
-  const isMaster = profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator';
-  const isInventoryManager = profile?.role === 'center_admin' || (profile?.role?.toLowerCase()?.includes('inventory manager') ?? false);
+  const normalizedRole = profile?.role?.toLowerCase() || '';
+  const isMaster = normalizedRole === 'main_admin' || normalizedRole === 'system_admin' || normalizedRole.includes('master admin') || normalizedRole.includes('system administrator');
+  const isInventoryManager = normalizedRole === 'center_admin' || normalizedRole.includes('inventory manager');
+  // Check for super admin emails
+  const isSuperAdmin = user?.email === 'system@techhub.in' || user?.email === 'admin@techhub.in';
   const location = useLocation();
   const { centerId: initialCenterId, centerName: initialCenterName } = (location.state || {}) as { centerId?: string; centerName?: string };
 
@@ -70,6 +73,7 @@ export default function Inventory() {
   const [qrModal, setQrModal] = useState<{ component: Component; dataUrl: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [requestingReplenishment, setRequestingReplenishment] = useState<string | null>(null);
 
   const [colFilters, setColFilters] = useState({
     name: '',
@@ -92,13 +96,16 @@ export default function Inventory() {
     if (initialCenterId && initialCenterId !== currentCenterId) {
       setCurrentCenterId(initialCenterId);
       setCurrentCenterName(initialCenterName || '');
-    } else if (!initialCenterId && !currentCenterId && !isMaster && profile?.center_id) {
-      setCurrentCenterId(profile.center_id);
-      if (profile.center) {
-        setCurrentCenterName(profile.center.name || '');
+    } else if (!initialCenterId && !currentCenterId) {
+      // If not super admin and is inventory manager, set to their own center
+      if (!isSuperAdmin && isInventoryManager && profile?.center_id) {
+        setCurrentCenterId(profile.center_id);
+        if (profile.center) {
+          setCurrentCenterName(profile.center.name || '');
+        }
       }
     }
-  }, [initialCenterId, initialCenterName, isMaster, profile]);
+  }, [initialCenterId, initialCenterName, isSuperAdmin, isInventoryManager, profile]);
 
   useEffect(() => {
     if (location.state?.filter) {
@@ -118,7 +125,8 @@ export default function Inventory() {
       setComponents(compData);
       setTransactions(txData || []);
 
-      if (profile?.role === 'master_admin' || profile?.role?.toLowerCase() === 'system administrator') {
+      // Fetch centers only for super admins
+      if (isSuperAdmin) {
         const centersData = await apiGet<Center[]>('/api/centers');
         setCenters(centersData);
       } else {
@@ -156,6 +164,28 @@ export default function Inventory() {
     setShowModal(true);
   };
 
+  const handleRequestReplenishment = async (component: Component) => {
+    setRequestingReplenishment(component.id);
+    try {
+      const requiredQuantity = Math.max(
+        1,
+        (component.min_stock_threshold || 10) - component.available_quantity
+      );
+      await apiPost('/api/replenishment-requests', {
+        componentId: component.id,
+        centerId: component.center_id,
+        requiredQuantity,
+        reason: `Low stock: ${component.available_quantity} available, threshold is ${component.min_stock_threshold || 10}`
+      });
+      alert('Replenishment request sent successfully!');
+    } catch (error) {
+      console.error('Error requesting replenishment:', error);
+      alert('Failed to send replenishment request');
+    } finally {
+      setRequestingReplenishment(null);
+    }
+  };
+
   const handleSave = async () => {
     setSaveError('');
     const centerId = form.center_id || profile?.center_id;
@@ -181,28 +211,35 @@ export default function Inventory() {
         editItem?.id ||
         (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `tmp-${Date.now()}`);
       const qrData = generateComponentQRData(qrId, form.name.trim(), centerId);
-      // Calculate available quantity properly
-      const available = editItem 
-        ? editItem.available_quantity // Keep existing available quantity when editing
-        : form.total_quantity; // When creating new, all quantities are available
 
-      const autoStatus: ComponentStatus = form.total_quantity === 0 ? 'out_of_stock'
-        : available <= form.total_quantity * 0.2 ? 'low_stock' : form.status;
-
-      const payload = {
+      // For new components, available quantity equals total quantity
+      // For existing components, backend will calculate available_quantity based on transactions
+      const payload: any = {
         name: form.name.trim(),
         category: form.category,
         description: form.description,
         total_quantity: form.total_quantity,
-        available_quantity: Math.max(0, available),
         max_usage_limit: form.max_usage_limit,
+        usage_count: 0,
         unit_cost: form.unit_cost,
         center_id: centerId,
-        status: autoStatus,
+        status: form.status,
         sku,
         qr_code: editItem?.qr_code || qrData,
-        updated_at: new Date().toISOString(),
+        min_stock_threshold: 5,
+        course_id: null,
+        course_name: null,
+        skill_tags: null,
+        is_shared_component: false,
       };
+
+      // Only set available_quantity for new components
+      if (!editItem) {
+        payload.available_quantity = form.total_quantity;
+        // Set auto status for new components
+        payload.status = form.total_quantity === 0 ? 'out_of_stock'
+          : form.total_quantity <= 5 ? 'low_stock' : form.status;
+      }
 
       console.log('Attempting to save component:', payload);
 
@@ -237,6 +274,8 @@ export default function Inventory() {
   };
 
   const filtered = components.filter(c => {
+    // If not super admin and is inventory manager, only show their own center's inventory
+    if (!isSuperAdmin && isInventoryManager && profile?.center_id && c.center_id !== profile.center_id) return false;
     if (currentCenterId && c.center_id !== currentCenterId) return false;
 
     const matchSearch = (c.name?.toLowerCase() || '').includes(search.toLowerCase()) ||
@@ -265,9 +304,17 @@ export default function Inventory() {
   });
 
   const inventoryTotals = (() => {
-    const scope = currentCenterId
-      ? components.filter(c => c.center_id === currentCenterId)
-      : components;
+    const scope = components.filter(c => {
+      // If not super admin and is inventory manager, only their own center
+      if (!isSuperAdmin && isInventoryManager && profile?.center_id) {
+        return c.center_id === profile.center_id;
+      }
+      // Otherwise, use currentCenterId if set
+      if (currentCenterId) {
+        return c.center_id === currentCenterId;
+      }
+      return true;
+    });
     const totalUnits = scope.reduce((s, c) => s + (c.total_quantity || 0), 0);
     const availableUnits = scope.reduce((s, c) => s + (c.available_quantity || 0), 0);
     const scopeIds = new Set(scope.map(c => c.id));
@@ -305,6 +352,16 @@ export default function Inventory() {
     };
   };
 
+  const getHubStats = (centerId: string) => {
+    const hubComponents = components.filter(c => c.center_id === centerId);
+    const totalUnits = hubComponents.reduce((s, c) => s + (c.total_quantity || 0), 0);
+    const availableUnits = hubComponents.reduce((s, c) => s + (c.available_quantity || 0), 0);
+    const lowStockCount = hubComponents.filter(isLowStockAsset).length;
+    const outOfStockCount = hubComponents.filter(isOutOfStockAsset).length;
+    const componentCount = hubComponents.length;
+    return { totalUnits, availableUnits, lowStockCount, outOfStockCount, componentCount };
+  };
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-slate-900 dark:text-slate-100">
       <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -323,10 +380,16 @@ export default function Inventory() {
             <div className="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
               <Package size={20} className="text-white" />
             </div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Asset Registry</h1>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+              {currentCenterName ? `Inventory - ${currentCenterName}` : 'Inventory Management'}
+            </h1>
           </div>
           <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-            {currentCenterName ? `Managing ${currentCenterName}` : 'All Hubs Overview'} •{' '}
+            {currentCenterName 
+              ? `Managing ${currentCenterName}` 
+              : isMaster 
+                ? 'Select a hub to view its inventory' 
+                : 'All Hubs Overview'} •{' '}
             <span className="text-indigo-600 dark:text-indigo-400">
               {inventoryTotals.assetCount} components • {inventoryTotals.availableUnits} units available • {inventoryTotals.netIssued} issued
             </span>
@@ -334,7 +397,7 @@ export default function Inventory() {
         </div>
         
         <div className="flex items-center gap-3">
-          {isMaster && (
+          {isSuperAdmin && (
             <div className="relative group">
               <select
                 value={currentCenterId}
@@ -346,7 +409,7 @@ export default function Inventory() {
                 }}
                 className="appearance-none pl-10 pr-10 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-black uppercase tracking-widest premium-shadow focus:border-indigo-500/30 transition-all cursor-pointer min-w-[250px] text-slate-900 dark:text-white"
               >
-                <option value="">Global Hub View</option>
+                <option value="">All Hubs</option>
                 {centers.map(c => (
                   <option key={c.id} value={c.id}>{c.name} ({c.location})</option>
                 ))}
@@ -365,44 +428,130 @@ export default function Inventory() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          {
-            label: 'Low Stock',
-            value: inventoryTotals.lowStockCount,
-            sub: 'Needs restock',
-            filter: 'low_stock',
-            color: 'border-amber-200 dark:border-amber-900/40 hover:border-amber-400',
-          },
-          {
-            label: 'Out Of Stock',
-            value: inventoryTotals.outOfStockCount,
-            sub: 'Unavailable now',
-            filter: 'out_of_stock',
-            color: 'border-slate-200 dark:border-slate-700 hover:border-slate-400',
-          },
-          {
-            label: 'Damaged Asset',
-            value: inventoryTotals.damagedAssetCount,
-            sub: `${inventoryTotals.damagedUnits} units logged`,
-            filter: 'damaged',
-            color: 'border-rose-200 dark:border-rose-900/40 hover:border-rose-400',
-          },
-        ].map((stat) => (
-          <button
-            key={stat.label}
-            type="button"
-            onClick={() => setFilterStatus(stat.filter)}
-            className={`glass-card rounded-2xl p-5 border text-left transition-all ${stat.color} ${
-              filterStatus === stat.filter ? 'ring-2 ring-indigo-500/40' : ''
-            }`}
-          >
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-            <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stat.value}</p>
-            <p className="text-[9px] font-bold text-slate-500 uppercase mt-1">{stat.sub}</p>
-          </button>
-        ))}
-      </div>
+      {/* Hub Grid View (for super admins - no center selected) */}
+      {isSuperAdmin && !currentCenterId && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {centers.map(center => {
+              const stats = getHubStats(center.id);
+              return (
+                <div
+                  key={center.id}
+                  onClick={() => {
+                    setCurrentCenterId(center.id);
+                    setCurrentCenterName(center.name);
+                  }}
+                  className="glass-card p-6 cursor-pointer hover:scale-[1.02] transition-all duration-300 group"
+                >
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center border border-indigo-100 dark:border-indigo-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
+                      <Building2 size={24} className="text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1.5">{center.name}</h3>
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        <MapPin size={12} className="text-indigo-500" /> {center.location}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
+                      <p className="text-sm font-black text-slate-900 dark:text-white">{stats.componentCount}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Components</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
+                      <p className="text-sm font-black text-slate-900 dark:text-white">{stats.availableUnits}/{stats.totalUnits}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Available</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {stats.lowStockCount > 0 && (
+                      <div className="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl">
+                        <AlertTriangle size={12} className="text-amber-600 dark:text-amber-400" />
+                        <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase">{stats.lowStockCount} Low Stock</span>
+                      </div>
+                    )}
+                    {stats.outOfStockCount > 0 && (
+                      <div className="flex items-center gap-2 p-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-xl">
+                        <AlertCircle size={12} className="text-rose-600 dark:text-rose-400" />
+                        <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">{stats.outOfStockCount} Out Of Stock</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex justify-end">
+                    <ChevronRight size={16} className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 transition-colors group-hover:translate-x-1" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {centers.length === 0 && (
+            <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-16 text-center">
+              <Building2 size={48} className="mx-auto mb-4 text-slate-300 dark:text-slate-700" />
+              <p className="text-lg font-black text-slate-500 dark:text-slate-400 uppercase">No hubs available</p>
+              <p className="text-sm text-slate-400 mt-1">Add hubs from the Hubs page</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Inventory View (when center is selected OR not super admin) */}
+      {(!isSuperAdmin || currentCenterId) && (
+        <>
+          {isSuperAdmin && currentCenterId && (
+            <button
+              onClick={() => {
+                setCurrentCenterId('');
+                setCurrentCenterName('');
+              }}
+              className="flex items-center gap-2 text-xs font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors"
+            >
+              <ChevronLeft size={16} /> Back to all hubs
+            </button>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              {
+                label: 'Low Stock',
+                value: inventoryTotals.lowStockCount,
+                sub: 'Needs restock',
+                filter: 'low_stock',
+                color: 'border-amber-200 dark:border-amber-900/40 hover:border-amber-400',
+              },
+              {
+                label: 'Out Of Stock',
+                value: inventoryTotals.outOfStockCount,
+                sub: 'Unavailable now',
+                filter: 'out_of_stock',
+                color: 'border-slate-200 dark:border-slate-700 hover:border-slate-400',
+              },
+              {
+                label: 'Damaged Asset',
+                value: inventoryTotals.damagedAssetCount,
+                sub: `${inventoryTotals.damagedUnits} units logged`,
+                filter: 'damaged',
+                color: 'border-rose-200 dark:border-rose-900/40 hover:border-rose-400',
+              },
+            ].map((stat) => (
+              <button
+                key={stat.label}
+                type="button"
+                onClick={() => setFilterStatus(stat.filter)}
+                className={`glass-card rounded-2xl p-5 border text-left transition-all ${stat.color} ${
+                  filterStatus === stat.filter ? 'ring-2 ring-indigo-500/40' : ''
+                }`}
+              >
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{stat.value}</p>
+                <p className="text-[9px] font-bold text-slate-500 uppercase mt-1">{stat.sub}</p>
+              </button>
+            ))}
+          </div>
 
       {/* Glassmorphism Filters */}
       <div className="glass-card p-4 rounded-[32px] premium-shadow border border-white/40 dark:border-slate-800/40">
@@ -635,23 +784,32 @@ export default function Inventory() {
                     )}
                     <td className="px-8 py-6 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500">
-                        <button 
-                          onClick={() => showQR(c)} 
+                        {isInventoryManager && (isLowStockAsset(c) || isOutOfStockAsset(c)) && (
+                          <button
+                            onClick={() => handleRequestReplenishment(c)}
+                            disabled={requestingReplenishment === c.id}
+                            className="px-4 py-3 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all disabled:opacity-50"
+                          >
+                            {requestingReplenishment === c.id ? <Loader2 size={16} className="animate-spin" /> : 'Request Replenishment'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => showQR(c)}
                           className="p-3 bg-white dark:bg-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:border-indigo-100 transition-all"
                           title="View QR Code"
                         >
                           <QrCode size={18} />
                         </button>
-                        <button 
-                          onClick={() => openEdit(c)} 
+                        <button
+                          onClick={() => openEdit(c)}
                           className="p-3 bg-white dark:bg-slate-800 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:border-amber-100 transition-all"
                           title="Edit Asset"
                         >
                           <Edit size={18} />
                         </button>
                         {isMaster && (
-                          <button 
-                            onClick={() => handleDelete(c.id)} 
+                          <button
+                            onClick={() => handleDelete(c.id)}
                             className="p-3 bg-white dark:bg-slate-800 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:border-rose-100 transition-all"
                             title="Decommission Asset"
                           >
@@ -676,6 +834,8 @@ export default function Inventory() {
           </div>
         </div>
       </div>
+        </>
+      )}
 
       {/* Premium Modal for Add/Edit */}
       {showModal && (
